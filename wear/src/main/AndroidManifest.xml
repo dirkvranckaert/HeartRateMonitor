@@ -1,0 +1,28 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="eu.vranckaert.heart.rate.monitor">
+
+    <uses-feature android:name="android.hardware.type.watch"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
+
+    <application android:allowBackup="true"
+                 android:label="@string/app_name"
+                 android:icon="@mipmap/ic_launcher"
+                 android:theme="@android:style/Theme.DeviceDefault.Light"
+                 android:name=".HearRateApplication">
+        <uses-library android:name="com.google.android.wearable" android:required="false" />
+
+        <activity
+            android:name=".HearRateActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <service android:name=".HeartRateMonitorIntentService"/>
+    </application>
+
+</manifest>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.wearable.view.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                              xmlns:tools="http://schemas.android.com/tools"
+                                              xmlns:app="http://schemas.android.com/apk/res-auto"
+                                              android:orientation="vertical"
+                                              android:layout_width="match_parent"
+                                              android:layout_height="match_parent"
+                                              android:background="@android:color/black">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_box="left|right">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/heart_rate"
+            android:textColor="@android:color/white"
+            android:layout_centerInParent="true"
+            android:text="-- BPM"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/diagnostics"
+            android:textColor="@android:color/white"
+            tools:text="DIAGNOSTICS HERE"
+            android:layout_below="@id/heart_rate"
+            android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
+</android.support.wearable.view.BoxInsetLayout>

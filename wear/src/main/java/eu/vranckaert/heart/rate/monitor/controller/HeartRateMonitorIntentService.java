@@ -1,4 +1,4 @@
-package eu.vranckaert.heart.rate.monitor;
+package eu.vranckaert.heart.rate.monitor.controller;
 
 import android.app.IntentService;
 import android.content.Context;

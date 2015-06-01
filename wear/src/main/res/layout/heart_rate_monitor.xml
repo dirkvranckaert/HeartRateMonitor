@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/container">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        tools:text="@string/heart_rate_monitor_title_no_history"
+        android:layout_above="@+id/heart_rate"
+        android:layout_marginBottom="6dp"
+        android:id="@+id/title"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/heart_rate"
+        android:textSize="24dp"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical"
+        android:layout_alignTop="@+id/bpm_label_container"
+        android:layout_alignBottom="@+id/bpm_label_container"
+        android:layout_above="@+id/center_placeholder"
+        tools:text="@string/heart_rate_monitor_empty_heart_beat"
+        tools:visibility="visible"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/bpm_label_container"
+        android:layout_toRightOf="@+id/heart_rate"
+        android:layout_above="@+id/center_placeholder"
+        android:layout_marginLeft="6dp"
+        tools:visibility="visible">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:src="@drawable/heart_rate"
+            android:id="@+id/heart_rate_img"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/heart_rate_monitor_bpm"
+            android:id="@+id/bpm_label"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"
+        android:id="@+id/center_placeholder"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:layout_below="@+id/center_placeholder"
+        android:id="@+id/timestamp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="6dp"
+        tools:text="23/05/2015 10:03"
+        tools:visibility="visible"/>
+
+    <Button
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        tools:text="START"
+        android:textSize="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_below="@id/timestamp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/action"/>
+</RelativeLayout>

@@ -1,4 +1,4 @@
-package eu.vranckaert.heart.rate.monitor;
+package eu.vranckaert.heart.rate.monitor.controller;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
+import eu.vranckaert.heart.rate.monitor.R;
 
 /**
  * Date: 28/05/15
@@ -19,7 +21,7 @@ import android.widget.TextView;
  *
  * @author Dirk Vranckaert
  */
-public class HearRateActivity extends WearableActivity implements SensorEventListener, OnClickListener {
+public class HearRateTestActivity extends WearableActivity implements SensorEventListener, OnClickListener {
     private TextView mHearRate;
     private TextView mDiagnostics;
     private Button mStartStop;
@@ -58,7 +60,7 @@ public class HearRateActivity extends WearableActivity implements SensorEventLis
     }
 
     private void setUpContentView() {
-        setContentView(isAmbient() ? R.layout.heart_rate_ambient : R.layout.heart_rate);
+        setContentView(R.layout.heart_rate_monitor_old);
         mHearRate = (TextView) findViewById(R.id.heart_rate);
         mDiagnostics = (TextView) findViewById(R.id.diagnostics);
         mStartStop = (Button) findViewById(R.id.start_stop);

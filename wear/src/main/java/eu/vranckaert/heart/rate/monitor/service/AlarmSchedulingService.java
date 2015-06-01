@@ -1,10 +1,12 @@
-package eu.vranckaert.heart.rate.monitor;
+package eu.vranckaert.heart.rate.monitor.service;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import eu.vranckaert.heart.rate.monitor.HearRateApplication;
+import eu.vranckaert.heart.rate.monitor.controller.HeartRateMonitorIntentService;
 
 import java.util.Calendar;
 

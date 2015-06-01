@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Hear Rate Monitor</string>
+
+    <string name="heart_rate_unavailable">Your device does not have a heart rate sensor installed.</string>
+    <string name="heart_rate_monitor_title_no_history">Start your first measurement now</string>
+    <string name="heart_rate_monitor_title_recent">Latest Measurement</string>
+    <string name="heart_rate_monitor_bpm">BPM</string>
+    <string name="heart_rate_monitor_title_setup">Detecting...</string>
+    <string name="heart_rate_monitor_title_measuring">Measuring...</string>
+    <string name="heart_rate_monitor_empty_heart_beat">- -</string>
+    <string name="heart_rate_monitor_action_start">Start</string>
+    <string name="heart_rate_monitor_action_stop">Stop</string>
+    <string name="heart_rate_list_empty">You did not yet measure your heart rate so far.</string>
 </resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#50082FE2">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Schedule in 1 min"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/schedule_test"
+        android:layout_above="@+id/heart_rate"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/heart_rate"
+        android:layout_centerInParent="true"
+        android:text="-- BPM"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/diagnostics"
+        android:layout_below="@id/heart_rate"
+        android:layout_centerHorizontal="true"
+        tools:text="DIAGNOSTICS HERE"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="START"
+        android:layout_below="@id/diagnostics"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/start_stop"/>
+</RelativeLayout>

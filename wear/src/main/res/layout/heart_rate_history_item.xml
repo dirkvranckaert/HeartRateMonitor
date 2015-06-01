@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        tools:text="96 BPM"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        android:id="@+id/bpm"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/duration"
+        tools:text="00:20"
+        android:layout_below="@id/bpm"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/bpm"
+        android:id="@+id/date"
+        tools:text="29/05"
+        android:layout_alignParentRight="true"
+        android:gravity="right"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/bpm"
+        tools:text="10:23"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/date"
+        android:id="@+id/time"
+        android:gravity="right"/>
+</RelativeLayout>

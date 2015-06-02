@@ -9,9 +9,11 @@ import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
-import eu.vranckaert.heart.rate.monitor.Measurement;
+import eu.vranckaert.heart.rate.monitor.UserPreferences;
+import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.task.ActivitySetupTask;
 import eu.vranckaert.heart.rate.monitor.view.AbstractViewHolder;
-import eu.vranckaert.heart.rate.monitor.view.HearRateHistoryView;
+import eu.vranckaert.heart.rate.monitor.view.HeartRateHistoryView;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateMonitorView;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateUnavailableView;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateView;
@@ -38,15 +40,15 @@ public class HearRateActivity extends WearableActivity implements SensorEventLis
     private List<Float> mMeasuredValues = new ArrayList<>();
 
     private HeartRateMonitorView mMonitorView;
-    private HearRateHistoryView mHistoryView;
+    private HeartRateHistoryView mHistoryView;
     private boolean mInputLocked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (getSystemService(Context.SENSOR_SERVICE) != null) {
+        if (getSystemService(Context.SENSOR_SERVICE) != null) {
             mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-//            if (mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE) != null) {
+            if (mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE) != null) {
                 mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
 
                 setAmbientEnabled();
@@ -54,12 +56,18 @@ public class HearRateActivity extends WearableActivity implements SensorEventLis
                     mView = new HeartRateView(this, this);
                 }
                 setContentView(mView.getView());
-//            } else {
-//                heartRateSensorNotSupported();
-//            }
-//        } else {
-//            heartRateSensorNotSupported();
-//        }
+
+                if (!UserPreferences.getInstance().hasRunBefore()) {
+                    UserPreferences.getInstance().setHasRunBefore();
+                    new ActivitySetupTask().execute();
+                    SetupBroadcastReceiver.setupMeasuring(this);
+                }
+            } else {
+                heartRateSensorNotSupported();
+            }
+        } else {
+            heartRateSensorNotSupported();
+        }
     }
 
     private void heartRateSensorNotSupported() {
@@ -91,11 +99,6 @@ public class HearRateActivity extends WearableActivity implements SensorEventLis
     @Override
     public void onSensorChanged(SensorEvent event) {
         Log.d("dirk", "onSensorChanged");
-        Log.d("dirk", "event.sensor.getType() = " + event.sensor.getType());
-        Log.d("dirk", "event.sensor.getStringType() = " + event.sensor.getStringType());
-        Log.d("dirk", "event.sensor.getName() = " + event.sensor.getName());
-        Log.d("dirk", "event.sensor.getVendor() = " + event.sensor.getVendor());
-        Log.d("dirk", "event.values.length = " + event.values.length);
         for (int i = 0; i < event.values.length; i++) {
             float value = event.values[i];
             Log.d("dirk", "event.values[i] = " + value);
@@ -145,7 +148,7 @@ public class HearRateActivity extends WearableActivity implements SensorEventLis
             measurement.setAverageHeartBeat(averageHeartBeat);
             measurement.setStartMeasurement(mStartTimeMeasurement);
             measurement.setEndMeasurement(new Date().getTime());
-            // TODO store measured data...
+            UserPreferences.getInstance().addMeasurement(measurement);
         }
     }
 
@@ -154,7 +157,7 @@ public class HearRateActivity extends WearableActivity implements SensorEventLis
         Log.d("dirk", "mMeasuredValues.size=" + mMeasuredValues.size());
 
         float sum = 0f;
-        for (int i=0; i<mMeasuredValues.size(); i++) {
+        for (int i = 0; i < mMeasuredValues.size(); i++) {
             float measuredValue = mMeasuredValues.get(i);
             sum += measuredValue;
         }
@@ -167,8 +170,8 @@ public class HearRateActivity extends WearableActivity implements SensorEventLis
     public void onHearRateViewCreated(AbstractViewHolder view) {
         if (view instanceof HeartRateMonitorView) {
             mMonitorView = (HeartRateMonitorView) view;
-        } else if (view instanceof HearRateHistoryView) {
-            mHistoryView = (HearRateHistoryView) view;
+        } else if (view instanceof HeartRateHistoryView) {
+            mHistoryView = (HeartRateHistoryView) view;
         }
 
         if (mMonitorView != null && mHistoryView != null) {
@@ -177,19 +180,9 @@ public class HearRateActivity extends WearableActivity implements SensorEventLis
     }
 
     private void loadHistoricalData() {
-        // TODO TEMP
-        if (!mMeasuredValues.isEmpty()) {
-            final float averageHeartBeat = calculateAverageHeartBeat();
-            Measurement measurement = new Measurement();
-            measurement.setAverageHeartBeat(averageHeartBeat);
-            measurement.setStartMeasurement(mStartTimeMeasurement);
-            measurement.setEndMeasurement(new Date().getTime());
-            mMonitorView.setLatestMeasurement(measurement);
-        } else {
-            mMonitorView.setLatestMeasurement(null);
-        }
-
-        mHistoryView.setMeasurements(null);
+        Measurement latestMeasurement = UserPreferences.getInstance().getLatestMeasurment();
+        mMonitorView.setLatestMeasurement(latestMeasurement);
+        mHistoryView.setMeasurements(UserPreferences.getInstance().getAllMeasurements());
     }
 
     @Override

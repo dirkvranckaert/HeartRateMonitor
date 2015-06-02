@@ -2,6 +2,7 @@ package eu.vranckaert.heart.rate.monitor.view;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -17,12 +18,11 @@ import eu.vranckaert.heart.rate.monitor.util.MetricHelper;
  *
  * @author Dirk Vranckaert
  */
-public abstract class AbstractViewHolder {
+public abstract class AbstractViewHolder extends ViewHolder {
     protected static final int VISIBLE = View.VISIBLE;
     protected static final int GONE = View.GONE;
     protected static final int INVISIBLE = View.INVISIBLE;
     protected static final int OVER_SCROLL_NEVER = View.OVER_SCROLL_NEVER;
-    protected final View view;
 
     /**
      * Default constructor
@@ -48,21 +48,21 @@ public abstract class AbstractViewHolder {
 
     public AbstractViewHolder(LayoutInflater inflater, ViewGroup parent,
                               int layoutResource) {
-        view = inflater.inflate(layoutResource, parent, false);
-        view.setTag(this);
+        super(inflater.inflate(layoutResource, parent, false));
+        itemView.setTag(this);
     }
 
     @SuppressWarnings("unchecked")
     protected <T extends View> T findViewById(int id) {
-        return (T) view.findViewById(id);
+        return (T) itemView.findViewById(id);
     }
 
     public Context getContext() {
-        return view.getContext();
+        return itemView.getContext();
     }
 
     protected Resources getResources() {
-        return view.getResources();
+        return itemView.getResources();
     }
 
     protected String getString(int id) {
@@ -82,7 +82,7 @@ public abstract class AbstractViewHolder {
     }
 
     public View getView() {
-        return view;
+        return itemView;
     }
 
     protected int toDp(int i) {
@@ -102,7 +102,7 @@ public abstract class AbstractViewHolder {
     }
 
     public void post(Runnable runnable) {
-        view.post(runnable);
+        itemView.post(runnable);
     }
 
     protected void applyTextColorSpan(TextView view, String text, String search, int color) {

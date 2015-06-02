@@ -12,8 +12,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
+import eu.vranckaert.heart.rate.monitor.task.ActivitySetupTask;
 import eu.vranckaert.heart.rate.monitor.R;
+import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
 
 /**
  * Date: 28/05/15
@@ -75,16 +76,14 @@ public class HearRateTestActivity extends WearableActivity implements SensorEven
         if (findViewById(R.id.schedule_test) != null) {
             findViewById(R.id.schedule_test).setOnClickListener(this);
         }
+        if (findViewById(R.id.activity_test) != null) {
+            findViewById(R.id.activity_test).setOnClickListener(this);
+        }
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         Log.d("dirk", "onSensorChanged");
-        Log.d("dirk", "event.sensor.getType() = " + event.sensor.getType());
-        Log.d("dirk", "event.sensor.getStringType() = " + event.sensor.getStringType());
-        Log.d("dirk", "event.sensor.getName() = " + event.sensor.getName());
-        Log.d("dirk", "event.sensor.getVendor() = " + event.sensor.getVendor());
-        Log.d("dirk", "event.values.length = " + event.values.length);
         for (int i = 0; i < event.values.length; i++) {
             float value = event.values[i];
             Log.d("dirk", "event.values[i] = " + value);
@@ -119,6 +118,8 @@ public class HearRateTestActivity extends WearableActivity implements SensorEven
             }
         } else if (v.getId() == R.id.schedule_test) {
             AlarmSchedulingService.getInstance().scheduleHeartRateMonitorInXMillis(30000);
+        } else if (v.getId() == R.id.activity_test) {
+            new ActivitySetupTask().execute();
         }
     }
 

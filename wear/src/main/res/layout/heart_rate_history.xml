@@ -3,8 +3,7 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:orientation="vertical"
              android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:background="#50082FE2">
+             android:layout_height="match_parent">
 
     <TextView
         android:layout_width="wrap_content"
@@ -14,7 +13,7 @@
         android:text="@string/heart_rate_list_empty"
         android:id="@+id/empty"/>
 
-    <ListView
+    <eu.vranckaert.heart.rate.monitor.widget.GreedyRecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/list"/>

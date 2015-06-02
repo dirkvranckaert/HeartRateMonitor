@@ -11,7 +11,25 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        debug {
+            storeFile file('../keystore/debug.keystore')
+        }
+        release {
+            storeFile file('../keystore/dvr-android.keystore')
+            storePassword System.getenv("storepwd")
+            keyAlias System.getenv("keyalias")
+            keyPassword System.getenv("keypwd")
+        }
+    }
+
     buildTypes {
+        debug {
+            versionNameSuffix " - DEBUG"
+            applicationIdSuffix ".debug"
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -22,5 +40,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     wearApp project(':wear')
+    compile project(':shared')
     compile 'com.google.android.gms:play-services:+'
+    compile 'com.google.android.gms:play-services-location:+'
 }

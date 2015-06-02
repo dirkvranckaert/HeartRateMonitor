@@ -18,7 +18,7 @@ public class HeartRateAdapter extends GridPagerAdapter {
     private final HeartRateListener mListener;
 
     private HeartRateMonitorView mMonitorView;
-    private HearRateHistoryView mHistoryView;
+    private HeartRateHistoryView mHistoryView;
 
     public HeartRateAdapter(Context context, HeartRateListener listener) {
         mLayoutInflater = LayoutInflater.from(context);
@@ -46,7 +46,7 @@ public class HeartRateAdapter extends GridPagerAdapter {
             view = mMonitorView;
         } else if (column == 1) {
             if (mHistoryView == null) {
-                mHistoryView = new HearRateHistoryView(mLayoutInflater, viewGroup, mListener);
+                mHistoryView = new HeartRateHistoryView(mLayoutInflater, viewGroup, mListener);
             }
             view = mHistoryView;
         }

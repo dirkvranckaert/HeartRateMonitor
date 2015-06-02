@@ -2,15 +2,25 @@
           package="eu.vranckaert.heart.rate.monitor">
 
     <uses-feature android:name="android.hardware.type.watch"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.BODY_SENSORS" />
 
-    <application android:allowBackup="true"
-                 android:label="@string/app_name"
-                 android:icon="@mipmap/ic_launcher"
-                 android:theme="@android:style/Theme.DeviceDefault.Light"
-                 android:name=".HearRateApplication">
-        <uses-library android:name="com.google.android.wearable" android:required="false" />
+    <!-- Broadcast Receivers -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+    <!-- Ambient Mode -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <!-- Heart Rate -->
+    <uses-permission android:name="android.permission.BODY_SENSORS"/>
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@android:style/Theme.DeviceDefault.Light"
+        android:name=".HearRateApplication">
+        <uses-library
+            android:name="com.google.android.wearable"
+            android:required="false"/>
 
         <activity
             android:name=".controller.HearRateActivity"
@@ -32,7 +42,23 @@
             </intent-filter>
         </activity>
 
+        <receiver
+            android:name=".controller.SetupBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+            </intent-filter>
+        </receiver>
+
         <service android:name=".controller.HeartRateMonitorIntentService"/>
+
+        <service android:name=".controller.HearRateMonitorWearableListenerService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

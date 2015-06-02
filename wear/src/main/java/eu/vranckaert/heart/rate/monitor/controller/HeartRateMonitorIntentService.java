@@ -3,12 +3,19 @@ package eu.vranckaert.heart.rate.monitor.controller;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.BatteryManager;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.util.Log;
 import android.widget.Toast;
+import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.HearRateApplication;
+import eu.vranckaert.heart.rate.monitor.UserPreferences;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -42,10 +49,22 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
             mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             if (mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE) != null) {
                 mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
-
-                startHearRateMonitor();
+                if (!isCharging()) {
+                    startHearRateMonitor();
+                } else {
+                    Log.d("dirk-background", "Will not start heart rate monitoring as device is currently charging");
+                }
             }
         }
+    }
+
+    private boolean isCharging() {
+        boolean isCharging;
+        Intent intent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+        isCharging = plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB ||
+                plugged == BatteryManager.BATTERY_PLUGGED_WIRELESS;
+        return isCharging;
     }
 
     private void checkDuration() {
@@ -61,23 +80,30 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
             long currentTime = new Date().getTime();
             if (currentTime >= mEndTime) {
                 stopHearRateMonitor();
-                calculateAverageHeartBeat();
+                float heartBeat = calculateAverageHeartBeat();
+                Measurement measurement = new Measurement();
+                measurement.setAverageHeartBeat(heartBeat);
+                measurement.setStartMeasurement(mStarTime);
+                measurement.setEndMeasurement(currentTime);
+                UserPreferences.getInstance().addMeasurement(measurement);
+
+                // TODO notify UI to be updated if visible right now...
             }
         }
     }
 
-    private void calculateAverageHeartBeat() {
+    private float calculateAverageHeartBeat() {
         Log.d("dirk-background", "calculateAverageHeartBeat");
         Log.d("dirk-background", "mMeasuredValues.size=" + mMeasuredValues.size());
 
         float sum = 0f;
-        for (int i=0; i<mMeasuredValues.size(); i++) {
+        for (int i = 0; i < mMeasuredValues.size(); i++) {
             float measuredValue = mMeasuredValues.get(i);
             sum += measuredValue;
         }
         float averageHearBeat = sum / mMeasuredValues.size();
         Log.d("dirk-background", "averageHearBeat=" + averageHearBeat);
-        Toast.makeText(HeartRateMonitorIntentService.this, "averageHearBeat=" + averageHearBeat, Toast.LENGTH_LONG).show();
+        return averageHearBeat;
     }
 
     private void startHearRateMonitor() {
@@ -94,14 +120,9 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
     @Override
     public void onSensorChanged(SensorEvent event) {
         Log.d("dirk-background", "onSensorChanged");
-        Log.d("dirk-background", "event.sensor.getType() = " + event.sensor.getType());
-        Log.d("dirk-background", "event.sensor.getStringType() = " + event.sensor.getStringType());
-        Log.d("dirk-background", "event.sensor.getName() = " + event.sensor.getName());
-        Log.d("dirk-background", "event.sensor.getVendor() = " + event.sensor.getVendor());
-        Log.d("dirk-background", "event.values.length = " + event.values.length);
         for (int i = 0; i < event.values.length; i++) {
             float value = event.values[i];
-            Log.d("dirk-background", "event.values[i] = " + value);
+            Log.d("dirk-background", "event.values[" + i + "] = " + value);
         }
 
         if (event.values.length > 0 && (event.values[event.values.length - 1] > 0 || mMeasuring)) {

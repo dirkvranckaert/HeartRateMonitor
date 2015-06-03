@@ -43,4 +43,11 @@
         android:layout_below="@+id/date"
         android:id="@+id/time"
         android:gravity="right"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/activity"
+        tools:text="Walking"
+        android:layout_below="@+id/time"/>
 </RelativeLayout>

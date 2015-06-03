@@ -3,6 +3,7 @@ package eu.vranckaert.heart.rate.monitor.view;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.util.DateUtil;
@@ -21,6 +22,7 @@ public class HeartRateHistoryItemView extends AbstractViewHolder {
     private final TextView mDuration;
     private final TextView mDate;
     private final TextView mTime;
+    private final TextView mActivity;
 
     int mOriginalPaddingTop = -1;
     int mOriginalPaddingBottom = -1;
@@ -32,6 +34,7 @@ public class HeartRateHistoryItemView extends AbstractViewHolder {
         mDuration = findViewById(R.id.duration);
         mDate = findViewById(R.id.date);
         mTime = findViewById(R.id.time);
+        mActivity = findViewById(R.id.activity);
     }
 
     public void setMeasurement(Measurement measurement) {
@@ -49,6 +52,33 @@ public class HeartRateHistoryItemView extends AbstractViewHolder {
         }
         durationText += "" + minutes;
         mDuration.setText(durationText);
+
+        switch (measurement.getActivity()) {
+            case ActivityState.IN_VEHICLE:
+                mActivity.setText(R.string.heart_rate_history_activity_vehicle);
+                break;
+            case ActivityState.WALKING:
+                mActivity.setText(R.string.heart_rate_history_activity_walking);
+                break;
+            case ActivityState.ON_FOOT:
+                mActivity.setText(R.string.heart_rate_history_activity_on_foot);
+                break;
+            case ActivityState.ON_BICYCLE:
+                mActivity.setText(R.string.heart_rate_history_activity_bicycle);
+                break;
+            case ActivityState.RUNNING:
+                mActivity.setText(R.string.heart_rate_history_activity_running);
+                break;
+            case ActivityState.STILL:
+                mActivity.setText(R.string.heart_rate_history_activity_still);
+                break;
+            case ActivityState.TILTING:
+                mActivity.setText(R.string.heart_rate_history_activity_tilting);
+                break;
+            case ActivityState.UNKNOWN:
+                mActivity.setText(R.string.heart_rate_history_activity_unknown);
+                break;
+        }
     }
 
     public void setPaddingTop(int paddingTop) {

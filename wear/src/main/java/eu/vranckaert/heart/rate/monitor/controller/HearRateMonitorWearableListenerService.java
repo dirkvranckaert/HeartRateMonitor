@@ -25,6 +25,7 @@ public class HearRateMonitorWearableListenerService extends WearableListenerServ
         Log.d("dirk", "Message received on " + path);
 
         if (path.startsWith(WearURL.URL_ACTIVITY_MONITORING_RESULT)) {
+            Log.d("dirk", "Activity monitoring update");
             int currentActivity = Integer.parseInt(path.replace(WearURL.URL_ACTIVITY_MONITORING_RESULT, ""));
 
             boolean useActivity = true;
@@ -34,13 +35,16 @@ public class HearRateMonitorWearableListenerService extends WearableListenerServ
                     useActivity = false;
             }
 
+            Log.d("dirk", "Activity found is " + currentActivity + ", will ignore this activity? " + !useActivity);
             if (useActivity) {
                 int previousActivity = UserPreferences.getInstance().getLatestActivity();
-                if (currentActivity != previousActivity) {
-                    UserPreferences.getInstance().storeLatestActivity(currentActivity);
-                } else {
+                UserPreferences.getInstance().storeLatestActivity(currentActivity);
+                Log.d("dirk", "Activity is same as previous activity, so possible a trusted activity");
+                if (currentActivity == previousActivity) {
+                    int previousActivityCount = UserPreferences.getInstance().getLatestActivityCount();
                     int acceptedActivity = UserPreferences.getInstance().getAcceptedActivity();
-                    if (acceptedActivity != currentActivity) {
+                    Log.d("dirk", "Activity has been seen now for " + previousActivityCount + " times and the currentActivity is different from the acceptedActivity? " + (acceptedActivity != currentActivity));
+                    if (previousActivityCount >= ActivityState.TRUSTED_COUNT && acceptedActivity != currentActivity) {
                         UserPreferences.getInstance().setAcceptedActivity(currentActivity);
                         test(currentActivity); // TODO remove the notification test block, it's only for testing!
                         if (ActivityState.getMeasuringIntervalForActivity(acceptedActivity) != ActivityState.getMeasuringIntervalForActivity(currentActivity)) {

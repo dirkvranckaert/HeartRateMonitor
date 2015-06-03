@@ -15,6 +15,7 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 import eu.vranckaert.hear.rate.monitor.shared.WearURL;
+import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.heart.rate.monitor.controller.ActivityRecognitionIntentService;
 
 import java.util.List;
@@ -97,7 +98,7 @@ public class BusinessService {
 
         PendingResult<Status> pendingResult = ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
                 getActivityRecognitionApiClient(),
-                0,
+                ActivityState.DETECTION_INTERVAL,
                 pendingIntent
         );
         Status status = pendingResult.await();

@@ -21,6 +21,7 @@ import java.util.List;
 public class UserPreferences {
     private static final String KEY_HAS_RUN_BEFORE = "has_run_before";
     private static final String KEY_LATEST_ACTIVITY = "latest_activity";
+    private static final String KEY_LATEST_ACTIVITY_COUNT = "latest_activity_count";
     private static final String KEY_ACCEPTED_ACTIVITY = "accepted_activity";
     private static final String KEY_ALL_MEASUREMENTS = "all_measurements";
     private static final String KEY_LATEST_MEASUREMENTS = "latest_measurements";
@@ -52,12 +53,25 @@ public class UserPreferences {
     }
 
     public void storeLatestActivity(int activityState) {
+        int previousActivity = getLatestActivity();
+        int count;
+        if (previousActivity == activityState) {
+            count = getLatestActivityCount() + 1;
+        } else {
+            count = 1;
+        }
+        Log.d("dirk", "Storing activity (" + activityState + ") and count (" + count + ")");
+        mEditor.putInt(KEY_LATEST_ACTIVITY_COUNT, count);
         mEditor.putInt(KEY_LATEST_ACTIVITY, activityState);
         mEditor.commit();
     }
 
     public int getLatestActivity() {
         return mSharedPreferences.getInt(KEY_LATEST_ACTIVITY, ActivityState.STILL);
+    }
+
+    public int getLatestActivityCount() {
+        return mSharedPreferences.getInt(KEY_LATEST_ACTIVITY_COUNT, 0);
     }
 
     public void setAcceptedActivity(int activityState) {

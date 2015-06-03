@@ -10,6 +10,8 @@ import eu.vranckaert.hear.rate.monitor.shared.DateUtil;
  */
 public class ActivityState {
     public static final long DEFAULT_MEASURING_INTERVAL = DateUtil.convertMinutesToMillis(15);
+    public static final long DETECTION_INTERVAL = 10000; // 10 seconds
+    public static final int TRUSTED_COUNT = 6; // TRUSTED_COUNT * DETECTION_INTERVAL = time before an activity is accepted. So 6 * 10000 = 60000 millis or 60 seconds or 1 minute before we accept that a user is running/bicycling/driving/still/...
 
     public static final int IN_VEHICLE = 0;
     public static final int ON_BICYCLE = 1;

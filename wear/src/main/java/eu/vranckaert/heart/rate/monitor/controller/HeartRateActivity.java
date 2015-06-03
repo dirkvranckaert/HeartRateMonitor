@@ -12,6 +12,7 @@ import android.view.View;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.task.ActivitySetupTask;
+import eu.vranckaert.heart.rate.monitor.util.DeviceUtil;
 import eu.vranckaert.heart.rate.monitor.view.AbstractViewHolder;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateHistoryView;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateMonitorView;
@@ -42,6 +43,10 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     private HeartRateMonitorView mMonitorView;
     private HeartRateHistoryView mHistoryView;
     private boolean mInputLocked;
+
+    // TODO start using the maximum heart rate (MHR): http://www.calculatenow.biz/sport/heart.php?age=28&submit=Calculate+MHR#mhr
+    // This is based on the users age (below 30 or above 30). If average measured heart beat is significantly higher than
+    // the MHR we could notify the user
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +109,13 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
             Log.d("dirk", "event.values[i] = " + value);
         }
 
+        if (DeviceUtil.isCharging()) {
+            // TODO show message to the user somehow that while charging the heart rate cannot be measured...
+            mMeasuredValues.clear();
+            stopHearRateMonitor();
+            loadHistoricalData();
+            return;
+        }
         if (event.values.length > 0) {
             float value = event.values[event.values.length - 1];
             if (mFirstValueFound || value > 0f) {

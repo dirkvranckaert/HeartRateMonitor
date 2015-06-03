@@ -12,6 +12,7 @@ import android.os.BatteryManager;
 import android.util.Log;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
+import eu.vranckaert.heart.rate.monitor.util.DeviceUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,22 +46,13 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
             mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             if (mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE) != null) {
                 mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
-                if (!isCharging()) {
+                if (!DeviceUtil.isCharging()) {
                     startHearRateMonitor();
                 } else {
                     Log.d("dirk-background", "Will not start heart rate monitoring as device is currently charging");
                 }
             }
         }
-    }
-
-    private boolean isCharging() {
-        boolean isCharging;
-        Intent intent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-        isCharging = plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB ||
-                plugged == BatteryManager.BATTERY_PLUGGED_WIRELESS;
-        return isCharging;
     }
 
     private void checkDuration() {

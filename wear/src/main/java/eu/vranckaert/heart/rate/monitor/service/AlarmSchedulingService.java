@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.util.Log;
 import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.heart.rate.monitor.HearRateApplication;
-import eu.vranckaert.heart.rate.monitor.UserPreferences;
+import eu.vranckaert.heart.rate.monitor.WearHeartRateApplication;
+import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.controller.HeartRateMonitorIntentService;
 import eu.vranckaert.heart.rate.monitor.util.DateUtil;
 
@@ -36,12 +36,12 @@ public class AlarmSchedulingService {
     }
 
     private static AlarmManager getAlarmManager() {
-        return (AlarmManager) HearRateApplication.getInstance().getApplicationContext().getSystemService(
+        return (AlarmManager) WearHeartRateApplication.getInstance().getApplicationContext().getSystemService(
                 Context.ALARM_SERVICE);
     }
 
     private PendingIntent getHeartRateMonitorIntent(int requestCode) {
-        Context context = HearRateApplication.getInstance().getApplicationContext();
+        Context context = WearHeartRateApplication.getInstance().getApplicationContext();
         Intent intent = new Intent(context, HeartRateMonitorIntentService.class);
         PendingIntent operation = PendingIntent.getService(context, requestCode, intent, 0);
         return operation;
@@ -64,12 +64,12 @@ public class AlarmSchedulingService {
         getAlarmManager().cancel(getHeartRateMonitorIntent(REQUEST_CODE_ONE_TIME_HEART_RATE_MEASUREMENT));
         getAlarmManager().cancel(getHeartRateMonitorIntent(REQUEST_CODE_REPEATING_HEART_RATE_MEASUREMENT));
         
-        int activityState = UserPreferences.getInstance().getAcceptedActivity();
+        int activityState = WearUserPreferences.getInstance().getAcceptedActivity();
         long interval = ActivityState.getMeasuringIntervalForActivity(activityState);
         Log.d("dirk", "interval is " + interval + " millis for activityState " + activityState);
         boolean defaultInterval = interval == ActivityState.DEFAULT_MEASURING_INTERVAL;
         Log.d("dirk", "interval is default interval?" + defaultInterval);
-        Measurement latestMeasurement = UserPreferences.getInstance().getLatestMeasurment();
+        Measurement latestMeasurement = WearUserPreferences.getInstance().getLatestMeasurment();
         long currentTime = new Date().getTime();
         long nextExecution = -1;
         if (latestMeasurement != null) {

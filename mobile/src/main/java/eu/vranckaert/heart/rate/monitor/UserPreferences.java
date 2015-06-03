@@ -19,7 +19,7 @@ public class UserPreferences {
     private final Editor mEditor;
     
     private UserPreferences() {
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(HearRateApplication.getContext());
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(HeartRateApplication.getContext());
         mEditor = mSharedPreferences.edit();
     }
     

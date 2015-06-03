@@ -17,14 +17,14 @@ import java.util.List;
  *
  * @author Dirk Vranckaert
  */
-public class BusinessService {
-    private static BusinessService INSTANCE;
+public class WearBusinessService {
+    private static WearBusinessService INSTANCE;
 
     private GoogleApiClient mGoogleApiClient;
 
-    public static BusinessService getInstance() {
+    public static WearBusinessService getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new BusinessService();
+            INSTANCE = new WearBusinessService();
         }
 
         return INSTANCE;
@@ -32,7 +32,7 @@ public class BusinessService {
 
     private GoogleApiClient getGoogleApiClient() {
         if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
-            mGoogleApiClient = new GoogleApiClient.Builder(HearRateApplication.getContext())
+            mGoogleApiClient = new GoogleApiClient.Builder(WearHeartRateApplication.getContext())
                     .addApi(Wearable.API)
                     .build();
             ConnectionResult connectionResult = mGoogleApiClient.blockingConnect();

@@ -9,13 +9,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.BatteryManager;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.util.Log;
-import android.widget.Toast;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.heart.rate.monitor.HearRateApplication;
-import eu.vranckaert.heart.rate.monitor.UserPreferences;
+import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -85,7 +81,7 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
                 measurement.setAverageHeartBeat(heartBeat);
                 measurement.setStartMeasurement(mStarTime);
                 measurement.setEndMeasurement(currentTime);
-                UserPreferences.getInstance().addMeasurement(measurement);
+                WearUserPreferences.getInstance().addMeasurement(measurement);
 
                 // TODO notify UI to be updated if visible right now...
             }

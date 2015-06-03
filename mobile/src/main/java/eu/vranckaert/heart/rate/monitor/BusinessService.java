@@ -10,7 +10,6 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.ActivityRecognition;
-import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
@@ -42,7 +41,7 @@ public class BusinessService {
     private GoogleApiClient getActivityRecognitionApiClient() {
         if (mActivityRecognitionApiClient == null || !mActivityRecognitionApiClient.isConnected()){
             Log.d("dirk-background", "No mActivityRecognitionApiClient or not connected anymore");
-            GoogleApiClient googleApiClient = new GoogleApiClient.Builder(HearRateApplication.getContext())
+            GoogleApiClient googleApiClient = new GoogleApiClient.Builder(HeartRateApplication.getContext())
                     .addApi(ActivityRecognition.API)
                     .addConnectionCallbacks(new ConnectionCallbacks() {
                         @Override
@@ -74,7 +73,7 @@ public class BusinessService {
 
     private GoogleApiClient getWearableGoogleApiClient() {
         if (mWearableGoogleApiClient == null || !mWearableGoogleApiClient.isConnected()) {
-            mWearableGoogleApiClient = new GoogleApiClient.Builder(HearRateApplication.getContext())
+            mWearableGoogleApiClient = new GoogleApiClient.Builder(HeartRateApplication.getContext())
                     .addApi(Wearable.API)
                     .build();
             ConnectionResult connectionResult = mWearableGoogleApiClient.blockingConnect();
@@ -93,8 +92,8 @@ public class BusinessService {
     }
 
     public void connectActivityRecognitionApiClient() {
-        Intent intent = new Intent(HearRateApplication.getContext(), ActivityRecognitionIntentService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(HearRateApplication.getContext(), 0, intent, 0);
+        Intent intent = new Intent(HeartRateApplication.getContext(), ActivityRecognitionIntentService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(HeartRateApplication.getContext(), 0, intent, 0);
 
         PendingResult<Status> pendingResult = ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
                 getActivityRecognitionApiClient(),

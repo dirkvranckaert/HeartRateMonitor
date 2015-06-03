@@ -1,7 +1,7 @@
 package eu.vranckaert.heart.rate.monitor.task;
 
 import android.os.AsyncTask;
-import eu.vranckaert.heart.rate.monitor.BusinessService;
+import eu.vranckaert.heart.rate.monitor.WearBusinessService;
 
 /**
  * Date: 01/06/15
@@ -12,7 +12,7 @@ import eu.vranckaert.heart.rate.monitor.BusinessService;
 public class ActivitySetupTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
-        BusinessService.getInstance().requestActivityUpdates();
+        WearBusinessService.getInstance().requestActivityUpdates();
         return null;
     }
 }

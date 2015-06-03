@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
-import eu.vranckaert.heart.rate.monitor.UserPreferences;
+import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
 
 /**
@@ -20,8 +20,8 @@ public class SetupBroadcastReceiver extends BroadcastReceiver {
     }
 
     public static void setupMeasuring(Context context) {
-        UserPreferences.getInstance().storeLatestActivity(ActivityState.STILL);
-        UserPreferences.getInstance().setAcceptedActivity(ActivityState.STILL);
+        WearUserPreferences.getInstance().storeLatestActivity(ActivityState.STILL);
+        WearUserPreferences.getInstance().setAcceptedActivity(ActivityState.STILL);
         AlarmSchedulingService.getInstance().rescheduleHeartRateMeasuringAlarms();
     }
 }

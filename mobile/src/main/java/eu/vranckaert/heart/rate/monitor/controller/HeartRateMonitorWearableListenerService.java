@@ -12,7 +12,7 @@ import eu.vranckaert.heart.rate.monitor.task.ActivityRecognitionTask;
  *
  * @author Dirk Vranckaert
  */
-public class HearRateMonitorWearableListenerService extends WearableListenerService {
+public class HeartRateMonitorWearableListenerService extends WearableListenerService {
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         String path = messageEvent.getPath();

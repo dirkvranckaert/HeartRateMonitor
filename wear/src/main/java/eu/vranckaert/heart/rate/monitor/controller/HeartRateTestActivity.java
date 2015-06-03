@@ -22,7 +22,7 @@ import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
  *
  * @author Dirk Vranckaert
  */
-public class HearRateTestActivity extends WearableActivity implements SensorEventListener, OnClickListener {
+public class HeartRateTestActivity extends WearableActivity implements SensorEventListener, OnClickListener {
     private TextView mHearRate;
     private TextView mDiagnostics;
     private Button mStartStop;

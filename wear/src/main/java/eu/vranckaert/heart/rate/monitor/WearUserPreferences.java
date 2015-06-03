@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.List;
  *
  * @author Dirk Vranckaert
  */
-public class UserPreferences {
+public class WearUserPreferences {
     private static final String KEY_HAS_RUN_BEFORE = "has_run_before";
     private static final String KEY_LATEST_ACTIVITY = "latest_activity";
     private static final String KEY_LATEST_ACTIVITY_COUNT = "latest_activity_count";
@@ -26,19 +25,19 @@ public class UserPreferences {
     private static final String KEY_ALL_MEASUREMENTS = "all_measurements";
     private static final String KEY_LATEST_MEASUREMENTS = "latest_measurements";
 
-    private static UserPreferences INSTANCE;
+    private static WearUserPreferences INSTANCE;
     
     private final SharedPreferences mSharedPreferences;
     private final Editor mEditor;
     
-    private UserPreferences() {
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(HearRateApplication.getContext());
+    private WearUserPreferences() {
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(WearHeartRateApplication.getContext());
         mEditor = mSharedPreferences.edit();
     }
     
-    public static UserPreferences getInstance() {
+    public static WearUserPreferences getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new UserPreferences();
+            INSTANCE = new WearUserPreferences();
         }
         return INSTANCE;
     }

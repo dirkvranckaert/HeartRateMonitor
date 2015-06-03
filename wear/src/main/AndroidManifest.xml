@@ -17,13 +17,13 @@
         android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
         android:theme="@android:style/Theme.DeviceDefault.Light"
-        android:name=".HearRateApplication">
+        android:name=".WearHeartRateApplication">
         <uses-library
             android:name="com.google.android.wearable"
             android:required="false"/>
 
         <activity
-            android:name=".controller.HearRateActivity"
+            android:name=".controller.HeartRateActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -33,7 +33,7 @@
         </activity>
 
         <activity
-            android:name=".controller.HearRateTestActivity"
+            android:name=".controller.HeartRateTestActivity"
             android:label="Heart Rate Monitor Test">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

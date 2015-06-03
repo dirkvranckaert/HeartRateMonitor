@@ -7,9 +7,9 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.hear.rate.monitor.shared.WearURL;
-import eu.vranckaert.heart.rate.monitor.HearRateApplication;
+import eu.vranckaert.heart.rate.monitor.WearHeartRateApplication;
 import eu.vranckaert.heart.rate.monitor.R;
-import eu.vranckaert.heart.rate.monitor.UserPreferences;
+import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
 
 /**
@@ -37,15 +37,15 @@ public class HearRateMonitorWearableListenerService extends WearableListenerServ
 
             Log.d("dirk", "Activity found is " + currentActivity + ", will ignore this activity? " + !useActivity);
             if (useActivity) {
-                int previousActivity = UserPreferences.getInstance().getLatestActivity();
-                UserPreferences.getInstance().storeLatestActivity(currentActivity);
+                int previousActivity = WearUserPreferences.getInstance().getLatestActivity();
+                WearUserPreferences.getInstance().storeLatestActivity(currentActivity);
                 Log.d("dirk", "Activity is same as previous activity, so possible a trusted activity");
                 if (currentActivity == previousActivity) {
-                    int previousActivityCount = UserPreferences.getInstance().getLatestActivityCount();
-                    int acceptedActivity = UserPreferences.getInstance().getAcceptedActivity();
+                    int previousActivityCount = WearUserPreferences.getInstance().getLatestActivityCount();
+                    int acceptedActivity = WearUserPreferences.getInstance().getAcceptedActivity();
                     Log.d("dirk", "Activity has been seen now for " + previousActivityCount + " times and the currentActivity is different from the acceptedActivity? " + (acceptedActivity != currentActivity));
                     if (previousActivityCount >= ActivityState.TRUSTED_COUNT && acceptedActivity != currentActivity) {
-                        UserPreferences.getInstance().setAcceptedActivity(currentActivity);
+                        WearUserPreferences.getInstance().setAcceptedActivity(currentActivity);
                         test(currentActivity); // TODO remove the notification test block, it's only for testing!
                         if (ActivityState.getMeasuringIntervalForActivity(acceptedActivity) != ActivityState.getMeasuringIntervalForActivity(currentActivity)) {
                             AlarmSchedulingService.getInstance().rescheduleHeartRateMeasuringAlarms();
@@ -85,13 +85,13 @@ public class HearRateMonitorWearableListenerService extends WearableListenerServ
                 break;
         }
 
-        Notification notification = new Notification.Builder(HearRateApplication.getContext())
+        Notification notification = new Notification.Builder(WearHeartRateApplication.getContext())
                 .setContentTitle("Activity Update")
                 .setContentText("Current activity = " + loggedActivity)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .build();
         NotificationManager notificationManager =
-                (NotificationManager) HearRateApplication.getContext()
+                (NotificationManager) WearHeartRateApplication.getContext()
                         .getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(101, notification);
     }

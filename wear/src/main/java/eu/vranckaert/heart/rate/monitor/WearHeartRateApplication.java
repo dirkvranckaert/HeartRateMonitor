@@ -9,16 +9,16 @@ import android.content.Context;
  *
  * @author Dirk Vranckaert
  */
-public class HearRateApplication extends Application {
-    private static HearRateApplication INSTANCE;
+public class WearHeartRateApplication extends Application {
+    private static WearHeartRateApplication INSTANCE;
 
-    public HearRateApplication() {
+    public WearHeartRateApplication() {
         INSTANCE = this;
     }
 
-    public static HearRateApplication getInstance() {
+    public static WearHeartRateApplication getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new HearRateApplication();
+            INSTANCE = new WearHeartRateApplication();
         }
 
         return INSTANCE;

@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
-import eu.vranckaert.heart.rate.monitor.UserPreferences;
+import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.task.ActivitySetupTask;
 import eu.vranckaert.heart.rate.monitor.view.AbstractViewHolder;
@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author Dirk Vranckaert
  */
-public class HearRateActivity extends WearableActivity implements SensorEventListener, HeartRateListener {
+public class HeartRateActivity extends WearableActivity implements SensorEventListener, HeartRateListener {
     private HeartRateView mView;
 
     private SensorManager mSensorManager;
@@ -57,8 +57,8 @@ public class HearRateActivity extends WearableActivity implements SensorEventLis
                 }
                 setContentView(mView.getView());
 
-                if (!UserPreferences.getInstance().hasRunBefore()) {
-                    UserPreferences.getInstance().setHasRunBefore();
+                if (!WearUserPreferences.getInstance().hasRunBefore()) {
+                    WearUserPreferences.getInstance().setHasRunBefore();
                     new ActivitySetupTask().execute();
                     SetupBroadcastReceiver.setupMeasuring(this);
                 }
@@ -148,7 +148,7 @@ public class HearRateActivity extends WearableActivity implements SensorEventLis
             measurement.setAverageHeartBeat(averageHeartBeat);
             measurement.setStartMeasurement(mStartTimeMeasurement);
             measurement.setEndMeasurement(new Date().getTime());
-            UserPreferences.getInstance().addMeasurement(measurement);
+            WearUserPreferences.getInstance().addMeasurement(measurement);
         }
     }
 
@@ -180,9 +180,9 @@ public class HearRateActivity extends WearableActivity implements SensorEventLis
     }
 
     private void loadHistoricalData() {
-        Measurement latestMeasurement = UserPreferences.getInstance().getLatestMeasurment();
+        Measurement latestMeasurement = WearUserPreferences.getInstance().getLatestMeasurment();
         mMonitorView.setLatestMeasurement(latestMeasurement);
-        mHistoryView.setMeasurements(UserPreferences.getInstance().getAllMeasurements());
+        mHistoryView.setMeasurements(WearUserPreferences.getInstance().getAllMeasurements());
     }
 
     @Override

@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="@string/heart_rate_list_empty"
+        android:text="@string/heart_rate_history_empty"
         android:id="@+id/empty"/>
 
     <eu.vranckaert.heart.rate.monitor.widget.GreedyRecyclerView

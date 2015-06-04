@@ -12,6 +12,7 @@ import android.view.View;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.task.ActivitySetupTask;
+import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
 import eu.vranckaert.heart.rate.monitor.util.DeviceUtil;
 import eu.vranckaert.heart.rate.monitor.view.AbstractViewHolder;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateHistoryView;
@@ -39,6 +40,8 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     private long mStartTimeMeasurement;
     private boolean mFirstValueFound;
     private List<Float> mMeasuredValues = new ArrayList<>();
+    private float mMaximumHeartBeat = -1;
+    private float mMinimumHeartBeat = -1;
 
     private HeartRateMonitorView mMonitorView;
     private HeartRateHistoryView mHistoryView;
@@ -112,6 +115,8 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
         if (DeviceUtil.isCharging()) {
             // TODO show message to the user somehow that while charging the heart rate cannot be measured...
             mMeasuredValues.clear();
+            mMinimumHeartBeat = -1;
+            mMaximumHeartBeat = -1;
             stopHearRateMonitor();
             loadHistoricalData();
             return;
@@ -121,6 +126,12 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
             if (mFirstValueFound || value > 0f) {
                 mFirstValueFound = true;
                 mMeasuredValues.add(value);
+                if (mMinimumHeartBeat == -1 || value < mMinimumHeartBeat) {
+                    mMinimumHeartBeat = value;
+                }
+                if (mMaximumHeartBeat == -1 || value > mMaximumHeartBeat) {
+                    mMaximumHeartBeat = value;
+                }
                 mMonitorView.setMeasuringHeartBeat((int) value);
             }
         }
@@ -141,6 +152,8 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     private void startHearRateMonitor() {
         mFirstValueFound = false;
         mMeasuredValues.clear();
+        mMinimumHeartBeat = -1;
+        mMaximumHeartBeat = -1;
         if (mSensorManager != null && mHeartRateSensor != null) {
             mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_FASTEST);
             mMeasuring = true;
@@ -158,9 +171,12 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
             final float averageHeartBeat = calculateAverageHeartBeat();
             Measurement measurement = new Measurement();
             measurement.setAverageHeartBeat(averageHeartBeat);
+            measurement.setMinimumHeartBeat(mMinimumHeartBeat);
+            measurement.setMaximumHeartBeat(mMaximumHeartBeat);
             measurement.setStartMeasurement(mStartTimeMeasurement);
             measurement.setEndMeasurement(new Date().getTime());
             WearUserPreferences.getInstance().addMeasurement(measurement);
+            new HeartRateMeasurementTask().execute(measurement);
         }
     }
 

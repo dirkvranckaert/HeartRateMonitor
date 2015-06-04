@@ -43,4 +43,5 @@ dependencies {
     compile project(':shared')
     compile 'com.google.android.gms:play-services:+'
     compile 'com.google.android.gms:play-services-location:+'
+    compile 'com.google.android.gms:play-services-fitness:+'
 }

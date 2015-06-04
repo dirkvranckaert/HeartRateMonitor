@@ -12,6 +12,7 @@ import android.os.BatteryManager;
 import android.util.Log;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
+import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
 import eu.vranckaert.heart.rate.monitor.util.DeviceUtil;
 
 import java.util.ArrayList;
@@ -33,6 +34,8 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
     private Sensor mHeartRateSensor;
     private boolean mMeasuring;
     private List<Float> mMeasuredValues = new ArrayList<>();
+    private float mMaximumHeartBeat = -1;
+    private float mMinimumHeartBeat = -1;
 
     public HeartRateMonitorIntentService() {
         super(HeartRateMonitorIntentService.class.getName());
@@ -71,9 +74,12 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
                 float heartBeat = calculateAverageHeartBeat();
                 Measurement measurement = new Measurement();
                 measurement.setAverageHeartBeat(heartBeat);
+                measurement.setMinimumHeartBeat(mMinimumHeartBeat);
+                measurement.setMaximumHeartBeat(mMaximumHeartBeat);
                 measurement.setStartMeasurement(mStarTime);
                 measurement.setEndMeasurement(currentTime);
                 WearUserPreferences.getInstance().addMeasurement(measurement);
+                new HeartRateMeasurementTask().execute(measurement);
 
                 // TODO notify UI to be updated if visible right now...
             }
@@ -117,6 +123,12 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
             mMeasuring = true;
             float value = event.values[event.values.length - 1];
             mMeasuredValues.add(value);
+            if (mMinimumHeartBeat == -1 || value < mMinimumHeartBeat) {
+                mMinimumHeartBeat = value;
+            }
+            if (mMaximumHeartBeat == -1 || value > mMaximumHeartBeat) {
+                mMaximumHeartBeat = value;
+            }
             checkDuration();
         }
     }

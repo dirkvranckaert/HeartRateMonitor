@@ -12,9 +12,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.task.ActivitySetupTask;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
+import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
+
+import java.util.Date;
 
 /**
  * Date: 28/05/15
@@ -79,6 +84,9 @@ public class HeartRateTestActivity extends WearableActivity implements SensorEve
         if (findViewById(R.id.activity_test) != null) {
             findViewById(R.id.activity_test).setOnClickListener(this);
         }
+        if (findViewById(R.id.fitness_test) != null) {
+            findViewById(R.id.fitness_test).setOnClickListener(this);
+        }
     }
 
     @Override
@@ -120,6 +128,14 @@ public class HeartRateTestActivity extends WearableActivity implements SensorEve
             AlarmSchedulingService.getInstance().scheduleHeartRateMonitorInXMillis(30000);
         } else if (v.getId() == R.id.activity_test) {
             new ActivitySetupTask().execute();
+        } else if (v.getId() == R.id.fitness_test) {
+            Measurement measurement = new Measurement();
+            measurement.setAverageHeartBeat(71.3f);
+            measurement.setMinimumHeartBeat(60.3f);
+            measurement.setMaximumHeartBeat(83.0f);
+            measurement.setStartMeasurement(new Date().getTime());
+            measurement.setEndMeasurement(new Date().getTime());
+            new HeartRateMeasurementTask().execute(measurement);
         }
     }
 

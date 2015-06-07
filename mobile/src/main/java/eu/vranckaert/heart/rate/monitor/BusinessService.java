@@ -50,6 +50,7 @@ public class BusinessService {
         if (mFitnessApiClient == null || !mFitnessApiClient.isConnected()) {
             Log.d("dirk-background", "No mFitnessApiClient or not connected anymore");
             GoogleApiClient googleApiClient = new GoogleApiClient.Builder(HeartRateApplication.getContext())
+                    .addApi(Fitness.HISTORY_API)
                     .addApi(Fitness.RECORDING_API)
                     .addScope(new Scope(Scopes.FITNESS_BODY_READ_WRITE))
                     .build();
@@ -164,6 +165,22 @@ public class BusinessService {
             }
         }
         return false;
+    }
+
+    public void cancelFitnessSubscription(DataType type) {
+        Log.d("dirk-background", "Cancelling subscription " + type.getName());
+        GoogleApiClient googleApiClient = getFitnessApiClient();
+        if (googleApiClient == null) {
+            return;
+        }
+
+        Status status = Fitness.RecordingApi.unsubscribe(googleApiClient, DataType.TYPE_ACTIVITY_SAMPLE).await();
+        if (status.isSuccess()) {
+            Log.i("dirk-background", "Successfully unsubscribed for data type: " + type.toString());
+        } else {
+            // Subscription not removed
+            Log.i("dirk-background", "Failed to unsubscribe for data type: " + type.toString());
+        }
     }
 
     public void addFitnessHeartRateMeasurement(DataSet dataSet) {

@@ -2,8 +2,10 @@
     <string name="app_name">Hear Rate Monitor</string>
 
     <string name="google_fit_setup_title">Google Fitness Setup</string>
-    <string name="google_fit_setup_summary">Google Fit lets you control your fitness data from multiple apps and devices.\n\nBy connecting Heart Rate Monitor and Google Fit you will be able to see all your automated heart rates during the day in Google Fit.</string>
+    <string name="google_fit_setup_disconnected_summary">Google Fit lets you control your fitness data from multiple apps and devices.\n\nBy connecting Heart Rate Monitor and Google Fit you will be able to see all your automated heart rates during the day in Google Fit.</string>
+    <string name="google_fit_setup_connected_summary">Google Fit lets you control your fitness data from multiple apps and devices.\n\nYou have connected Heart Rate Monitor and Google Fit. All you measured heart rate throughout the day will automatically be stored in Google Fit.</string>
     <string name="google_fit_setup_connect">Connect to Google Fit</string>
+    <string name="google_fit_setup_disconnect">Disconnect from Google Fit</string>
     <string name="google_fit_setup_connecting">Making a connection...</string>
     <string name="google_fit_setup_setup_fit">Setting up Google Fitness...</string>
 

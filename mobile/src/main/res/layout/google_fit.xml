@@ -17,7 +17,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/google_fit_setup_summary"
+        android:text="@string/google_fit_setup_disconnected_summary"
+        android:id="@+id/fit_explanation"
         android:layout_marginBottom="6dp"
         android:layout_marginTop="6dp"/>
 
@@ -25,5 +26,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/connect"
-        android:text="@string/google_fit_setup_connect"/>
+        android:text="@string/google_fit_setup_connect"
+        android:visibility="gone"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/disconnect"
+        android:text="@string/google_fit_setup_disconnect"
+        android:visibility="gone"/>
 </LinearLayout>

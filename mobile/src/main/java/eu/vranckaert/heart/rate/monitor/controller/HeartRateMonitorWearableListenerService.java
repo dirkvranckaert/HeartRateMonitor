@@ -72,6 +72,7 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                         DataSource dataSource = new DataSource.Builder()
                                 .setDataType(DataType.AGGREGATE_HEART_RATE_SUMMARY)
                                 .setType(DataSource.TYPE_RAW)
+                                .setAppPackageName(HeartRateApplication.getContext())
                                 .build();
                         Log.d("dirk", "Building DataPoint");
                         DataPoint dataPoint = DataPoint.create(dataSource);
@@ -95,7 +96,7 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                                 (NotificationManager) HeartRateApplication.getContext()
                                         .getSystemService(Context.NOTIFICATION_SERVICE);
                         notificationManager.notify(5, notification);
-                        //BusinessService.getInstance().addFitnessHeartRateMeasurement(dataSet);
+                        BusinessService.getInstance().addFitnessHeartRateMeasurement(dataSet);
                     } else {
                         Log.d("dirk", "No Google Fitness subscriptions yet... Notify user...");
                         Notification notification = new Notification.Builder(HeartRateApplication.getContext())

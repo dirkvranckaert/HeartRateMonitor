@@ -1,0 +1,10 @@
+* Phone
+  * For now disable sync to Google Fit
+  * Database for storing measurements
+  * Add column indicating if the measurement has been synced with Google Fit
+  * Fix UI => when activating or disabling nothing seems to happen visually (unsubscribe doesn't even seem to work)
+  * Add UI button to sync all measurements to Google Fit if not yet done
+
+* Wear
+  * Remove storage of measurements in the preferences (keep the json stuff to sync between phone and watch)
+  * Read the measurements from the phone (forsee some loading stuff)

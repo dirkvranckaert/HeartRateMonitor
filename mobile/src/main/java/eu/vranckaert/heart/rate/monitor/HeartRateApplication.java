@@ -2,6 +2,8 @@ package eu.vranckaert.heart.rate.monitor;
 
 import android.app.Application;
 import android.content.Context;
+import eu.vranckaert.hear.rate.monitor.shared.dao.dao.SetupDao;
+import eu.vranckaert.heart.rate.monitor.dao.HeartRateDatabaseHelper;
 
 /**
  * Date: 28/05/15
@@ -22,6 +24,13 @@ public class HeartRateApplication extends Application {
         }
 
         return INSTANCE;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        SetupDao.getInstance(HeartRateDatabaseHelper.class, getContext()).setup(HeartRateDatabaseHelper.DB_VERSION);
     }
 
     public static Context getContext() {

@@ -1,6 +1,8 @@
 package eu.vranckaert.hear.rate.monitor.shared.model;
 
 import android.text.TextUtils;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,13 +17,42 @@ import java.util.List;
  *
  * @author Dirk Vranckaert
  */
+@DatabaseTable(tableName = Measurement.TABLE_NAME)
 public class Measurement implements Serializable {
+    public static final String TABLE_NAME = "MEASUREMENT";
+    public static final String COLUMN_ID = "ID";
+    public static final String COLUMN_AVERAGE = "AVERAGE";
+    public static final String COLUMN_MIN = "MIN";
+    public static final String COLUMN_MAX = "MAX";
+    public static final String COLUMN_START = "START";
+    public static final String COLUMN_END = "END";
+    public static final String COLUMN_ACTIVITY = "ACTIVITY";
+    public static final String COLUMN_SYNCED_WITH_GOOGLE_FIT = "GOOGLE_FIT";
+
+    @DatabaseField(generatedId = true, columnName = COLUMN_ID)
+    private Integer id;
+    @DatabaseField(columnName = COLUMN_AVERAGE)
     private float averageHeartBeat;
+    @DatabaseField(columnName = COLUMN_MIN)
     private float minimumHeartBeat;
+    @DatabaseField(columnName = COLUMN_MAX)
     private float maximumHeartBeat;
+    @DatabaseField(columnName = COLUMN_START)
     private long startMeasurement;
+    @DatabaseField(columnName = COLUMN_END)
     private long endMeasurement;
+    @DatabaseField(columnName = COLUMN_ACTIVITY)
     private int activity;
+    @DatabaseField(columnName = COLUMN_SYNCED_WITH_GOOGLE_FIT)
+    private boolean syncedWithGoogleFit;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public float getAverageHeartBeat() {
         return averageHeartBeat;
@@ -69,6 +100,14 @@ public class Measurement implements Serializable {
 
     public void setActivity(int activity) {
         this.activity = activity;
+    }
+
+    public boolean isSyncedWithGoogleFit() {
+        return syncedWithGoogleFit;
+    }
+
+    public void setSyncedWithGoogleFit(boolean syncedWithGoogleFit) {
+        this.syncedWithGoogleFit = syncedWithGoogleFit;
     }
 
     public String toJSON() {

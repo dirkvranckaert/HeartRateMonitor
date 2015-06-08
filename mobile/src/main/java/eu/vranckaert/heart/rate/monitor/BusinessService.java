@@ -193,10 +193,12 @@ public class BusinessService {
         }
     }
 
-    public void addFitnessHeartRateMeasurement(DataSet dataSet) {
+    public boolean addFitnessHeartRateMeasurement(DataSet dataSet) {
         Log.d("dirk-background", "Adding a new fitness heart rate measurement...");
         Status status = Fitness.HistoryApi.insertData(getFitnessApiClient(), dataSet).await();
         Log.d("dirk-background", "Adding the heart rate measurement to Fitness was success? " + status.isSuccess());
+
+        return status.isSuccess();
     }
 
     public void testQueryFitnessHeartRateData() {

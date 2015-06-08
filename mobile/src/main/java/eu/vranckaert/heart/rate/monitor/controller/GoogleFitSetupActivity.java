@@ -25,6 +25,7 @@ import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessStatusCodes;
 import com.google.android.gms.fitness.data.DataType;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
+import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.R;
 
 /**
@@ -154,7 +155,7 @@ public class GoogleFitSetupActivity extends Activity implements OnClickListener 
 
         // To create a subscription, invoke the Recording API. As soon as the subscription is
         // active, fitness data will start recording.
-        Fitness.RecordingApi.subscribe(mGoogleApiClient, DataType.AGGREGATE_HEART_RATE_SUMMARY)
+        Fitness.RecordingApi.subscribe(mGoogleApiClient, FitHelper.DATA_TYPE_HEART_RATE)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
@@ -219,7 +220,7 @@ public class GoogleFitSetupActivity extends Activity implements OnClickListener 
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            return BusinessService.getInstance().hasFitnessSubscription(DataType.AGGREGATE_HEART_RATE_SUMMARY);
+            return BusinessService.getInstance().hasFitnessSubscription(FitHelper.DATA_TYPE_HEART_RATE);
         }
 
         @Override
@@ -246,7 +247,7 @@ public class GoogleFitSetupActivity extends Activity implements OnClickListener 
 
         @Override
         protected Void doInBackground(Void... params) {
-            BusinessService.getInstance().cancelFitnessSubscription(DataType.AGGREGATE_HEART_RATE_SUMMARY);
+            BusinessService.getInstance().cancelFitnessSubscription(FitHelper.DATA_TYPE_HEART_RATE);
             return null;
         }
 

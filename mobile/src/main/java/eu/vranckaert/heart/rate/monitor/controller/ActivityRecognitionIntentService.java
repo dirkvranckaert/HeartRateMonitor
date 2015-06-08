@@ -72,11 +72,6 @@ public class ActivityRecognitionIntentService extends IntentService {
 
             Log.d("dirk-background", "Current activity = " + loggedActivity + "(confidence=" + confidence + ")");
 
-            //            int previousActivity = UserPreferences.getInstance().getLatestActivity();
-            //            if (previousActivity != activityType) {
-            //                UserPreferences.getInstance().storeLatestActivity(activityType);
-            //            }
-            // TODO put back in previous commented if
             BusinessService.getInstance().setActivityUpdate(activityType);
         }
     }

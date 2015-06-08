@@ -11,8 +11,6 @@ import android.preference.PreferenceManager;
  * @author Dirk Vranckaert
  */
 public class UserPreferences {
-    private static final String KEY_LATEST_ACTIVITY = "latest_activity";
-
     private static UserPreferences INSTANCE;
     
     private final SharedPreferences mSharedPreferences;
@@ -28,14 +26,5 @@ public class UserPreferences {
             INSTANCE = new UserPreferences();
         }
         return INSTANCE;
-    }
-
-    public void storeLatestActivity(int activityState) {
-        mEditor.putInt(KEY_LATEST_ACTIVITY, activityState);
-        mEditor.commit();
-    }
-
-    public int getLatestActivity() {
-        return mSharedPreferences.getInt(KEY_LATEST_ACTIVITY, -1);
     }
 }

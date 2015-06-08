@@ -3,14 +3,13 @@ package eu.vranckaert.heart.rate.monitor.controller;
 import android.app.Notification;
 import android.app.Notification.BigTextStyle;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
-import com.google.android.gms.fitness.Fitness;
-import com.google.android.gms.fitness.HistoryApi;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
-import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
@@ -24,6 +23,7 @@ import eu.vranckaert.hear.rate.monitor.shared.WearKeys;
 import eu.vranckaert.hear.rate.monitor.shared.WearURL;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
+import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.HeartRateApplication;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.task.ActivityRecognitionTask;
@@ -58,8 +58,7 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                 Log.d("dirk", "... on path " + path);
                 if (WearURL.HEART_RATE_MEASUREMENT.equals((path))) {
                     boolean hasAggregateHeartRateSummarySubscription =
-                            BusinessService.getInstance().hasFitnessSubscription(
-                                    DataType.AGGREGATE_HEART_RATE_SUMMARY);
+                            BusinessService.getInstance().hasFitnessSubscription(FitHelper.DATA_TYPE_HEART_RATE);
                     Log.d("dirk", "hasAggregateHeartRateSummarySubscription=" + hasAggregateHeartRateSummarySubscription);
                     if (hasAggregateHeartRateSummarySubscription) {
                         DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
@@ -70,19 +69,19 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
 
                         Log.d("dirk", "Building DataSource");
                         DataSource dataSource = new DataSource.Builder()
-                                .setDataType(DataType.AGGREGATE_HEART_RATE_SUMMARY)
+                                .setDataType(FitHelper.DATA_TYPE_HEART_RATE)
                                 .setType(DataSource.TYPE_RAW)
                                 .setAppPackageName(HeartRateApplication.getContext())
                                 .build();
-                        Log.d("dirk", "Building DataPoint");
-                        DataPoint dataPoint = DataPoint.create(dataSource);
-                        dataPoint.setTimeInterval(measurement.getStartMeasurement(), measurement.getEndMeasurement(),
-                                TimeUnit.MILLISECONDS);
-                        dataPoint.getValue(Field.FIELD_MIN).setFloat(measurement.getMinimumHeartBeat());
-                        dataPoint.getValue(Field.FIELD_AVERAGE).setFloat(measurement.getAverageHeartBeat());
-                        dataPoint.getValue(Field.FIELD_MAX).setFloat(measurement.getMaximumHeartBeat());
                         Log.d("dirk", "Building DataSet");
                         DataSet dataSet = DataSet.create(dataSource);
+                        Log.d("dirk", "Building DataPoint");
+                        DataPoint dataPoint = dataSet.createDataPoint();
+                        dataPoint.setTimeInterval(measurement.getStartMeasurement(), measurement.getEndMeasurement(), TimeUnit.MILLISECONDS);
+                        //dataPoint.getValue(Field.FIELD_MIN).setFloat(measurement.getMinimumHeartBeat());
+                        dataPoint.getValue(Field.FIELD_BPM).setFloat(measurement.getAverageHeartBeat());
+                        //dataPoint.getValue(Field.FIELD_AVERAGE).setFloat(measurement.getAverageHeartBeat());
+                        //dataPoint.getValue(Field.FIELD_MAX).setFloat(measurement.getMaximumHeartBeat());
                         dataSet.add(dataPoint);
 
                         Log.d("dirk", "Storing Google Fitness BPM DataSet");
@@ -90,7 +89,9 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                         Notification notification = new Notification.Builder(HeartRateApplication.getContext())
                                 .setContentTitle(HeartRateApplication.getContext().getString(R.string.app_name))
                                 .setContentText("Will add the measurement to Google Fit")
-                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setSmallIcon(R.drawable.ic_notification)
+                                .setColor(HeartRateApplication.getContext().getResources()
+                                .getColor(R.color.hrm_accent_color))
                                 .build();
                         NotificationManager notificationManager =
                                 (NotificationManager) HeartRateApplication.getContext()
@@ -99,6 +100,10 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                         BusinessService.getInstance().addFitnessHeartRateMeasurement(dataSet);
                     } else {
                         Log.d("dirk", "No Google Fitness subscriptions yet... Notify user...");
+
+                        Intent intent = new Intent(HeartRateApplication.getContext(), GoogleFitSetupActivity.class);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(HeartRateApplication.getContext(), 0, intent, 0);
+
                         Notification notification = new Notification.Builder(HeartRateApplication.getContext())
                                 .setContentTitle(HeartRateApplication.getContext()
                                         .getString(R.string.app_name))
@@ -106,8 +111,11 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                                         .getString(R.string.notification_google_fitness_not_connected_message))
                                 .setStyle(new BigTextStyle().bigText(HeartRateApplication.getContext()
                                         .getString(R.string.notification_google_fitness_not_connected_message)))
-                                .setSmallIcon(R.mipmap.ic_launcher)
-                                .addAction(R.drawable.fit_notification, HeartRateApplication.getContext().getString(R.string.notification_google_fitness_not_connected_message_action_connect), null)
+                                .setSmallIcon(R.drawable.ic_notification)
+                                .setColor(HeartRateApplication.getContext().getResources().getColor(R.color.hrm_accent_color))
+                                .addAction(R.drawable.fit_notification,
+                                        HeartRateApplication.getContext().getString(R.string.notification_google_fitness_not_connected_message_action_connect),
+                                        pendingIntent)
                                 .build();
                         NotificationManager notificationManager =
                                 (NotificationManager) HeartRateApplication.getContext()

@@ -1,0 +1,5 @@
+<resources>
+    <color name="hrm_primary_dark_color">#FFF57C00</color>
+    <color name="hrm_primary_color">#FFFF9800</color>
+    <color name="hrm_accent_color">#FFED6C1E</color>
+</resources>

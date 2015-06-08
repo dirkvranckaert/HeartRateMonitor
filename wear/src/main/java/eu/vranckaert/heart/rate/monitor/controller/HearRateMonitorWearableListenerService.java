@@ -46,7 +46,6 @@ public class HearRateMonitorWearableListenerService extends WearableListenerServ
                     Log.d("dirk", "Activity has been seen now for " + previousActivityCount + " times and the currentActivity is different from the acceptedActivity? " + (acceptedActivity != currentActivity));
                     if (previousActivityCount >= ActivityState.TRUSTED_COUNT && acceptedActivity != currentActivity) {
                         WearUserPreferences.getInstance().setAcceptedActivity(currentActivity);
-                        test(currentActivity); // TODO remove the notification test block, it's only for testing!
                         if (ActivityState.getMeasuringIntervalForActivity(acceptedActivity) != ActivityState.getMeasuringIntervalForActivity(currentActivity)) {
                             AlarmSchedulingService.getInstance().rescheduleHeartRateMeasuringAlarms();
                         }
@@ -54,45 +53,5 @@ public class HearRateMonitorWearableListenerService extends WearableListenerServ
                 }
             }
         }
-    }
-
-    private void test(int activity) {
-        String loggedActivity = "";
-        switch (activity) {
-            case ActivityState.IN_VEHICLE:
-                loggedActivity = "inVehicle";
-                break;
-            case ActivityState.ON_BICYCLE:
-                loggedActivity = "onBicycle";
-                break;
-            case ActivityState.ON_FOOT:
-                loggedActivity = "onFoot";
-                break;
-            case ActivityState.STILL:
-                loggedActivity = "still";
-                break;
-            case ActivityState.UNKNOWN:
-                loggedActivity = "unknown";
-                break;
-            case ActivityState.TILTING:
-                loggedActivity = "tilting";
-                break;
-            case ActivityState.WALKING:
-                loggedActivity = "walking";
-                break;
-            case ActivityState.RUNNING:
-                loggedActivity = "running";
-                break;
-        }
-
-        Notification notification = new Notification.Builder(WearHeartRateApplication.getContext())
-                .setContentTitle("Activity Update")
-                .setContentText("Current activity = " + loggedActivity)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .build();
-        NotificationManager notificationManager =
-                (NotificationManager) WearHeartRateApplication.getContext()
-                        .getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(101, notification);
     }
 }

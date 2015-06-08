@@ -12,19 +12,29 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.data.Bucket;
+import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Subscription;
+import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.result.DataReadResult;
 import com.google.android.gms.fitness.result.ListSubscriptionsResult;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
+import eu.vranckaert.hear.rate.monitor.shared.DateUtil;
 import eu.vranckaert.hear.rate.monitor.shared.WearURL;
 import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.heart.rate.monitor.controller.ActivityRecognitionIntentService;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Date: 12/05/15
@@ -187,5 +197,78 @@ public class BusinessService {
         Log.d("dirk-background", "Adding a new fitness heart rate measurement...");
         Status status = Fitness.HistoryApi.insertData(getFitnessApiClient(), dataSet).await();
         Log.d("dirk-background", "Adding the heart rate measurement to Fitness was success? " + status.isSuccess());
+    }
+
+    public void testQueryFitnessHeartRateData() {
+        Log.d("dirk-background", "Querying for fitness data...");
+
+        Calendar cal = Calendar.getInstance();
+        Date now = new Date();
+        cal.setTime(now);
+        long endTime = cal.getTimeInMillis();
+        cal.add(Calendar.HOUR_OF_DAY, -24);
+        long startTime = cal.getTimeInMillis();
+
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                // The data request can specify multiple data types to return, effectively
+                // combining multiple data queries into one call.
+                // In this example, it's very unlikely that the request is for several hundred
+                // datapoints each consisting of a few steps and a timestamp.  The more likely
+                // scenario is wanting to see how many steps were walked per day, for 7 days.
+                .read(DataType.TYPE_HEART_RATE_BPM)
+//                .aggregate(DataType.TYPE_HEART_RATE_BPM, DataType.AGGREGATE_HEART_RATE_SUMMARY)
+//                        // Analogous to a "Group By" in SQL, defines how data should be aggregated.
+//                        // bucketByTime allows for a time span, whereas bucketBySession would allow
+//                        // bucketing by "sessions", which would need to be defined in code.
+                .bucketByTime(1, TimeUnit.MINUTES)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build();
+        Log.d("dirk-background", "About to read fitness data...");
+        DataReadResult dataReadResult = Fitness.HistoryApi.readData(getFitnessApiClient(), readRequest).await();
+        if (dataReadResult.getStatus().isSuccess()) {
+            Log.d("dirk-background", "Successfully read data");
+        } else {
+            Log.d("dirk-background", "Could not read the data (" + dataReadResult.getStatus().getStatusCode() + " - " + dataReadResult.getStatus().getStatusMessage() +" )");
+        }
+
+        // If the DataReadRequest object specified aggregated data, dataReadResult will be returned
+        // as buckets containing DataSets, instead of just DataSets.
+        if (dataReadResult.getBuckets().size() > 0) {
+            Log.i("dirk-background", "Number of returned buckets of DataSets is: " + dataReadResult.getBuckets().size());
+            for (Bucket bucket : dataReadResult.getBuckets()) {
+                List<DataSet> dataSets = bucket.getDataSets();
+                Log.i("dirk-background", "Number of datasets in bucket: " + dataSets.size());
+                for (DataSet dataSet : dataSets) {
+                    dumpDataSet(dataSet);
+                }
+            }
+        } else {
+            Log.i("dirk-background", "No data in the buckets");
+        }
+
+        if (dataReadResult.getDataSets().size() > 0) {
+            Log.i("dirk-background", "Number of returned DataSets is: " + dataReadResult.getDataSets().size());
+            for (DataSet dataSet : dataReadResult.getDataSets()) {
+                dumpDataSet(dataSet);
+            }
+        } else {
+            Log.i("dirk-background", "No data in the datasets");
+        }
+    }
+
+    private void dumpDataSet(DataSet dataSet) {
+        Log.i("dirk-background", "Data returned for Data type: " + dataSet.getDataType().getName());
+        Log.i("dirk-background", "Number of points in dataset: " + dataSet.getDataPoints().size());
+
+        for (DataPoint dp : dataSet.getDataPoints()) {
+            Log.i("dirk-background", "Data point:");
+            Log.i("dirk-background", "\tType: " + dp.getDataType().getName());
+            Log.i("dirk-background", "\tStart: " + new Date(dp.getStartTime(TimeUnit.MILLISECONDS)).toString());
+            Log.i("dirk-background", "\tEnd: " +  new Date(dp.getEndTime(TimeUnit.MILLISECONDS)).toString());
+            for(Field field : dp.getDataType().getFields()) {
+                Log.i("dirk-background", "\tField: " + field.getName() +
+                        " Value: " + dp.getValue(field));
+            }
+        }
     }
 }

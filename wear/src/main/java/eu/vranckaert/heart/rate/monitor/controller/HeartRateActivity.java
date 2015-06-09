@@ -23,7 +23,10 @@ import eu.vranckaert.heart.rate.monitor.view.HeartRateView.HeartRateListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Date: 28/05/15
@@ -38,8 +41,9 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     private Sensor mHeartRateSensor;
     private boolean mMeasuring;
     private long mStartTimeMeasurement;
+    private long mFirstMeasurement;
     private boolean mFirstValueFound;
-    private List<Float> mMeasuredValues = new ArrayList<>();
+    private Map<Long, Float> mMeasuredValues = new HashMap<>();
     private float mMaximumHeartBeat = -1;
     private float mMinimumHeartBeat = -1;
 
@@ -124,8 +128,12 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
         if (event.values.length > 0) {
             float value = event.values[event.values.length - 1];
             if (mFirstValueFound || value > 0f) {
+                long currentTime = new Date().getTime();
                 mFirstValueFound = true;
-                mMeasuredValues.add(value);
+                if (mFirstMeasurement == -1) {
+                    mFirstMeasurement = currentTime;
+                }
+                mMeasuredValues.put(currentTime, value);
                 if (mMinimumHeartBeat == -1 || value < mMinimumHeartBeat) {
                     mMinimumHeartBeat = value;
                 }
@@ -175,6 +183,8 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
             measurement.setMaximumHeartBeat(mMaximumHeartBeat);
             measurement.setStartMeasurement(mStartTimeMeasurement);
             measurement.setEndMeasurement(new Date().getTime());
+            measurement.setFirstMeasurement(mFirstMeasurement);
+            measurement.setMeasuredValues(mMeasuredValues);
             WearUserPreferences.getInstance().addMeasurement(measurement);
             new HeartRateMeasurementTask().execute(measurement);
         }
@@ -185,10 +195,11 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
         Log.d("dirk", "mMeasuredValues.size=" + mMeasuredValues.size());
 
         float sum = 0f;
-        for (int i = 0; i < mMeasuredValues.size(); i++) {
-            float measuredValue = mMeasuredValues.get(i);
+        for (Entry<Long, Float> entry : mMeasuredValues.entrySet()) {
+            float measuredValue = entry.getValue();
             sum += measuredValue;
         }
+
         float averageHearBeat = sum / mMeasuredValues.size();
         Log.d("dirk", "averageHearBeat=" + averageHearBeat);
         return averageHearBeat;

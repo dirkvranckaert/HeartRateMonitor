@@ -1,6 +1,7 @@
 package eu.vranckaert.hear.rate.monitor.shared.model;
 
 import android.text.TextUtils;
+import android.util.Log;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import org.json.JSONArray;
@@ -9,7 +10,10 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Date: 29/05/15
@@ -25,7 +29,9 @@ public class Measurement implements Serializable {
     public static final String COLUMN_MIN = "MIN";
     public static final String COLUMN_MAX = "MAX";
     public static final String COLUMN_START = "START";
+    public static final String COLUMN_FIRST_MEASUREMENT = "FIRST_MEASUREMENT";
     public static final String COLUMN_END = "END";
+    public static final String COLUMN_MEASURED_VALUES = "MEASURED_VALUES";
     public static final String COLUMN_ACTIVITY = "ACTIVITY";
     public static final String COLUMN_SYNCED_WITH_GOOGLE_FIT = "GOOGLE_FIT";
 
@@ -41,6 +47,11 @@ public class Measurement implements Serializable {
     private long startMeasurement;
     @DatabaseField(columnName = COLUMN_END)
     private long endMeasurement;
+    @DatabaseField(columnName = COLUMN_FIRST_MEASUREMENT)
+    private long firstMeasurement;
+    private Map<Long, Float> measuredValues;
+    @DatabaseField(columnName = COLUMN_MEASURED_VALUES)
+    private String measuredValuesString;
     @DatabaseField(columnName = COLUMN_ACTIVITY)
     private int activity;
     @DatabaseField(columnName = COLUMN_SYNCED_WITH_GOOGLE_FIT)
@@ -94,6 +105,24 @@ public class Measurement implements Serializable {
         this.endMeasurement = endMeasurement;
     }
 
+    public long getFirstMeasurement() {
+        return firstMeasurement;
+    }
+
+    public void setFirstMeasurement(long firstMeasurement) {
+        this.firstMeasurement = firstMeasurement;
+    }
+
+    public Map<Long, Float> getMeasuredValues() {
+        measuredValues = measuredValuesFromJson(measuredValuesString);
+        return measuredValues;
+    }
+
+    public void setMeasuredValues(Map<Long, Float> measuredValues) {
+        this.measuredValues = measuredValues;
+        measuredValuesString = measuredValuesToJSON();
+    }
+
     public int getActivity() {
         return activity;
     }
@@ -118,8 +147,26 @@ public class Measurement implements Serializable {
             json.put("maximumHeartBeat", getMaximumHeartBeat());
             json.put("startMeasurement", getStartMeasurement());
             json.put("endMeasurement", getEndMeasurement());
+            json.put("firstMeasurement", getFirstMeasurement());
             json.put("activity", getActivity());
+            json.put("measuredValues", measuredValuesToJSON());
+
             return json.toString();
+        } catch (JSONException e) {
+            return "";
+        }
+    }
+
+    public String measuredValuesToJSON() {
+        try {
+            JSONArray measuredValuesArray = new JSONArray();
+            for (Entry<Long, Float> entry : this.measuredValues.entrySet()) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("key", entry.getKey());
+                jsonObject.put("value", entry.getValue());
+                measuredValuesArray.put(jsonObject.toString());
+            }
+            return measuredValuesArray.toString();
         } catch (JSONException e) {
             return "";
         }
@@ -138,10 +185,31 @@ public class Measurement implements Serializable {
             measurement.setMaximumHeartBeat(maxHeartBeat.floatValue());
             measurement.setStartMeasurement(jsonObject.optLong("startMeasurement"));
             measurement.setEndMeasurement(jsonObject.optLong("endMeasurement"));
+            measurement.setFirstMeasurement(jsonObject.optLong("firstMeasurement"));
             measurement.setActivity(jsonObject.optInt("activity"));
+
+            String measuredValuesString = jsonObject.optString("measuredValues");
+            Map<Long, Float> measuredValues = measuredValuesFromJson(measuredValuesString);
+            measurement.setMeasuredValues(measuredValues);
+
             return measurement;
         } catch (JSONException e) {
             return null;
+        }
+    }
+
+    public static Map<Long, Float> measuredValuesFromJson(String json) {
+        try {
+            JSONArray measuredValuesArray = new JSONArray(json);
+            Map<Long, Float> measuredValues = new HashMap<>();
+            for (int i = 0; i < measuredValuesArray.length(); i++) {
+                JSONObject measuredValue = new JSONObject(measuredValuesArray.optString(i));
+                measuredValues
+                        .put(measuredValue.optLong("key"), ((Double) measuredValue.optDouble("value")).floatValue());
+            }
+            return measuredValues;
+        } catch (JSONException e) {
+            return new HashMap<>();
         }
     }
 

@@ -1,14 +1,10 @@
 package eu.vranckaert.heart.rate.monitor.controller;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.util.Log;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
-import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.hear.rate.monitor.shared.WearURL;
-import eu.vranckaert.heart.rate.monitor.WearHeartRateApplication;
-import eu.vranckaert.heart.rate.monitor.R;
+import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
 

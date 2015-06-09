@@ -4,7 +4,6 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataApi.DataItemResult;
 import com.google.android.gms.wearable.MessageApi.SendMessageResult;
 import com.google.android.gms.wearable.Node;
@@ -75,6 +74,32 @@ public class WearBusinessService {
         Log.d("dirk", "Send measured heart rate to phone");
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create(WearURL.HEART_RATE_MEASUREMENT);
         putDataMapReq.getDataMap().putString(WearKeys.MEASUREMENT, measurement.toJSON());
+//        if (measurement.getMeasuredValues() != null && !measurement.getMeasuredValues().isEmpty()) {
+//            long[] keys = new long[measurement.getMeasuredValues().size()];
+//            float[] values = new float[measurement.getMeasuredValues().size()];
+//
+//            Set<Long> measuredValuesDates = measurement.getMeasuredValues().keySet();
+//            Iterator<Long> measuredValuesDateIterator = measuredValuesDates.iterator();
+//            int i = 0;
+//            while (measuredValuesDateIterator.hasNext()) {
+//                Long date = measuredValuesDateIterator.next();
+//                keys[i] = date;
+//                i++;
+//            }
+//
+//            Collection<Float> measuredValuesValues = measurement.getMeasuredValues().values();
+//            Iterator<Float> measuredValuesIterator = measuredValuesValues.iterator();
+//            int j = 0;
+//            while (measuredValuesIterator.hasNext()) {
+//                Float value = measuredValuesIterator.next();
+//                values[j] = value;
+//                j++;
+//            }
+//
+//            Log.d("dirk", "Adding all the heart rate measurement");
+//            putDataMapReq.getDataMap().putLongArray(WearKeys.MEASUREMENT_VALUES_KEYS, keys);
+//            putDataMapReq.getDataMap().putFloatArray(WearKeys.MEASUREMENT_VALUES_VALUES, values);
+//        }
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataItemResult> pendingResult = Wearable.DataApi.putDataItem(getGoogleApiClient(), putDataReq);
         DataItemResult result = pendingResult.await();

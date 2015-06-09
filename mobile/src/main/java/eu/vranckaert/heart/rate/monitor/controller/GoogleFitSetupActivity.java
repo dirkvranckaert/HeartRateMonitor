@@ -24,9 +24,16 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessStatusCodes;
 import com.google.android.gms.fitness.data.DataType;
+import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
 import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.R;
+import eu.vranckaert.heart.rate.monitor.dao.MeasurementDao;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Date: 04/06/15

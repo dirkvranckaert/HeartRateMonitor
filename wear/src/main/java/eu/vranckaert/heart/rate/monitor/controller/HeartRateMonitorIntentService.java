@@ -3,12 +3,10 @@ package eu.vranckaert.heart.rate.monitor.controller;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.BatteryManager;
 import android.util.Log;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
@@ -18,7 +16,11 @@ import eu.vranckaert.heart.rate.monitor.util.DeviceUtil;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Date: 28/05/15
@@ -27,13 +29,14 @@ import java.util.List;
  * @author Dirk Vranckaert
  */
 public class HeartRateMonitorIntentService extends IntentService implements SensorEventListener {
-    private long mStarTime = -1;
+    private long mStartTime = -1;
+    private long mFirstMeasurement = -1;
     private long mEndTime = -1;
 
     private SensorManager mSensorManager;
     private Sensor mHeartRateSensor;
     private boolean mMeasuring;
-    private List<Float> mMeasuredValues = new ArrayList<>();
+    private Map<Long, Float> mMeasuredValues = new HashMap<>();
     private float mMaximumHeartBeat = -1;
     private float mMinimumHeartBeat = -1;
 
@@ -59,11 +62,11 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
     }
 
     private void checkDuration() {
-        if (mStarTime == -1 || mEndTime == -1) {
+        if (mStartTime == -1 || mEndTime == -1) {
             Log.d("dirk-background", "checkDuration (set initial values)");
             // Determine the end time of the measurement (aka the duration)
             Calendar calendar = Calendar.getInstance();
-            mStarTime = calendar.getTimeInMillis();
+            mStartTime = calendar.getTimeInMillis();
             calendar.add(Calendar.MILLISECOND, 15000);
             mEndTime = calendar.getTimeInMillis();
         } else {
@@ -76,8 +79,9 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
                 measurement.setAverageHeartBeat(heartBeat);
                 measurement.setMinimumHeartBeat(mMinimumHeartBeat);
                 measurement.setMaximumHeartBeat(mMaximumHeartBeat);
-                measurement.setStartMeasurement(mStarTime);
+                measurement.setStartMeasurement(mStartTime);
                 measurement.setEndMeasurement(currentTime);
+                measurement.setFirstMeasurement(mFirstMeasurement);
                 WearUserPreferences.getInstance().addMeasurement(measurement);
                 new HeartRateMeasurementTask().execute(measurement);
 
@@ -91,10 +95,11 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
         Log.d("dirk-background", "mMeasuredValues.size=" + mMeasuredValues.size());
 
         float sum = 0f;
-        for (int i = 0; i < mMeasuredValues.size(); i++) {
-            float measuredValue = mMeasuredValues.get(i);
+        for (Entry<Long, Float> entry : mMeasuredValues.entrySet()) {
+            float measuredValue = entry.getValue();
             sum += measuredValue;
         }
+
         float averageHearBeat = sum / mMeasuredValues.size();
         Log.d("dirk-background", "averageHearBeat=" + averageHearBeat);
         return averageHearBeat;
@@ -120,9 +125,13 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
         }
 
         if (event.values.length > 0 && (event.values[event.values.length - 1] > 0 || mMeasuring)) {
+            long currentTime = new Date().getTime();
             mMeasuring = true;
+            if (mFirstMeasurement == -1) {
+                mFirstMeasurement = currentTime;
+            }
             float value = event.values[event.values.length - 1];
-            mMeasuredValues.add(value);
+            mMeasuredValues.put(currentTime, value);
             if (mMinimumHeartBeat == -1 || value < mMinimumHeartBeat) {
                 mMinimumHeartBeat = value;
             }

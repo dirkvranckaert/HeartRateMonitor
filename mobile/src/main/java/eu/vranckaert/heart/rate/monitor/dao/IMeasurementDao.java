@@ -13,5 +13,5 @@ import java.util.List;
  */
 public interface IMeasurementDao extends IDao<Measurement, Integer, HeartRateDatabaseHelper> {
     List<Measurement> findExact(Measurement measurement);
-    List<Measurement> findMeasurementsToSync(Measurement measurement);
+    List<Measurement> findMeasurementsToSync();
 }

@@ -8,4 +8,6 @@ package eu.vranckaert.hear.rate.monitor.shared;
  */
 public class WearKeys {
     public static final String MEASUREMENT = "measurement";
+    public static final String MEASUREMENT_VALUES_KEYS = "measurement_values_keys";
+    public static final String MEASUREMENT_VALUES_VALUES = "measurement_values_values";
 }

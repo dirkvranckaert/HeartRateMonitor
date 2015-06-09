@@ -42,7 +42,7 @@ public class MeasurementDao extends Dao<Measurement, Integer, HeartRateDatabaseH
     }
 
     @Override
-    public List<Measurement> findMeasurementsToSync(Measurement measurement) {
+    public List<Measurement> findMeasurementsToSync() {
         try {
             QueryBuilder<Measurement, Integer> qb = dao.queryBuilder();
             qb.where().eq(Measurement.COLUMN_SYNCED_WITH_GOOGLE_FIT, false);

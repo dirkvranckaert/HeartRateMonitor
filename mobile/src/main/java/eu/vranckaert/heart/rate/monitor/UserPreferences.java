@@ -11,8 +11,10 @@ import android.preference.PreferenceManager;
  * @author Dirk Vranckaert
  */
 public class UserPreferences {
+    private static final String KEY_GOOGLE_FIT_ACTIVATION_ERROR = "google_fit_activation_error";
+
     private static UserPreferences INSTANCE;
-    
+
     private final SharedPreferences mSharedPreferences;
     private final Editor mEditor;
     
@@ -26,5 +28,18 @@ public class UserPreferences {
             INSTANCE = new UserPreferences();
         }
         return INSTANCE;
+    }
+
+    public int getGoogleFitActivationErrorCount() {
+        return mSharedPreferences.getInt(KEY_GOOGLE_FIT_ACTIVATION_ERROR, -1);
+    }
+
+    public void setGoogleFitActivationErrorCount(int count) {
+        if (count == -1) {
+            mEditor.remove(KEY_GOOGLE_FIT_ACTIVATION_ERROR);
+        } else {
+            mEditor.putInt(KEY_GOOGLE_FIT_ACTIVATION_ERROR, count);
+        }
+        mEditor.commit();
     }
 }

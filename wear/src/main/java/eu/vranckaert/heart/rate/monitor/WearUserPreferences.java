@@ -99,7 +99,7 @@ public class WearUserPreferences {
         return Measurement.fromJSON(value);
     }
 
-    public List<Measurement> addMeasurement(Measurement measurement) {
+    public void addMeasurement(Measurement measurement) {
         measurement.setActivity(getAcceptedActivity());
         String latestMeasurement = measurement.toJSON();
         Log.d("dirk", "Adding heart rate measurement: " + latestMeasurement);
@@ -110,7 +110,5 @@ public class WearUserPreferences {
         mEditor.putString(KEY_LATEST_MEASUREMENTS, latestMeasurement);
         mEditor.putString(KEY_ALL_MEASUREMENTS, measurementList);
         mEditor.commit();
-
-        return measurements;
     }
 }

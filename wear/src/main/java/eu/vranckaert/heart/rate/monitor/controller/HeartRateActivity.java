@@ -21,10 +21,8 @@ import eu.vranckaert.heart.rate.monitor.view.HeartRateUnavailableView;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateView;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateView.HeartRateListener;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 

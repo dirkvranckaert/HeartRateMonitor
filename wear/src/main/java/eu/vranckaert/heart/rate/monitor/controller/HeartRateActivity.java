@@ -39,9 +39,9 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     private Sensor mHeartRateSensor;
     private boolean mMeasuring;
     private long mStartTimeMeasurement;
-    private long mFirstMeasurement;
     private boolean mFirstValueFound;
     private Map<Long, Float> mMeasuredValues = new HashMap<>();
+    private long mFirstMeasurement = -1;
     private float mMaximumHeartBeat = -1;
     private float mMinimumHeartBeat = -1;
 

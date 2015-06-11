@@ -271,4 +271,21 @@ public class Measurement implements Serializable {
         result = 31 * result + (int) (endMeasurement ^ (endMeasurement >>> 32));
         return result;
     }
+
+    public boolean isFakeHeartRate() {
+        boolean timeCheckFailed = false;
+        boolean measuredHeartRateCountFailed = false;
+
+        // If it takes more than 20 seconds to find a heart beat it might be 'fake' one
+        long timeBeforeFirstMeasurement = firstMeasurement - startMeasurement;
+        if (timeBeforeFirstMeasurement > 20000) {
+            timeCheckFailed = true;
+        }
+
+        if (measuredValues == null || measuredValues.size() <= 3) {
+            measuredHeartRateCountFailed = true;
+        }
+
+        return timeCheckFailed || measuredHeartRateCountFailed;
+    }
 }

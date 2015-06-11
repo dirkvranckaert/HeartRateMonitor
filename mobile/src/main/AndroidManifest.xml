@@ -28,6 +28,15 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".controller.FakeHeartRateDetectionActivity"
+                  android:label="0 FAKE HEART RATE">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
         <receiver
             android:name=".controller.RebootDeviceReceiver"
             android:enabled="true"

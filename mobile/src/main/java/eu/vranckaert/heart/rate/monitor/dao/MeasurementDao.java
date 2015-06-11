@@ -27,10 +27,7 @@ public class MeasurementDao extends Dao<Measurement, Integer, HeartRateDatabaseH
         try {
             QueryBuilder<Measurement, Integer> qb = dao.queryBuilder();
             qb.where().eq(Measurement.COLUMN_START, measurement.getStartMeasurement())
-                    .and().eq(Measurement.COLUMN_END, measurement.getEndMeasurement())
-                    .and().eq(Measurement.COLUMN_AVERAGE, measurement.getAverageHeartBeat())
-                    .and().eq(Measurement.COLUMN_MIN, measurement.getMinimumHeartBeat())
-                    .and().eq(Measurement.COLUMN_MAX, measurement.getMaximumHeartBeat());
+                    .and().eq(Measurement.COLUMN_END, measurement.getEndMeasurement());
             PreparedQuery<Measurement> pq = qb.prepare();
             return dao.query(pq);
         } catch (SQLException e) {

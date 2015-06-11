@@ -47,6 +47,7 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.d("dirk-background", "onHandleIntent");
+        mStartTime = new Date().getTime();
 
         if (getSystemService(Context.SENSOR_SERVICE) != null) {
             mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -62,11 +63,10 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
     }
 
     private void checkDuration() {
-        if (mStartTime == -1 || mEndTime == -1) {
+        if (mEndTime == -1) {
             Log.d("dirk-background", "checkDuration (set initial values)");
             // Determine the end time of the measurement (aka the duration)
             Calendar calendar = Calendar.getInstance();
-            mStartTime = calendar.getTimeInMillis();
             calendar.add(Calendar.MILLISECOND, 15000);
             mEndTime = calendar.getTimeInMillis();
         } else {
@@ -82,6 +82,7 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
                 measurement.setStartMeasurement(mStartTime);
                 measurement.setEndMeasurement(currentTime);
                 measurement.setFirstMeasurement(mFirstMeasurement);
+                measurement.setMeasuredValues(mMeasuredValues);
                 WearUserPreferences.getInstance().addMeasurement(measurement);
                 new HeartRateMeasurementTask().execute(measurement);
 

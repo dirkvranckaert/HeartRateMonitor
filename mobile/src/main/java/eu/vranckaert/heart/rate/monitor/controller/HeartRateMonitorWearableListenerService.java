@@ -85,56 +85,62 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                     Log.d("dirk", "Storing the measurement locally");
                     measurement = mDao.save(measurement);
 
-                    boolean hasAggregateHeartRateSummarySubscription =
-                            BusinessService.getInstance().hasFitnessSubscription(FitHelper.DATA_TYPE_HEART_RATE);
-                    Log.d("dirk", "hasAggregateHeartRateSummarySubscription=" + hasAggregateHeartRateSummarySubscription);
-                    hasAggregateHeartRateSummarySubscription = false; // TODO enable again to enable all Fit synchronisation
-                    if (hasAggregateHeartRateSummarySubscription) {
-                        UserPreferences.getInstance().setGoogleFitActivationErrorCount(-1);
-                        DataSet dataSet = getGoogleFitDataSet(measurement);
+                    if (!measurement.isFakeHeartRate()) {
+                        boolean hasAggregateHeartRateSummarySubscription =
+                                BusinessService.getInstance().hasFitnessSubscription(FitHelper.DATA_TYPE_HEART_RATE);
+                        Log.d("dirk",
+                                "hasAggregateHeartRateSummarySubscription=" + hasAggregateHeartRateSummarySubscription);
+                        if (hasAggregateHeartRateSummarySubscription) {
+                            UserPreferences.getInstance().setGoogleFitActivationErrorCount(-1);
+                            DataSet dataSet = getGoogleFitDataSet(measurement);
 
-                        Log.d("dirk", "Storing Google Fitness BPM DataSet");
-                        boolean success = BusinessService.getInstance().addFitnessHeartRateMeasurement(dataSet);
-                        if (success) {
-                            Log.d("dirk", "Storing the BPM in Google Fit was successful, updating local DB");
-                            measurement.setSyncedWithGoogleFit(true);
-                            mDao.update(measurement);
+                            Log.d("dirk", "Storing Google Fitness BPM DataSet");
+                            boolean success = BusinessService.getInstance().addFitnessHeartRateMeasurement(dataSet);
+                            if (success) {
+                                Log.d("dirk", "Storing the BPM in Google Fit was successful, updating local DB");
+                                measurement.setSyncedWithGoogleFit(true);
+                                mDao.update(measurement);
 
-                            syncPostponedMeasurements();
+                                syncPostponedMeasurements();
+                            } else {
+                                Log.d("dirk", "Could not store BPM in Google Fit, updating local DB");
+                                measurement.setSyncedWithGoogleFit(false);
+                                mDao.update(measurement);
+                            }
                         } else {
-                            Log.d("dirk", "Could not store BPM in Google Fit, updating local DB");
-                            measurement.setSyncedWithGoogleFit(false);
-                            mDao.update(measurement);
-                        }
-                    } else {
-                        Log.d("dirk", "No Google Fitness subscriptions yet...");
+                            Log.d("dirk", "No Google Fitness subscriptions yet...");
 
-                        int errorCount = UserPreferences.getInstance().getGoogleFitActivationErrorCount();
-                        if (errorCount == 10) {
-                            UserPreferences.getInstance().setGoogleFitActivationErrorCount(0);
+                            int errorCount = UserPreferences.getInstance().getGoogleFitActivationErrorCount();
+                            if (errorCount == 10) {
+                                UserPreferences.getInstance().setGoogleFitActivationErrorCount(0);
 
-                            Intent intent = new Intent(HeartRateApplication.getContext(), GoogleFitSetupActivity.class);
-                            PendingIntent pendingIntent = PendingIntent.getActivity(HeartRateApplication.getContext(), 0, intent, 0);
+                                Intent intent =
+                                        new Intent(HeartRateApplication.getContext(), GoogleFitSetupActivity.class);
+                                PendingIntent pendingIntent =
+                                        PendingIntent.getActivity(HeartRateApplication.getContext(), 0, intent, 0);
 
-                            Notification notification = new Notification.Builder(HeartRateApplication.getContext())
-                                    .setContentTitle(HeartRateApplication.getContext()
-                                            .getString(R.string.app_name))
-                                    .setContentText(HeartRateApplication.getContext()
-                                            .getString(R.string.notification_google_fitness_not_connected_message))
-                                    .setStyle(new BigTextStyle().bigText(HeartRateApplication.getContext()
-                                            .getString(R.string.notification_google_fitness_not_connected_message)))
-                                    .setSmallIcon(R.drawable.ic_notification)
-                                    .setColor(HeartRateApplication.getContext().getResources().getColor(R.color.hrm_accent_color))
-                                    .addAction(R.drawable.fit_notification,
-                                            HeartRateApplication.getContext().getString(R.string.notification_google_fitness_not_connected_message_action_connect),
-                                            pendingIntent)
-                                    .build();
-                            NotificationManager notificationManager =
-                                    (NotificationManager) HeartRateApplication.getContext()
-                                            .getSystemService(Context.NOTIFICATION_SERVICE);
-                            notificationManager.notify(NotificationId.GOOGLE_FITNESS_NOT_CONNECTED, notification);
-                        } else {
-                            UserPreferences.getInstance().setGoogleFitActivationErrorCount(errorCount + 1);
+                                Notification notification = new Notification.Builder(HeartRateApplication.getContext())
+                                        .setContentTitle(HeartRateApplication.getContext()
+                                                .getString(R.string.app_name))
+                                        .setContentText(HeartRateApplication.getContext()
+                                                .getString(R.string.notification_google_fitness_not_connected_message))
+                                        .setStyle(new BigTextStyle().bigText(HeartRateApplication.getContext()
+                                                .getString(R.string.notification_google_fitness_not_connected_message)))
+                                        .setSmallIcon(R.drawable.ic_notification)
+                                        .setColor(HeartRateApplication.getContext().getResources()
+                                                .getColor(R.color.hrm_accent_color))
+                                        .addAction(R.drawable.fit_notification,
+                                                HeartRateApplication.getContext().getString(
+                                                        R.string.notification_google_fitness_not_connected_message_action_connect),
+                                                pendingIntent)
+                                        .build();
+                                NotificationManager notificationManager =
+                                        (NotificationManager) HeartRateApplication.getContext()
+                                                .getSystemService(Context.NOTIFICATION_SERVICE);
+                                notificationManager.notify(NotificationId.GOOGLE_FITNESS_NOT_CONNECTED, notification);
+                            } else {
+                                UserPreferences.getInstance().setGoogleFitActivationErrorCount(errorCount + 1);
+                            }
                         }
                     }
                 }
@@ -147,13 +153,16 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
         Log.d("dirk", "Sycning all postponed measurements, found " + measurements.size() + " measurement(s)");
         for (int i=0; i<measurements.size(); i++) {
             Measurement measurement = measurements.get(i);
-            DataSet dataSet = getGoogleFitDataSet(measurement);
-            boolean succuess = BusinessService.getInstance().addFitnessHeartRateMeasurement(dataSet);
-            Log.d("dirk", "Measurement from " + new Date(measurement.getStartMeasurement()) + " has been synced with Google Fit. Result is success? " + succuess);
-            if (succuess) {
-                Log.d("dirk", "Updating local storage indicating the measurement should be in Google Fit");
-                measurement.setSyncedWithGoogleFit(true);
-                mDao.update(measurement);
+            if (!measurement.isFakeHeartRate()) {
+                DataSet dataSet = getGoogleFitDataSet(measurement);
+                boolean succuess = BusinessService.getInstance().addFitnessHeartRateMeasurement(dataSet);
+                Log.d("dirk", "Measurement from " + new Date(measurement.getStartMeasurement()) +
+                        " has been synced with Google Fit. Result is success? " + succuess);
+                if (succuess) {
+                    Log.d("dirk", "Updating local storage indicating the measurement should be in Google Fit");
+                    measurement.setSyncedWithGoogleFit(true);
+                    mDao.update(measurement);
+                }
             }
         }
     }

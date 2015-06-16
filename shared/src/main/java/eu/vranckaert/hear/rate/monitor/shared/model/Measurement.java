@@ -10,10 +10,12 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * Date: 29/05/15
@@ -273,19 +275,69 @@ public class Measurement implements Serializable {
     }
 
     public boolean isFakeHeartRate() {
+        return !TextUtils.isEmpty(detectFakeHeartRate());
+    }
+
+    public String detectFakeHeartRate() {
         boolean timeCheckFailed = false;
         boolean measuredHeartRateCountFailed = false;
+        boolean measurementHeartRateDropCheckFailed = false;
+        boolean measuremntCannotAwakeFromDeathCheckFailed = false;
 
-        // If it takes more than 20 seconds to find a heart beat it might be 'fake' one
+        // If it takes more than 60 seconds to find a heart beat it might be 'fake' one
         long timeBeforeFirstMeasurement = firstMeasurement - startMeasurement;
-        if (timeBeforeFirstMeasurement > 20000) {
+        if (timeBeforeFirstMeasurement > 60000) {
             timeCheckFailed = true;
         }
 
+        // If we have 3 or less measurements it should be a fake heart rate
         if (measuredValues == null || measuredValues.size() <= 3) {
             measuredHeartRateCountFailed = true;
         }
 
-        return timeCheckFailed || measuredHeartRateCountFailed;
+        //
+        if (measuredValues != null && !measuredValues.isEmpty()) {
+            TreeMap<Long,Float> sortedMap = new TreeMap<Long,Float>(new Comparator<Long>() {
+                @Override
+                public int compare(Long lhs, Long rhs) {
+                    return lhs.compareTo(rhs);
+                }
+            });
+            sortedMap.putAll(getMeasuredValues());
+
+            long previousTimeStamp = -1;
+            float previousHeartBeat = -1;
+            for (Entry<Long, Float> entry : sortedMap.entrySet()) {
+                long timeStamp = entry.getKey();
+                float heartBeat = entry.getValue();
+                if (previousHeartBeat != -1 && previousTimeStamp != -1) {
+                    long timeBetween = timeStamp - previousTimeStamp;
+                    if (heartBeat == 0 && previousHeartBeat > 100 && timeBetween <= 2000L) {
+                        measurementHeartRateDropCheckFailed = true;
+                    } else if (previousHeartBeat == 0 && heartBeat > 0) {
+                        measuremntCannotAwakeFromDeathCheckFailed = true;
+                    }
+                }
+
+                if (measurementHeartRateDropCheckFailed || measuremntCannotAwakeFromDeathCheckFailed) {
+                    break;
+                }
+
+                previousTimeStamp = timeStamp;
+                previousHeartBeat = heartBeat;
+            }
+        }
+
+        if (timeCheckFailed) {
+            return "TIME_CHECK";
+        } else if (measuredHeartRateCountFailed) {
+            return "HEART_RATE_COUNT";
+        } else if (measurementHeartRateDropCheckFailed) {
+            return "HEART_RATE_DROP";
+        } else if (measuremntCannotAwakeFromDeathCheckFailed) {
+            return "HEART_RATE_AWAKE_FROM_DEATH";
+        } else {
+            return "";
+        }
     }
 }

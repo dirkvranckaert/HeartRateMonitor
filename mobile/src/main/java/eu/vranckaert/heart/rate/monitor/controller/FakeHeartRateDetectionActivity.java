@@ -83,7 +83,7 @@ public class FakeHeartRateDetectionActivity extends Activity {
             });
             sortedMap.putAll(measurement.getMeasuredValues());
 
-            String fake = measurement.isFakeHeartRate() ? "==FAKE HEART RATE DETECTED==\n" : "";
+            String fake = measurement.isFakeHeartRate() ? "==FAKE: " + measurement.detectFakeHeartRate() +"==\n" : "";
             String startTime = "Start: " + new Date(measurement.getStartMeasurement()).toString();
             String firstMeasurement = "First: " + new Date(measurement.getFirstMeasurement()).toString();
             long millisBeforeFirstResult = measurement.getFirstMeasurement() - measurement.getStartMeasurement();
@@ -105,7 +105,7 @@ public class FakeHeartRateDetectionActivity extends Activity {
             if (!TextUtils.isEmpty(currentContent)) {
                 firstItem = "\n\n";
             }
-            mContent.setText(mContent.getText() + fake + firstItem + startTime + "\n" + firstMeasurement + "\n" + timeUntilFirstMeasurementInMillis + "\n" + timeUntilFirstMeasurementInSeconds + "\n" + averageHeartBeat + "\n" + minimumHeartBeat + "\n" + maximumHeartBeat + "\n" + measurementsText);
+            mContent.setText(mContent.getText() + firstItem + fake + startTime + "\n" + firstMeasurement + "\n" + timeUntilFirstMeasurementInMillis + "\n" + timeUntilFirstMeasurementInSeconds + "\n" + averageHeartBeat + "\n" + minimumHeartBeat + "\n" + maximumHeartBeat + "\n" + measurementsText);
         }
     }
 }

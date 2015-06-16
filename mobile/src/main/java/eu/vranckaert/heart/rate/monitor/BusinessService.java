@@ -106,9 +106,14 @@ public class BusinessService {
             }
         }
 
-        Log.d("dirk-background", "mActivityRecognitionApiClient.connected=" + mActivityRecognitionApiClient.isConnected());
-        if (mActivityRecognitionApiClient.isConnected()) {
-            return mActivityRecognitionApiClient;
+        if (mActivityRecognitionApiClient != null) {
+            Log.d("dirk-background",
+                    "mActivityRecognitionApiClient.connected=" + mActivityRecognitionApiClient.isConnected());
+            if (mActivityRecognitionApiClient.isConnected()) {
+                return mActivityRecognitionApiClient;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }

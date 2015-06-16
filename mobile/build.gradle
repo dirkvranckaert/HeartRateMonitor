@@ -41,7 +41,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     //wearApp project(':wear')
-    wearApp files('/wear/build/outputs/apk/wearable.apk')
+    wearApp files('wear/build/outputs/apk/wearable.apk')
     compile project(':shared')
     compile 'com.google.android.gms:play-services:+'
     compile 'com.google.android.gms:play-services-location:+'

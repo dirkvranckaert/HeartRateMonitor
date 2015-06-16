@@ -39,6 +39,17 @@ android {
     }
 }
 
+android.applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+        def setAPKOutputName = "set${variant.name}APKOutputName"
+        task (setAPKOutputName) << {
+            output.outputFile = new File(output.outputFile.parent, "wearable.apk")
+        }
+        def hookTask1 = variant.generateBuildConfig
+        hookTask1.dependsOn(setAPKOutputName)
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.android.support:wearable:+'

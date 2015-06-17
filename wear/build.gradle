@@ -9,8 +9,6 @@ android {
         applicationId "eu.vranckaert.heart.rate.monitor"
         minSdkVersion 21
         targetSdkVersion 22
-        versionCode 5
-        versionName "0.1"
     }
 
     signingConfigs {

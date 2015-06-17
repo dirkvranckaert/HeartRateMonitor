@@ -89,13 +89,14 @@ public class BusinessService {
                     .addConnectionCallbacks(new ConnectionCallbacks() {
                         @Override
                         public void onConnected(Bundle bundle) {
-
+                            Log.d("dirk-background", "ActivityRecognitionApiClient connected!");
+                            connectActivityRecognitionApiClient();
                         }
 
                         @Override
                         public void onConnectionSuspended(int i) {
-                            Log.d("dirk-background", "mActivityRecognitionApiClient suspended, restarting connectActivityRecognitionApiClient");
-                            connectActivityRecognitionApiClient();
+                            Log.d("dirk-background",
+                                    "mActivityRecognitionApiClient suspended, restarting connectActivityRecognitionApiClient");
                         }
                     })
                     .build();
@@ -104,18 +105,12 @@ public class BusinessService {
                 Log.d("dirk-background", "mActivityRecognitionApiClient connected");
                 mActivityRecognitionApiClient = googleApiClient;
             }
-        }
 
-        if (mActivityRecognitionApiClient != null) {
+            return null;
+        } else {
             Log.d("dirk-background",
                     "mActivityRecognitionApiClient.connected=" + mActivityRecognitionApiClient.isConnected());
-            if (mActivityRecognitionApiClient.isConnected()) {
-                return mActivityRecognitionApiClient;
-            } else {
-                return null;
-            }
-        } else {
-            return null;
+            return mActivityRecognitionApiClient;
         }
     }
 
@@ -143,15 +138,19 @@ public class BusinessService {
         Intent intent = new Intent(HeartRateApplication.getContext(), ActivityRecognitionIntentService.class);
         PendingIntent pendingIntent = PendingIntent.getService(HeartRateApplication.getContext(), 0, intent, 0);
 
-        PendingResult<Status> pendingResult = ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
-                getActivityRecognitionApiClient(),
-                ActivityState.DETECTION_INTERVAL,
-                pendingIntent
-        );
-        Status status = pendingResult.await();
-        Log.d("dirk-background", "status.success=" + status.isSuccess());
-        Log.d("dirk-background", "status.statusMessage=" + status.getStatusMessage());
-        Log.d("dirk-background", "status.statusCode=" + status.getStatusCode());
+        if (getActivityRecognitionApiClient() != null) {
+            PendingResult<Status> pendingResult = ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
+                    mActivityRecognitionApiClient,
+                    ActivityState.DETECTION_INTERVAL,
+                    pendingIntent
+            );
+            Status status = pendingResult.await();
+            Log.d("dirk-background", "status.success=" + status.isSuccess());
+            Log.d("dirk-background", "status.statusMessage=" + status.getStatusMessage());
+            Log.d("dirk-background", "status.statusCode=" + status.getStatusCode());
+        } else {
+            Log.d("dirk-background", "Google api client for activity recognition is null");
+        }
     }
 
     public void setActivityUpdate(int activityState) {

@@ -29,22 +29,46 @@ android {
             applicationIdSuffix ".debug"
             signingConfig signingConfigs.debug
         }
+        jenkinsDebug.initWith(buildTypes.debug)
+        jenkinsDebug {
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
             //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+
+            applicationVariants.all { variant ->
+                appendVersionName(variant, defaultConfig)
+            }
         }
     }
 }
 
-android.applicationVariants.all { variant ->
+//android.applicationVariants.all { variant ->
+//    variant.outputs.each { output ->
+//        if (!variant.name.equals("debug")) {
+//            def setAPKOutputName = "set${variant.name}APKOutputName"
+//            task(setAPKOutputName) << {
+//                output.outputFile = new File(output.outputFile.parent, "wearable.apk")
+//            }
+//            def hookTask1 = variant.generateBuildConfig
+//            hookTask1.dependsOn(setAPKOutputName)
+//        }
+//    }
+//}
+
+def appendVersionName(variant, defaultConfig) {
     variant.outputs.each { output ->
-        def setAPKOutputName = "set${variant.name}APKOutputName"
-        task (setAPKOutputName) << {
-            output.outputFile = new File(output.outputFile.parent, "wearable.apk")
+        if (!variant.name.equals("debug")) {
+            if (output.zipAlign) {
+                def file = output.outputFile
+                output.outputFile = new File(file.parent, "wearable.apk")
+            }
+
+            def file = output.packageApplication.outputFile
+            output.outputFile = new File(file.parent, "wearable.apk")
         }
-        def hookTask1 = variant.generateBuildConfig
-        hookTask1.dependsOn(setAPKOutputName)
     }
 }
 

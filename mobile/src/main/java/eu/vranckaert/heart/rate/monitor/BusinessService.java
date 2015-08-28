@@ -165,6 +165,7 @@ public class BusinessService {
         Log.d("dirk-background", "Checking if subscription is available for " + type.getName());
         GoogleApiClient googleApiClient = getFitnessApiClient();
         if (googleApiClient == null) {
+            Log.d("dirk-background", "Could not get fitness API client...");
             return false;
         }
 
@@ -178,6 +179,7 @@ public class BusinessService {
                 }
             }
         }
+        Log.d("dirk-background", "No fitness subscriptions found");
         return false;
     }
 

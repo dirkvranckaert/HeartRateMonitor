@@ -109,9 +109,10 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                             }
                         } else {
                             Log.d("dirk", "No Google Fitness subscriptions yet...");
-
                             int errorCount = UserPreferences.getInstance().getGoogleFitActivationErrorCount();
+                            Log.d("dirk", "Google fit activation error occurred " + errorCount + " time(s) now");
                             if (errorCount == 10) {
+                                Log.d("dirk", "Showing notification to logon to Google Fit");
                                 UserPreferences.getInstance().setGoogleFitActivationErrorCount(0);
 
                                 Intent intent =
@@ -139,6 +140,7 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                                                 .getSystemService(Context.NOTIFICATION_SERVICE);
                                 notificationManager.notify(NotificationId.GOOGLE_FITNESS_NOT_CONNECTED, notification);
                             } else {
+                                Log.d("dirk", "Not showing notification to logon to Google Fit right now");
                                 UserPreferences.getInstance().setGoogleFitActivationErrorCount(errorCount + 1);
                             }
                         }

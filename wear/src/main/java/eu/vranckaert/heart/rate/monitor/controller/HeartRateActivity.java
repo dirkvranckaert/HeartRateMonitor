@@ -217,6 +217,7 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     }
 
     private void loadHistoricalData() {
+        // TODO the historical data should come from the phone, not from the watch
         Measurement latestMeasurement = WearUserPreferences.getInstance().getLatestMeasurment();
         mMonitorView.setLatestMeasurement(latestMeasurement);
         mHistoryView.setMeasurements(WearUserPreferences.getInstance().getAllMeasurements());

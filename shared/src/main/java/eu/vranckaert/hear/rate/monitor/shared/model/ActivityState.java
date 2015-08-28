@@ -9,9 +9,16 @@ import eu.vranckaert.hear.rate.monitor.shared.DateUtil;
  * @author Dirk Vranckaert
  */
 public class ActivityState {
-    public static final long DEFAULT_MEASURING_INTERVAL = DateUtil.convertMinutesToMillis(15);
-    public static final long DETECTION_INTERVAL = 10000; // 10 seconds
-    public static final int TRUSTED_COUNT = 6; // TRUSTED_COUNT * DETECTION_INTERVAL = time before an activity is accepted. So 6 * 10000 = 60000 millis or 60 seconds or 1 minute before we accept that a user is running/bicycling/driving/still/...
+    /*
+     * With current settings activity detection will receive updates every 30 seconds.
+     * If a new activity is received, it's only trusted after it's been seen for 3 minutes (calculated with the trusted factor).
+     * Automatic measuring will, by default, run every 60 minutes (once ever hour). If we detect that you are doing some sports
+     * (like running or bycycling) the measuring interval is set to once every five minutes. If we detect that you are in
+     * a vehicle (your car, the bus, the train,...) we measure every 15 minutes.
+     */
+    public static final long DEFAULT_MEASURING_INTERVAL = DateUtil.convertMinutesToMillis(60);
+    public static final long DETECTION_INTERVAL = 30000; // 30 seconds
+    public static final int TRUSTED_FACTOR = 6; // TRUSTED_FACTOR * DETECTION_INTERVAL = time before an activity is accepted. So 6 * 10000 = 60000 millis or 60 seconds or 1 minute before we accept that a user is running/bicycling/driving/still/...
 
     public static final int IN_VEHICLE = 0;
     public static final int ON_BICYCLE = 1;
@@ -27,13 +34,13 @@ public class ActivityState {
 
         switch (activity) {
             case ActivityState.IN_VEHICLE:
-                interval = DateUtil.convertMinutesToMillis(5);
+                interval = DateUtil.convertMinutesToMillis(15);
                 break;
             case ActivityState.ON_BICYCLE:
-                interval = DateUtil.convertMinutesToMillis(1);
+                interval = DateUtil.convertMinutesToMillis(5);
                 break;
             case ActivityState.RUNNING:
-                interval = DateUtil.convertMinutesToMillis(1);
+                interval = DateUtil.convertMinutesToMillis(5);
                 break;
         }
 

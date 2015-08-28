@@ -40,7 +40,7 @@ public class HearRateMonitorWearableListenerService extends WearableListenerServ
                     int previousActivityCount = WearUserPreferences.getInstance().getLatestActivityCount();
                     int acceptedActivity = WearUserPreferences.getInstance().getAcceptedActivity();
                     Log.d("dirk", "Activity has been seen now for " + previousActivityCount + " times and the currentActivity is different from the acceptedActivity? " + (acceptedActivity != currentActivity));
-                    if (previousActivityCount >= ActivityState.TRUSTED_COUNT && acceptedActivity != currentActivity) {
+                    if (previousActivityCount >= ActivityState.TRUSTED_FACTOR && acceptedActivity != currentActivity) {
                         WearUserPreferences.getInstance().setAcceptedActivity(currentActivity);
                         if (ActivityState.getMeasuringIntervalForActivity(acceptedActivity) != ActivityState.getMeasuringIntervalForActivity(currentActivity)) {
                             AlarmSchedulingService.getInstance().rescheduleHeartRateMeasuringAlarms();

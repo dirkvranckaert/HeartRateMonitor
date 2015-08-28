@@ -23,7 +23,7 @@ configure(subprojects - project(':shared')) {
 
     android {
         defaultConfig {
-            versionCode 6
+            versionCode 7
             versionName '0.1'
         }
     }

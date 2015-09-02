@@ -18,7 +18,7 @@ public class ActivityState {
      */
     public static final long DEFAULT_MEASURING_INTERVAL = DateUtil.convertMinutesToMillis(60);
     public static final long DETECTION_INTERVAL = 30000; // 30 seconds
-    public static final int TRUSTED_FACTOR = 6; // TRUSTED_FACTOR * DETECTION_INTERVAL = time before an activity is accepted. So 6 * 10000 = 60000 millis or 60 seconds or 1 minute before we accept that a user is running/bicycling/driving/still/...
+    public static final int TRUSTED_FACTOR = 6; // TRUSTED_FACTOR * DETECTION_INTERVAL = time before an activity is accepted. So 6 * 30000 = 180000 millis or 180 seconds or 3 minutes before we accept that a user is running/bicycling/driving/still/...
 
     public static final int IN_VEHICLE = 0;
     public static final int ON_BICYCLE = 1;
@@ -32,16 +32,19 @@ public class ActivityState {
     public static long getMeasuringIntervalForActivity(int activity) {
         long interval = DEFAULT_MEASURING_INTERVAL;
 
-        switch (activity) {
-            case ActivityState.IN_VEHICLE:
-                interval = DateUtil.convertMinutesToMillis(15);
-                break;
-            case ActivityState.ON_BICYCLE:
-                interval = DateUtil.convertMinutesToMillis(5);
-                break;
-            case ActivityState.RUNNING:
-                interval = DateUtil.convertMinutesToMillis(5);
-                break;
+        // For now disabling the activity detection, should be configurable in the application
+        if (false) {
+            switch (activity) {
+                case ActivityState.IN_VEHICLE:
+                    interval = DateUtil.convertMinutesToMillis(15);
+                    break;
+                case ActivityState.ON_BICYCLE:
+                    interval = DateUtil.convertMinutesToMillis(5);
+                    break;
+                case ActivityState.RUNNING:
+                    interval = DateUtil.convertMinutesToMillis(5);
+                    break;
+            }
         }
 
         return interval;

@@ -25,12 +25,10 @@ import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
-import eu.vranckaert.hear.rate.monitor.shared.DateUtil;
 import eu.vranckaert.hear.rate.monitor.shared.WearURL;
 import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.heart.rate.monitor.controller.ActivityRecognitionIntentService;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;

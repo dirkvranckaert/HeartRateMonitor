@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/duration"
         tools:text="00:20"
-        android:layout_below="@id/bpm"/>
+        android:layout_below="@+id/bpm"/>
 
     <TextView
         android:layout_width="wrap_content"

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -28,12 +29,12 @@ import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
 import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.R;
+import eu.vranckaert.heart.rate.monitor.UserPreferences;
+import eu.vranckaert.heart.rate.monitor.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.dao.MeasurementDao;
 
-import java.util.Date;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Date: 04/06/15
@@ -41,28 +42,26 @@ import java.util.Map;
  *
  * @author Dirk Vranckaert
  */
-public class GoogleFitSetupActivity extends Activity implements OnClickListener {
+public class MainActivity extends Activity implements OnClickListener {
     private static final int REQUEST_OAUTH = 1;
     private static final int REQUEST_SUBSCRIPTION = 2;
+    private static final int VIEW_STATE_GOOGLE_FIT_CONNECTION = 0;
+    private static final int VIEW_STATE_MEASUREMENT_LIST = 1;
+
+    private int mCurrentViewSate = -1;
 
     private TextView mGoogleFitExplanation;
     private Button mConnect;
-    private Button mDisconnect;
+    private MeasurementsAdapter mMeasurementsAdapter;
+    // TODO we should have a disconnect button in the list somewhere (can be an action as well)...
+    // private Button mDisconnect;
 
     private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.google_fit);
-
-        mGoogleFitExplanation = (TextView) findViewById(R.id.fit_explanation);
-        mConnect = (Button) findViewById(R.id.connect);
-        mConnect.setOnClickListener(this);
-        mDisconnect = (Button) findViewById(R.id.disconnect);
-        mDisconnect.setOnClickListener(this);
-
+        mMeasurementsAdapter = new MeasurementsAdapter(this);
         initScreen(false);
         new CheckGoogleFitnessConnectionTask(this).execute();
     }
@@ -85,6 +84,7 @@ public class GoogleFitSetupActivity extends Activity implements OnClickListener 
      *  multiple accounts on the device and needing to specify which account to use, etc.
      */
     private void setupGoogleFit() {
+        // TODO is not yet a progress dialog with a spinning wheel
         final AlertDialog progress = new ProgressDialog.Builder(this)
                 .setMessage(R.string.google_fit_setup_connecting)
                 .setCancelable(false)
@@ -112,9 +112,11 @@ public class GoogleFitSetupActivity extends Activity implements OnClickListener 
                                 // If your connection to the sensor gets lost at some point,
                                 // you'll be able to determine the reason and react to it here.
                                 if (i == ConnectionCallbacks.CAUSE_NETWORK_LOST) {
-                                    Log.i("dirk", "Connection lost.  Cause: Network Lost.");
+                                    Log.e("dirk", "Connection lost.  Cause: Network Lost.");
+                                    // TODO show error handling
                                 } else if (i == ConnectionCallbacks.CAUSE_SERVICE_DISCONNECTED) {
-                                    Log.i("dirk", "Connection lost.  Reason: Service Disconnected");
+                                    Log.e("dirk", "Connection lost.  Reason: Service Disconnected");
+                                    // TODO show error handling
                                 }
                             }
                         }
@@ -128,7 +130,7 @@ public class GoogleFitSetupActivity extends Activity implements OnClickListener 
                                 progress.dismiss();
                                 if (!result.hasResolution()) {
                                     // Show the localized error dialog
-                                    GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), GoogleFitSetupActivity.this, 0).show();
+                                    GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), MainActivity.this, 0).show();
                                     return;
                                 }
                                 // The failure has a resolution. Resolve it.
@@ -136,9 +138,10 @@ public class GoogleFitSetupActivity extends Activity implements OnClickListener 
                                 // authorization dialog is displayed to the user.
                                 try {
                                     Log.i("dirk", "Attempting to resolve failed connection");
-                                    result.startResolutionForResult(GoogleFitSetupActivity.this, REQUEST_OAUTH);
+                                    result.startResolutionForResult(MainActivity.this, REQUEST_OAUTH);
                                 } catch (IntentSender.SendIntentException e) {
                                     Log.e("dirk", "Exception while starting resolution activity", e);
+                                    // TODO show error handling
                                 }
                             }
                         }
@@ -155,6 +158,7 @@ public class GoogleFitSetupActivity extends Activity implements OnClickListener 
      * a special success code.
      */
     public void subscribe() {
+        // TODO is not yet a progress dialog with a spinning wheel
         final AlertDialog progress = new ProgressDialog.Builder(this)
                 .setMessage(R.string.google_fit_setup_setup_fit)
                 .setCancelable(false)
@@ -174,17 +178,20 @@ public class GoogleFitSetupActivity extends Activity implements OnClickListener 
                             } else {
                                 Log.i("dirk", "Successfully subscribed!");
                             }
+                            UserPreferences.getInstance().setGoogleFitConnected(true);
                             initScreen(false);
                         } else {
                             Log.i("dirk", "There was a problem subscribing.");
+                            UserPreferences.getInstance().setGoogleFitConnected(false);
                             if (status.hasResolution()) {
                                 try {
-                                    status.startResolutionForResult(GoogleFitSetupActivity.this, REQUEST_SUBSCRIPTION);
+                                    status.startResolutionForResult(MainActivity.this, REQUEST_SUBSCRIPTION);
                                 } catch (SendIntentException e) {
                                     Log.e("dirk", "Exception while starting resolution activity", e);
                                 }
                             } else {
-                                GooglePlayServicesUtil.getErrorDialog(status.getStatusCode(), GoogleFitSetupActivity.this, 0).show();
+                                GooglePlayServicesUtil.getErrorDialog(status.getStatusCode(), MainActivity.this, 0)
+                                        .show();
                             }
                         }
                     }
@@ -211,17 +218,81 @@ public class GoogleFitSetupActivity extends Activity implements OnClickListener 
         }
     }
 
-    private void initScreen(boolean hasGoogleFitConnection) {
-        mConnect.setVisibility(hasGoogleFitConnection ? View.GONE : View.VISIBLE);
-        mDisconnect.setVisibility(hasGoogleFitConnection ? View.VISIBLE : View.GONE);
-        mGoogleFitExplanation.setText(hasGoogleFitConnection ? R.string.google_fit_setup_connected_summary :
-                R.string.google_fit_setup_disconnected_summary);
+    private void initScreen(boolean checkPerformed) {
+        invalidateOptionsMenu();
+        boolean hasGoogleFitConnection = UserPreferences.getInstance().getGoogleFitConnected();
+        if (hasGoogleFitConnection) {
+            initGoogleFitConnectionScreen(checkPerformed);
+        } else {
+            initOverviewOfMeasurements();
+        }
+    }
+
+    private void initGoogleFitConnectionScreen(boolean checkPerformed) {
+        mCurrentViewSate = VIEW_STATE_GOOGLE_FIT_CONNECTION;
+        setContentView(R.layout.google_fit_connection);
+        mGoogleFitExplanation = (TextView) findViewById(R.id.fit_explanation);
+        mConnect = (Button) findViewById(R.id.connect);
+        mConnect.setOnClickListener(this);
+        mConnect.setEnabled(checkPerformed);
+        mGoogleFitExplanation.setText(R.string.google_fit_setup_disconnected_summary);
+    }
+
+    private void initOverviewOfMeasurements() {
+        mCurrentViewSate = VIEW_STATE_MEASUREMENT_LIST;
+        setContentView(R.layout.heart_rate_measurements);
+        setMeasurements(new ArrayList<Measurement>());
+        // TOD start task and cancel in on destroy
+        new LoadMeasurementsTask().execute();
+    }
+
+    private void setMeasurements(List<Measurement> measurements) {
+        if (mCurrentViewSate == VIEW_STATE_MEASUREMENT_LIST) {
+            ListView list = (ListView) findViewById(R.id.list);
+            list.setAdapter(mMeasurementsAdapter);
+            mMeasurementsAdapter.setMeasurements(measurements);
+            TextView empty = (TextView) findViewById(R.id.empty);
+            if (measurements == null || measurements.isEmpty()) {
+                list.setVisibility(View.GONE);
+                empty.setVisibility(View.VISIBLE);
+            } else {
+                list.setVisibility(View.VISIBLE);
+                empty.setVisibility(View.GONE);
+
+
+            }
+        }
+    }
+
+    private class LoadMeasurementsTask extends AsyncTask<Void, Void, List<Measurement>> {
+
+        @Override
+        protected List<Measurement> doInBackground(Void... params) {
+            // Retrieve all measurements and filter out the fake heart rate measurements
+            IMeasurementDao dao = new MeasurementDao();
+            List<Measurement> measurements = dao.findAll();
+            List<Measurement> fakeMeasurements = new ArrayList<>();
+            int measurementCount = measurements.size();
+            for (int i=0; i<measurementCount; i++) {
+                Measurement measurement = measurements.get(i);
+                if (measurement.isFakeHeartRate()) {
+                    fakeMeasurements.add(measurement);
+                }
+            }
+            measurements.removeAll(fakeMeasurements);
+            return measurements;
+        }
+
+        @Override
+        protected void onPostExecute(List<Measurement> measurements) {
+            setMeasurements(measurements);
+        }
     }
 
     private class CheckGoogleFitnessConnectionTask extends AsyncTask<Void, Void, Boolean> {
-        private final GoogleFitSetupActivity mActivity;
+        private final MainActivity mActivity;
 
-        public CheckGoogleFitnessConnectionTask(GoogleFitSetupActivity activity) {
+        public CheckGoogleFitnessConnectionTask(MainActivity activity) {
             mActivity = activity;
         }
 
@@ -232,15 +303,16 @@ public class GoogleFitSetupActivity extends Activity implements OnClickListener 
 
         @Override
         protected void onPostExecute(Boolean hasGoogleFitConnection) {
-            mActivity.initScreen(hasGoogleFitConnection);
+            UserPreferences.getInstance().setGoogleFitConnected(hasGoogleFitConnection);
+            mActivity.initScreen(true);
         }
     }
 
     private class CancelGoogleFitSubscriptions extends AsyncTask<Void, Void, Void> {
-        private final GoogleFitSetupActivity mActivity;
+        private final MainActivity mActivity;
         private AlertDialog mProgress;
 
-        public CancelGoogleFitSubscriptions(GoogleFitSetupActivity activity) {
+        public CancelGoogleFitSubscriptions(MainActivity activity) {
             mActivity = activity;
         }
 
@@ -255,6 +327,7 @@ public class GoogleFitSetupActivity extends Activity implements OnClickListener 
         @Override
         protected Void doInBackground(Void... params) {
             BusinessService.getInstance().cancelFitnessSubscription(FitHelper.DATA_TYPE_HEART_RATE);
+            UserPreferences.getInstance().setGoogleFitConnected(false);
             return null;
         }
 

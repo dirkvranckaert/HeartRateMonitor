@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
  * @author Dirk Vranckaert
  */
 public class UserPreferences {
+    private static final String KEY_GOOGLE_FIT_CONNECTED = "gogole_fit_connected";
     private static final String KEY_GOOGLE_FIT_ACTIVATION_ERROR = "google_fit_activation_error";
 
     private static UserPreferences INSTANCE;
@@ -21,6 +22,15 @@ public class UserPreferences {
     private UserPreferences() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(HeartRateApplication.getContext());
         mEditor = mSharedPreferences.edit();
+    }
+
+    public boolean getGoogleFitConnected() {
+        return mSharedPreferences.getBoolean(KEY_GOOGLE_FIT_CONNECTED, false);
+    }
+
+    public void setGoogleFitConnected(boolean googleFitConnected) {
+        mEditor.putBoolean(KEY_GOOGLE_FIT_CONNECTED, googleFitConnected);
+        mEditor.commit();
     }
     
     public static UserPreferences getInstance() {

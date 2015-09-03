@@ -2,7 +2,6 @@ package eu.vranckaert.heart.rate.monitor.view;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -18,7 +17,9 @@ import eu.vranckaert.hear.rate.monitor.shared.util.MetricHelper;
  *
  * @author Dirk Vranckaert
  */
-public abstract class AbstractViewHolder extends ViewHolder {
+public abstract class AbstractViewHolder {
+    private final View mView;
+
     protected static final int VISIBLE = View.VISIBLE;
     protected static final int GONE = View.GONE;
     protected static final int INVISIBLE = View.INVISIBLE;
@@ -48,21 +49,21 @@ public abstract class AbstractViewHolder extends ViewHolder {
 
     public AbstractViewHolder(LayoutInflater inflater, ViewGroup parent,
                               int layoutResource) {
-        super(inflater.inflate(layoutResource, parent, false));
-        itemView.setTag(this);
+        mView = inflater.inflate(layoutResource, parent, false);
+        mView.setTag(this);
     }
 
     @SuppressWarnings("unchecked")
     protected <T extends View> T findViewById(int id) {
-        return (T) itemView.findViewById(id);
+        return (T) mView.findViewById(id);
     }
 
     public Context getContext() {
-        return itemView.getContext();
+        return mView.getContext();
     }
 
     protected Resources getResources() {
-        return itemView.getResources();
+        return mView.getResources();
     }
 
     protected String getString(int id) {
@@ -82,7 +83,7 @@ public abstract class AbstractViewHolder extends ViewHolder {
     }
 
     public View getView() {
-        return itemView;
+        return mView;
     }
 
     protected int toDp(int i) {
@@ -102,7 +103,7 @@ public abstract class AbstractViewHolder extends ViewHolder {
     }
 
     public void post(Runnable runnable) {
-        itemView.post(runnable);
+        mView.post(runnable);
     }
 
     protected void applyTextColorSpan(TextView view, String text, String search, int color) {

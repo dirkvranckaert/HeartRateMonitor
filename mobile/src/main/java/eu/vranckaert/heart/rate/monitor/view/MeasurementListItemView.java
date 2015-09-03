@@ -5,29 +5,26 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.hear.rate.monitor.shared.util.DateUtil;
+import eu.vranckaert.heart.rate.monitor.R;
 
 import java.util.Date;
 import java.util.Map;
 
 /**
- * Date: 02/06/15
- * Time: 18:28
+ * Date: 02/09/15
+ * Time: 16:49
  *
  * @author Dirk Vranckaert
  */
-public class HeartRateHistoryItemView extends AbstractViewHolder {
+public class MeasurementListItemView extends AbstractViewHolder {
     private final TextView mBpm;
     private final TextView mDuration;
     private final TextView mDate;
     private final TextView mTime;
     private final TextView mActivity;
 
-    int mOriginalPaddingTop = -1;
-    int mOriginalPaddingBottom = -1;
-
-    public HeartRateHistoryItemView(LayoutInflater inflater, ViewGroup parent) {
+    public MeasurementListItemView(LayoutInflater inflater, ViewGroup parent) {
         super(inflater, parent, R.layout.heart_rate_history_item);
 
         mBpm = findViewById(R.id.bpm);
@@ -51,6 +48,7 @@ public class HeartRateHistoryItemView extends AbstractViewHolder {
             durationText += "0";
         }
         durationText += "" + minutes;
+
         mDuration.setText(durationText);
 
         switch (measurement.getActivity()) {
@@ -79,29 +77,5 @@ public class HeartRateHistoryItemView extends AbstractViewHolder {
                 mActivity.setText(R.string.heart_rate_history_activity_unknown);
                 break;
         }
-    }
-
-    public void setPaddingTop(int paddingTop) {
-        if (mOriginalPaddingTop == -1) {
-            mOriginalPaddingTop = itemView.getPaddingTop();
-        }
-        int paddingLeft = itemView.getPaddingLeft();
-        int paddingRight = itemView.getPaddingRight();
-        int paddingBottom = itemView.getPaddingBottom();
-        int newPaddingTop = paddingTop == 0 ? mOriginalPaddingTop : paddingTop + mOriginalPaddingTop;
-
-        itemView.setPadding(paddingLeft, newPaddingTop, paddingRight, paddingBottom);
-    }
-
-    public void setPaddingBottom(int paddingBottom) {
-        if (mOriginalPaddingBottom == -1) {
-            mOriginalPaddingBottom = itemView.getPaddingBottom();
-        }
-        int paddingLeft = itemView.getPaddingLeft();
-        int paddingRight = itemView.getPaddingRight();
-        int newPaddingBottom = paddingBottom == 0 ? mOriginalPaddingBottom : paddingBottom + mOriginalPaddingBottom;
-        int paddingTop = itemView.getPaddingTop();
-
-        itemView.setPadding(paddingLeft, paddingTop, paddingRight, newPaddingBottom);
     }
 }

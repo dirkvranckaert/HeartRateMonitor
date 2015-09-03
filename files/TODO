@@ -4,6 +4,8 @@ Version 1.0.0
   * Fix UI => when activating or disabling nothing seems to happen visually (unsubscribe doesn't even seem to work)
   * Add UI button to sync all measurements to Google Fit if not yet done
   * Google Fit notification only every 10 times!
+  * Google Fit connection: when making a connection, we show a progress dialog, but it's a simple dialog instead of a progress...
+  * Error handling during the setup of the GoogleApiClient when setting up the Google Fit connection (see TODO's)
 * Wear
   * Remove storage of measurements in the preferences (keep the json stuff to sync between phone and watch)
   * Read the measurements from the phone (forsee some loading stuff)

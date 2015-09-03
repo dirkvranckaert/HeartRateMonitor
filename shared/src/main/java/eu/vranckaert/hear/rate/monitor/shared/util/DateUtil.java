@@ -1,4 +1,4 @@
-package eu.vranckaert.heart.rate.monitor.util;
+package eu.vranckaert.hear.rate.monitor.shared.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,6 +35,10 @@ public class DateUtil {
     private static SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
     private static SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
     private static SimpleDateFormat sdf8601 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ", Locale.getDefault());
+
+    public static long convertMinutesToMillis(int minutes) {
+        return minutes * 60L * 1000L;
+    }
 
     public static void resetDayInfo(Calendar calendar) {
         calendar.set(Calendar.YEAR, calendar.getActualMinimum(Calendar.YEAR));

@@ -9,7 +9,7 @@ import android.widget.TextView;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.util.BoxInsetLayoutUtil;
-import eu.vranckaert.heart.rate.monitor.util.DateUtil;
+import eu.vranckaert.hear.rate.monitor.shared.util.DateUtil;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateView.HeartRateListener;
 
 import java.util.Date;

@@ -10,7 +10,7 @@ import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.WearHeartRateApplication;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.controller.HeartRateMonitorIntentService;
-import eu.vranckaert.heart.rate.monitor.util.DateUtil;
+import eu.vranckaert.hear.rate.monitor.shared.util.DateUtil;
 
 import java.util.Calendar;
 import java.util.Date;

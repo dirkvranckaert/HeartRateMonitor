@@ -19,7 +19,7 @@
         android:name=".HeartRateApplication">
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".controller.GoogleFitSetupActivity"
+        <activity android:name=".controller.MainActivity"
                   android:label="@string/google_fit_setup_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

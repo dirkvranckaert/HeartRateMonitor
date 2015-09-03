@@ -1,4 +1,4 @@
-package eu.vranckaert.heart.rate.monitor.util;
+package eu.vranckaert.hear.rate.monitor.shared.util;
 
 import android.content.Context;
 

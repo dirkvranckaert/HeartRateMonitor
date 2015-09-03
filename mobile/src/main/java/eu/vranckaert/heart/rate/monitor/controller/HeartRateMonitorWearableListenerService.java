@@ -116,7 +116,7 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                                 UserPreferences.getInstance().setGoogleFitActivationErrorCount(0);
 
                                 Intent intent =
-                                        new Intent(HeartRateApplication.getContext(), GoogleFitSetupActivity.class);
+                                        new Intent(HeartRateApplication.getContext(), MainActivity.class);
                                 PendingIntent pendingIntent =
                                         PendingIntent.getActivity(HeartRateApplication.getContext(), 0, intent, 0);
 

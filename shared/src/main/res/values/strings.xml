@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="heart_rate_history_activity_bicycle">Bicycling</string>
+    <string name="heart_rate_history_activity_vehicle">Driving</string>
+    <string name="heart_rate_history_activity_on_foot">On foot</string>
+    <string name="heart_rate_history_activity_still">Still</string>
+    <string name="heart_rate_history_activity_tilting">@string/heart_rate_history_activity_still</string>
+    <string name="heart_rate_history_activity_walking">Walking</string>
+    <string name="heart_rate_history_activity_running">Running</string>
+    <string name="heart_rate_history_activity_unknown">Unknown</string>
+</resources>

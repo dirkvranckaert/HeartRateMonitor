@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:id="@+id/container">
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="wrap_content"
@@ -74,13 +73,21 @@
         tools:text="23/05/2015 10:03"
         tools:visibility="visible"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Current activity: vehicle"
+        android:layout_below="@+id/timestamp"
+        android:id="@+id/current_activity"
+        android:layout_centerHorizontal="true"/>
+
     <Button
         android:layout_width="80dp"
         android:layout_height="40dp"
         tools:text="START"
         android:textSize="12dp"
         android:layout_marginTop="6dp"
-        android:layout_below="@id/timestamp"
+        android:layout_below="@id/current_activity"
         android:layout_centerHorizontal="true"
         android:id="@+id/action"/>
 </RelativeLayout>

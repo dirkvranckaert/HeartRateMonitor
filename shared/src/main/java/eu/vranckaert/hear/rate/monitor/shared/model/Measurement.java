@@ -1,9 +1,11 @@
 package eu.vranckaert.hear.rate.monitor.shared.model;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import eu.vranckaert.heart.rate.monitor.shared.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -338,6 +340,31 @@ public class Measurement implements Serializable {
             return "HEART_RATE_AWAKE_FROM_DEATH";
         } else {
             return "";
+        }
+    }
+    
+    public String getActivityName(Context context) {
+        return getActivityName(context, activity);
+    }
+
+    public static String getActivityName(Context context, int activity) {
+        switch (activity) {
+            case ActivityState.IN_VEHICLE:
+                return context.getString(R.string.heart_rate_history_activity_vehicle);
+            case ActivityState.WALKING:
+                return context.getString(R.string.heart_rate_history_activity_walking);
+            case ActivityState.ON_FOOT:
+                return context.getString(R.string.heart_rate_history_activity_on_foot);
+            case ActivityState.ON_BICYCLE:
+                return context.getString(R.string.heart_rate_history_activity_bicycle);
+            case ActivityState.RUNNING:
+                return context.getString(R.string.heart_rate_history_activity_running);
+            case ActivityState.STILL:
+                return context.getString(R.string.heart_rate_history_activity_still);
+            case ActivityState.TILTING:
+                return context.getString(R.string.heart_rate_history_activity_tilting);
+            default:
+                return context.getString(R.string.heart_rate_history_activity_unknown);
         }
     }
 }

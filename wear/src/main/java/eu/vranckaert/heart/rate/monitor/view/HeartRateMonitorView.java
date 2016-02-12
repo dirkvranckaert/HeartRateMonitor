@@ -6,10 +6,11 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.heart.rate.monitor.util.BoxInsetLayoutUtil;
 import eu.vranckaert.hear.rate.monitor.shared.util.DateUtil;
+import eu.vranckaert.heart.rate.monitor.R;
+import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
+import eu.vranckaert.heart.rate.monitor.util.BoxInsetLayoutUtil;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateView.HeartRateListener;
 
 import java.util.Date;
@@ -23,23 +24,24 @@ import java.util.Date;
 public class HeartRateMonitorView extends AbstractViewHolder implements OnClickListener {
     private final HeartRateListener mListener;
 
-    private final View mContainer;
     private final TextView mTitle;
     private final TextView mBpm;
     private final View mBpmLabelContainer;
     private final TextView mTimestamp;
+    private final TextView mCurrentActivity;
     private final Button mAction;
 
     public HeartRateMonitorView(LayoutInflater inflater, ViewGroup parent, HeartRateListener listener) {
         super(inflater, parent, R.layout.heart_rate_monitor);
         mListener = listener;
-        BoxInsetLayoutUtil.setReferenceBoxInsetLayoutView(getView(), true, true, false, false, listener.getBoxInsetReferenceView());
+        BoxInsetLayoutUtil.setReferenceBoxInsetLayoutView(getView(), true, true, false, false,
+                listener.getBoxInsetReferenceView());
 
-        mContainer = findViewById(R.id.container);
         mTitle = findViewById(R.id.title);
         mBpm = findViewById(R.id.heart_rate);
         mBpmLabelContainer = findViewById(R.id.bpm_label_container);
         mTimestamp = findViewById(R.id.timestamp);
+        mCurrentActivity = findViewById(R.id.current_activity);
         mAction = findViewById(R.id.action);
 
         mBpm.setText(R.string.heart_rate_monitor_empty_heart_beat);
@@ -60,6 +62,7 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
         mBpm.setVisibility(View.VISIBLE);
         mBpmLabelContainer.setVisibility(VISIBLE);
         mTimestamp.setVisibility(INVISIBLE);
+        mCurrentActivity.setVisibility(VISIBLE);
         mAction.setVisibility(VISIBLE);
     }
 
@@ -71,22 +74,31 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
             mBpm.setVisibility(GONE);
             mBpmLabelContainer.setVisibility(GONE);
             mTimestamp.setVisibility(INVISIBLE);
+            mCurrentActivity.setVisibility(INVISIBLE);
             mAction.setVisibility(VISIBLE);
         } else {
             mTitle.setText(R.string.heart_rate_monitor_title_recent);
             int heartBeat = (int) measurement.getAverageHeartBeat();
             mBpm.setText("" + heartBeat);
             mTimestamp.setText(DateUtil.formatDateTime(new Date(measurement.getStartMeasurement())));
+            updateCurrentActivity();
 
             mBpm.setVisibility(View.VISIBLE);
             mBpmLabelContainer.setVisibility(VISIBLE);
             mTimestamp.setVisibility(VISIBLE);
+            mCurrentActivity.setVisibility(VISIBLE);
             mAction.setVisibility(VISIBLE);
         }
     }
 
+    private void updateCurrentActivity() {
+        String currentActivity = Measurement.getActivityName(getContext(), WearUserPreferences.getInstance().getAcceptedActivity());
+        mCurrentActivity.setText(getString(R.string.heart_rate_monitor_activity, currentActivity));
+    }
+
     @Override
     public void onClick(View v) {
+        updateCurrentActivity();
         if (v.getId() == R.id.action) {
             boolean started = mListener.toggleHeartRateMonitor();
             if (started) {

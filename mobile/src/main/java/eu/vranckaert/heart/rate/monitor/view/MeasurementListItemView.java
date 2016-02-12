@@ -57,32 +57,7 @@ public class MeasurementListItemView extends AbstractViewHolder {
 
         mDuration.setText(durationText);
 
-        switch (measurement.getActivity()) {
-            case ActivityState.IN_VEHICLE:
-                mActivity.setText(R.string.heart_rate_history_activity_vehicle);
-                break;
-            case ActivityState.WALKING:
-                mActivity.setText(R.string.heart_rate_history_activity_walking);
-                break;
-            case ActivityState.ON_FOOT:
-                mActivity.setText(R.string.heart_rate_history_activity_on_foot);
-                break;
-            case ActivityState.ON_BICYCLE:
-                mActivity.setText(R.string.heart_rate_history_activity_bicycle);
-                break;
-            case ActivityState.RUNNING:
-                mActivity.setText(R.string.heart_rate_history_activity_running);
-                break;
-            case ActivityState.STILL:
-                mActivity.setText(R.string.heart_rate_history_activity_still);
-                break;
-            case ActivityState.TILTING:
-                mActivity.setText(R.string.heart_rate_history_activity_tilting);
-                break;
-            case ActivityState.UNKNOWN:
-                mActivity.setText(R.string.heart_rate_history_activity_unknown);
-                break;
-        }
+        mActivity.setText(measurement.getActivityName(getContext()));
 
         mFitSyncState.setText(measurement.isSyncedWithGoogleFit() ? "Synced to Google Fit" : "Not yet synced to Google Fit");
 

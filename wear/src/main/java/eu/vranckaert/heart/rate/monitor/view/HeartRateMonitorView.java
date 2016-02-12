@@ -92,7 +92,8 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
     }
 
     private void updateCurrentActivity() {
-        String currentActivity = Measurement.getActivityName(getContext(), WearUserPreferences.getInstance().getAcceptedActivity());
+        String currentActivity =
+                Measurement.getActivityName(getContext(), WearUserPreferences.getInstance().getAcceptedActivity());
         mCurrentActivity.setText(getString(R.string.heart_rate_monitor_activity, currentActivity));
     }
 

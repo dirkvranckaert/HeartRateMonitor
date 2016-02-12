@@ -40,7 +40,7 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     private boolean mMeasuring;
     private long mStartTimeMeasurement;
     private boolean mFirstValueFound;
-    private Map<Long, Float> mMeasuredValues = new HashMap<>();
+    private Map<Long, Float> mMeasuredValues;
     private long mFirstMeasurement = -1;
     private float mMaximumHeartBeat = -1;
     private float mMinimumHeartBeat = -1;
@@ -116,7 +116,7 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
 
         if (DeviceUtil.isCharging()) {
             // TODO show message to the user somehow that while charging the heart rate cannot be measured...
-            mMeasuredValues.clear();
+            clearMeasuredValues();
             mMinimumHeartBeat = -1;
             mMaximumHeartBeat = -1;
             stopHearRateMonitor();
@@ -131,7 +131,7 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
                 if (mFirstMeasurement == -1) {
                     mFirstMeasurement = currentTime;
                 }
-                mMeasuredValues.put(currentTime, value);
+                addMeasuredValue(currentTime, value);
                 if (mMinimumHeartBeat == -1 || value < mMinimumHeartBeat) {
                     mMinimumHeartBeat = value;
                 }
@@ -142,6 +142,17 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
             }
         }
 
+    }
+
+    private void addMeasuredValue(long currentTime, float value) {
+        if (mMeasuredValues == null) {
+            clearMeasuredValues();
+        }
+        mMeasuredValues.put(currentTime, value);
+    }
+
+    private void clearMeasuredValues() {
+        mMeasuredValues = new HashMap<>();
     }
 
     @Override
@@ -157,7 +168,7 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
 
     private void startHearRateMonitor() {
         mFirstValueFound = false;
-        mMeasuredValues.clear();
+        clearMeasuredValues();
         mMinimumHeartBeat = -1;
         mMaximumHeartBeat = -1;
         if (mSensorManager != null && mHeartRateSensor != null) {
@@ -173,7 +184,7 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
             mSensorManager.unregisterListener(this, mHeartRateSensor);
         }
 
-        if (!mMeasuredValues.isEmpty()) {
+        if (mMeasuredValues != null && !mMeasuredValues.isEmpty()) {
             final float averageHeartBeat = calculateAverageHeartBeat();
             Measurement measurement = new Measurement();
             measurement.setAverageHeartBeat(averageHeartBeat);
@@ -185,6 +196,7 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
             measurement.setMeasuredValues(mMeasuredValues);
             WearUserPreferences.getInstance().addMeasurement(measurement);
             new HeartRateMeasurementTask().execute(measurement);
+            mMeasuredValues = null;
         }
     }
 
@@ -217,7 +229,6 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     }
 
     private void loadHistoricalData() {
-        // TODO the historical data should come from the phone, not from the watch
         Measurement latestMeasurement = WearUserPreferences.getInstance().getLatestMeasurment();
         mMonitorView.setLatestMeasurement(latestMeasurement);
         mHistoryView.setMeasurements(WearUserPreferences.getInstance().getAllMeasurements());

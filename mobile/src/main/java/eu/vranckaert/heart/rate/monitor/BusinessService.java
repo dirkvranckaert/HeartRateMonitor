@@ -84,24 +84,12 @@ public class BusinessService {
             Log.d("dirk-background", "No mActivityRecognitionApiClient or not connected anymore");
             GoogleApiClient googleApiClient = new GoogleApiClient.Builder(HeartRateApplication.getContext())
                     .addApi(ActivityRecognition.API)
-                    .addConnectionCallbacks(new ConnectionCallbacks() {
-                        @Override
-                        public void onConnected(Bundle bundle) {
-                            Log.d("dirk-background", "ActivityRecognitionApiClient connected!");
-                            connectActivityRecognitionApiClient();
-                        }
-
-                        @Override
-                        public void onConnectionSuspended(int i) {
-                            Log.d("dirk-background",
-                                    "mActivityRecognitionApiClient suspended, restarting connectActivityRecognitionApiClient");
-                        }
-                    })
                     .build();
             ConnectionResult connectionResult = googleApiClient.blockingConnect();
             if (connectionResult.isSuccess()) {
                 Log.d("dirk-background", "mActivityRecognitionApiClient connected");
                 mActivityRecognitionApiClient = googleApiClient;
+                connectActivityRecognitionApiClient();
             }
 
             return null;

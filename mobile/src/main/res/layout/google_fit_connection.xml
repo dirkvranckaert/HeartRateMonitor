@@ -26,8 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/connect"
-        android:text="@string/google_fit_setup_connect"
-        android:visibility="gone"/>
+        android:text="@string/google_fit_setup_connect"/>
 
     <Button
         android:layout_width="match_parent"

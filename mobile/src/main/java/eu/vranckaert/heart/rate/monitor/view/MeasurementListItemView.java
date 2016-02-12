@@ -1,6 +1,8 @@
 package eu.vranckaert.heart.rate.monitor.view;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
@@ -23,6 +25,8 @@ public class MeasurementListItemView extends AbstractViewHolder {
     private final TextView mDate;
     private final TextView mTime;
     private final TextView mActivity;
+    private final TextView mFitSyncState;
+    private final TextView mFakeHeartRate;
 
     public MeasurementListItemView(LayoutInflater inflater, ViewGroup parent) {
         super(inflater, parent, R.layout.heart_rate_history_item);
@@ -32,6 +36,8 @@ public class MeasurementListItemView extends AbstractViewHolder {
         mDate = findViewById(R.id.date);
         mTime = findViewById(R.id.time);
         mActivity = findViewById(R.id.activity);
+        mFitSyncState = findViewById(R.id.fit_sync_state);
+        mFakeHeartRate = findViewById(R.id.fake_heart_rate);
     }
 
     public void setMeasurement(Measurement measurement) {
@@ -77,5 +83,11 @@ public class MeasurementListItemView extends AbstractViewHolder {
                 mActivity.setText(R.string.heart_rate_history_activity_unknown);
                 break;
         }
+
+        mFitSyncState.setText(measurement.isSyncedWithGoogleFit() ? "Synced to Google Fit" : "Not yet synced to Google Fit");
+
+        String fakeHeartRate = measurement.detectFakeHeartRate();
+        mFakeHeartRate.setText(fakeHeartRate);
+        mFakeHeartRate.setVisibility(TextUtils.isEmpty(fakeHeartRate) ? GONE : VISIBLE);
     }
 }

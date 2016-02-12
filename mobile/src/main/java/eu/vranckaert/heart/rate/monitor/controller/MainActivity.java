@@ -26,6 +26,7 @@ import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessStatusCodes;
 import com.google.android.gms.fitness.data.DataType;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.BuildConfig;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
 import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.R;
@@ -34,6 +35,7 @@ import eu.vranckaert.heart.rate.monitor.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.dao.MeasurementDao;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,10 +59,12 @@ public class MainActivity extends Activity implements OnClickListener {
     // private Button mDisconnect;
 
     private GoogleApiClient mGoogleApiClient;
+    private LoadMeasurementsTask mLoadTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mMeasurementsAdapter = new MeasurementsAdapter(this);
         initScreen(false);
         new CheckGoogleFitnessConnectionTask(this).execute();
@@ -221,7 +225,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private void initScreen(boolean checkPerformed) {
         invalidateOptionsMenu();
         boolean hasGoogleFitConnection = UserPreferences.getInstance().getGoogleFitConnected();
-        if (hasGoogleFitConnection) {
+        if (!hasGoogleFitConnection) {
             initGoogleFitConnectionScreen(checkPerformed);
         } else {
             initOverviewOfMeasurements();
@@ -238,12 +242,25 @@ public class MainActivity extends Activity implements OnClickListener {
         mGoogleFitExplanation.setText(R.string.google_fit_setup_disconnected_summary);
     }
 
+    @Override
+    protected void onDestroy() {
+        if (mLoadTask != null) {
+            mLoadTask.cancel(true);
+            mLoadTask = null;
+        }
+
+        super.onDestroy();
+    }
+
     private void initOverviewOfMeasurements() {
         mCurrentViewSate = VIEW_STATE_MEASUREMENT_LIST;
         setContentView(R.layout.heart_rate_measurements);
-        setMeasurements(new ArrayList<Measurement>());
-        // TOD start task and cancel in on destroy
-        new LoadMeasurementsTask().execute();
+        setMeasurements(new ArrayList<>());
+        if (mLoadTask != null) {
+            mLoadTask.cancel(true);
+        }
+        mLoadTask = new LoadMeasurementsTask();
+        mLoadTask.execute();
     }
 
     private void setMeasurements(List<Measurement> measurements) {
@@ -258,8 +275,6 @@ public class MainActivity extends Activity implements OnClickListener {
             } else {
                 list.setVisibility(View.VISIBLE);
                 empty.setVisibility(View.GONE);
-
-
             }
         }
     }
@@ -271,15 +286,15 @@ public class MainActivity extends Activity implements OnClickListener {
             // Retrieve all measurements and filter out the fake heart rate measurements
             IMeasurementDao dao = new MeasurementDao();
             List<Measurement> measurements = dao.findAll();
-            List<Measurement> fakeMeasurements = new ArrayList<>();
-            int measurementCount = measurements.size();
-            for (int i=0; i<measurementCount; i++) {
-                Measurement measurement = measurements.get(i);
-                if (measurement.isFakeHeartRate()) {
-                    fakeMeasurements.add(measurement);
-                }
-            }
-            measurements.removeAll(fakeMeasurements);
+//            List<Measurement> fakeMeasurements = new ArrayList<>();
+//            int measurementCount = measurements.size();
+//            for (int i=0; i<measurementCount; i++) {
+//                Measurement measurement = measurements.get(i);
+//                if (measurement.isFakeHeartRate()) {
+//                    fakeMeasurements.add(measurement);
+//                }
+//            }
+//            measurements.removeAll(fakeMeasurements);
             return measurements;
         }
 

@@ -144,6 +144,8 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                                 UserPreferences.getInstance().setGoogleFitActivationErrorCount(errorCount + 1);
                             }
                         }
+                    } else {
+                        Log.d("dirk", "Fake heart rate! Reason:" + measurement.detectFakeHeartRate());
                     }
                 }
             }
@@ -165,6 +167,9 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                     measurement.setSyncedWithGoogleFit(true);
                     mDao.update(measurement);
                 }
+            } else {
+                String fakeHeartRateReason = measurement.detectFakeHeartRate();
+                Log.d("dirk", "Fake heart rate detected! Reason: " + fakeHeartRateReason);
             }
         }
     }

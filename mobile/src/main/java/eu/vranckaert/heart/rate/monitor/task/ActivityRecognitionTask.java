@@ -14,8 +14,9 @@ public class ActivityRecognitionTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         Log.d("dirk", "About to setup activity recognition");
-        BusinessService.getInstance().connectActivityRecognitionApiClient();
-        Log.d("dirk", "Activity recognition setup completed");
+        //BusinessService.getInstance().connectActivityRecognitionApiClient();
+        //Log.d("dirk", "Activity recognition setup completed");
+        Log.d("dirk", "Activity recognition not stated, disabled hard coded for now");
         return null;
     }
 }

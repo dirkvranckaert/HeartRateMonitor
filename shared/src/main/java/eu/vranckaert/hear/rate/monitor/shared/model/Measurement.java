@@ -293,12 +293,13 @@ public class Measurement implements Serializable {
         }
 
         // If we have 3 or less measurements it should be a fake heart rate
-        if (measuredValues == null || measuredValues.size() <= 3) {
+        int heartRateCount = getMeasuredValues() == null ? 0 : getMeasuredValues().size();
+        if (heartRateCount <= 3) {
             measuredHeartRateCountFailed = true;
         }
 
         //
-        if (measuredValues != null && !measuredValues.isEmpty()) {
+        if (getMeasuredValues() != null && !getMeasuredValues().isEmpty()) {
             TreeMap<Long,Float> sortedMap = new TreeMap<Long,Float>(new Comparator<Long>() {
                 @Override
                 public int compare(Long lhs, Long rhs) {
@@ -330,19 +331,31 @@ public class Measurement implements Serializable {
             }
         }
 
+        String result = "";
         if (timeCheckFailed) {
-            return "TIME_CHECK";
+            result = addSeperator(result, "|");
+            result += "TIME_CHECK(" + (timeBeforeFirstMeasurement/1000) + "s)";
         } else if (measuredHeartRateCountFailed) {
-            return "HEART_RATE_COUNT";
+            result = addSeperator(result, "|");
+            result += "HEART_RATE_COUNT(" + heartRateCount + ")";
         } else if (measurementHeartRateDropCheckFailed) {
-            return "HEART_RATE_DROP";
+            result = addSeperator(result, "|");
+            result += "HEART_RATE_DROP";
         } else if (measuremntCannotAwakeFromDeathCheckFailed) {
-            return "HEART_RATE_AWAKE_FROM_DEATH";
-        } else {
-            return "";
+            result = addSeperator(result, "|");
+            result += "HEART_RATE_AWAKE_FROM_DEATH";
         }
+
+        return result;
     }
-    
+
+    private String addSeperator(String result, String seperator) {
+        if (!TextUtils.isEmpty(result)) {
+            result += seperator;
+        }
+        return result;
+    }
+
     public String getActivityName(Context context) {
         return getActivityName(context, activity);
     }

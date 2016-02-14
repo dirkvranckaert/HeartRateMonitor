@@ -35,6 +35,7 @@ public class HeartRateHistoryItemView extends AbstractViewHolder {
         mDate = findViewById(R.id.date);
         mTime = findViewById(R.id.time);
         mActivity = findViewById(R.id.activity);
+        findViewById(R.id.fake_heart_rate).setVisibility(GONE);
     }
 
     public void setMeasurement(Measurement measurement) {

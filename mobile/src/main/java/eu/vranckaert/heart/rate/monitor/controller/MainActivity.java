@@ -35,6 +35,7 @@ import eu.vranckaert.heart.rate.monitor.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.dao.MeasurementDao;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -285,7 +286,7 @@ public class MainActivity extends Activity implements OnClickListener {
         protected List<Measurement> doInBackground(Void... params) {
             // Retrieve all measurements and filter out the fake heart rate measurements
             IMeasurementDao dao = new MeasurementDao();
-            List<Measurement> measurements = dao.findAll();
+            List<Measurement> measurements = dao.findAllSorted();
 //            List<Measurement> fakeMeasurements = new ArrayList<>();
 //            int measurementCount = measurements.size();
 //            for (int i=0; i<measurementCount; i++) {

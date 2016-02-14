@@ -52,4 +52,19 @@ public class MeasurementDao extends Dao<Measurement, Integer, HeartRateDatabaseH
 
         return new ArrayList<>();
     }
+
+    @Override
+    public List<Measurement> findAllSorted() {
+        try {
+            QueryBuilder<Measurement, Integer> qb = dao.queryBuilder();
+            qb.orderBy(Measurement.COLUMN_START, false);
+            PreparedQuery<Measurement> pq = qb.prepare();
+            return dao.query(pq);
+        } catch (SQLException e) {
+            Log.e("MeasurementDao", "Could not build the query...");
+            throwFatalException(e);
+        }
+
+        return new ArrayList<>();
+    }
 }

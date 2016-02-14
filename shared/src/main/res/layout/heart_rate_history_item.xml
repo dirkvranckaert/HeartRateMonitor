@@ -50,12 +50,14 @@
         android:id="@+id/activity"
         tools:text="Walking"
         android:layout_below="@+id/time"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/activity"
         android:id="@+id/fit_sync_state"
         tools:text="synced to google fit"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

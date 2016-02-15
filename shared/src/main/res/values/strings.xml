@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="general_ok">OK</string>
+    <string name="general_cancel">Cancel</string>
+
     <string name="heart_rate_history_activity_bicycle">Bicycling</string>
     <string name="heart_rate_history_activity_vehicle">Driving</string>
     <string name="heart_rate_history_activity_on_foot">On foot</string>

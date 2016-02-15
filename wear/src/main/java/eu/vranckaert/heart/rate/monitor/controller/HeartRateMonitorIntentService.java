@@ -1,5 +1,6 @@
 package eu.vranckaert.heart.rate.monitor.controller;
 
+import android.Manifest.permission;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.hear.rate.monitor.shared.permission.PermissionUtil;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
 import eu.vranckaert.heart.rate.monitor.util.DeviceUtil;
@@ -47,6 +49,12 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.d("dirk-background", "onHandleIntent");
+
+        if (!PermissionUtil.hasPermission(this, permission.BODY_SENSORS)) {
+            stopSelf();
+            return;
+        }
+
         mStartTime = new Date().getTime();
 
         if (getSystemService(Context.SENSOR_SERVICE) != null) {
@@ -57,8 +65,13 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
                     startHearRateMonitor();
                 } else {
                     Log.d("dirk-background", "Will not start heart rate monitoring as device is currently charging");
+                    stopSelf();
                 }
+            } else {
+                stopSelf();
             }
+        } else {
+            stopSelf();
         }
     }
 
@@ -87,6 +100,8 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
                 new HeartRateMeasurementTask().execute(measurement);
 
                 // TODO notify UI to be updated if visible right now...
+
+                stopSelf();
             }
         }
     }

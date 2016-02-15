@@ -1,11 +1,14 @@
 package eu.vranckaert.heart.rate.monitor.controller;
 
+import android.Manifest.permission;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.IntentSender.SendIntentException;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,7 +29,7 @@ import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessStatusCodes;
 import com.google.android.gms.fitness.data.DataType;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.heart.rate.monitor.BuildConfig;
+import eu.vranckaert.hear.rate.monitor.shared.permission.PermissionUtil;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
 import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.R;
@@ -35,8 +38,6 @@ import eu.vranckaert.heart.rate.monitor.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.dao.MeasurementDao;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,6 +49,7 @@ import java.util.List;
 public class MainActivity extends Activity implements OnClickListener {
     private static final int REQUEST_OAUTH = 1;
     private static final int REQUEST_SUBSCRIPTION = 2;
+    private static final int REQUEST_CODE_PERMISSON_BODY_SENSORS = 3;
     private static final int VIEW_STATE_GOOGLE_FIT_CONNECTION = 0;
     private static final int VIEW_STATE_MEASUREMENT_LIST = 1;
 
@@ -65,10 +67,50 @@ public class MainActivity extends Activity implements OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
 
-        mMeasurementsAdapter = new MeasurementsAdapter(this);
-        initScreen(false);
-        new CheckGoogleFitnessConnectionTask(this).execute();
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        setupView();
+    }
+
+    private void setupView() {
+        if (!checkPermissions()) {
+            setContentView(R.layout.heart_rate_permissions);
+
+            findViewById(R.id.open_settings).setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    intent.setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(intent);
+                }
+            });
+        } else {
+            mMeasurementsAdapter = new MeasurementsAdapter(this);
+            initScreen(false);
+            new CheckGoogleFitnessConnectionTask(this).execute();
+        }
+    }
+
+    private boolean checkPermissions() {
+        return PermissionUtil.requestPermission(this, REQUEST_CODE_PERMISSON_BODY_SENSORS, permission.BODY_SENSORS,
+                getString(R.string.permission_explanation_body_sensors));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_CODE_PERMISSON_BODY_SENSORS) {
+            if (permission.BODY_SENSORS.equals(permissions[0]) &&
+                    PackageManager.PERMISSION_GRANTED == grantResults[0]) {
+                setupView();
+            }
+            return;
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
@@ -81,12 +123,12 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     /**
-     *  Build a {@link GoogleApiClient} that will authenticate the user and allow the application
-     *  to connect to Fitness APIs. The scopes included should match the scopes your app needs
-     *  (see documentation for details). Authentication will occasionally fail intentionally,
-     *  and in those cases, there will be a known resolution, which the OnConnectionFailedListener()
-     *  can address. Examples of this include the user never having signed in before, or having
-     *  multiple accounts on the device and needing to specify which account to use, etc.
+     * Build a {@link GoogleApiClient} that will authenticate the user and allow the application
+     * to connect to Fitness APIs. The scopes included should match the scopes your app needs
+     * (see documentation for details). Authentication will occasionally fail intentionally,
+     * and in those cases, there will be a known resolution, which the OnConnectionFailedListener()
+     * can address. Examples of this include the user never having signed in before, or having
+     * multiple accounts on the device and needing to specify which account to use, etc.
      */
     private void setupGoogleFit() {
         // TODO is not yet a progress dialog with a spinning wheel
@@ -135,7 +177,8 @@ public class MainActivity extends Activity implements OnClickListener {
                                 progress.dismiss();
                                 if (!result.hasResolution()) {
                                     // Show the localized error dialog
-                                    GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), MainActivity.this, 0).show();
+                                    GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), MainActivity.this, 0)
+                                            .show();
                                     return;
                                 }
                                 // The failure has a resolution. Resolve it.
@@ -226,6 +269,9 @@ public class MainActivity extends Activity implements OnClickListener {
     private void initScreen(boolean checkPerformed) {
         invalidateOptionsMenu();
         boolean hasGoogleFitConnection = UserPreferences.getInstance().getGoogleFitConnected();
+        if (checkPerformed) {
+            new PhoneSetupTask().execute(hasGoogleFitConnection);
+        }
         if (!hasGoogleFitConnection) {
             initGoogleFitConnectionScreen(checkPerformed);
         } else {
@@ -287,15 +333,15 @@ public class MainActivity extends Activity implements OnClickListener {
             // Retrieve all measurements and filter out the fake heart rate measurements
             IMeasurementDao dao = new MeasurementDao();
             List<Measurement> measurements = dao.findAllSorted();
-//            List<Measurement> fakeMeasurements = new ArrayList<>();
-//            int measurementCount = measurements.size();
-//            for (int i=0; i<measurementCount; i++) {
-//                Measurement measurement = measurements.get(i);
-//                if (measurement.isFakeHeartRate()) {
-//                    fakeMeasurements.add(measurement);
-//                }
-//            }
-//            measurements.removeAll(fakeMeasurements);
+            //            List<Measurement> fakeMeasurements = new ArrayList<>();
+            //            int measurementCount = measurements.size();
+            //            for (int i=0; i<measurementCount; i++) {
+            //                Measurement measurement = measurements.get(i);
+            //                if (measurement.isFakeHeartRate()) {
+            //                    fakeMeasurements.add(measurement);
+            //                }
+            //            }
+            //            measurements.removeAll(fakeMeasurements);
             return measurements;
         }
 
@@ -351,6 +397,14 @@ public class MainActivity extends Activity implements OnClickListener {
         protected void onPostExecute(Void mVoid) {
             mProgress.dismiss();
             mActivity.initScreen(false);
+        }
+    }
+
+    private class PhoneSetupTask extends AsyncTask<Boolean, Void, Void> {
+        @Override
+        protected Void doInBackground(Boolean... params) {
+            BusinessService.getInstance().setPhoneSetupCompletionStatus(params[0]);
+            return null;
         }
     }
 }

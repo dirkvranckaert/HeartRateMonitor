@@ -147,6 +147,16 @@ public class BusinessService {
         getWearableGoogleApiClient().disconnect();
     }
 
+    public void setPhoneSetupCompletionStatus(boolean completed) {
+        String url = completed ? WearURL.URL_SETUP_COMPLETED : WearURL.URL_SETUP_UNCOMPLETED;
+
+        List<Node> nodes = getConnectedNodes();
+        for (Node node : nodes) {
+            Wearable.MessageApi.sendMessage(getWearableGoogleApiClient(), node.getId(), url, null);
+        }
+        getWearableGoogleApiClient().disconnect();
+    }
+
     public boolean hasFitnessSubscription(DataType type) {
         Log.d("dirk-background", "Checking if subscription is available for " + type.getName());
         GoogleApiClient googleApiClient = getFitnessApiClient();

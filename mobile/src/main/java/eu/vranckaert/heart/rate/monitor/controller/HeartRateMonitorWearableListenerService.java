@@ -1,5 +1,6 @@
 package eu.vranckaert.heart.rate.monitor.controller;
 
+import android.Manifest.permission;
 import android.app.Notification;
 import android.app.Notification.BigTextStyle;
 import android.app.NotificationManager;
@@ -23,6 +24,7 @@ import eu.vranckaert.hear.rate.monitor.shared.NotificationId;
 import eu.vranckaert.hear.rate.monitor.shared.WearKeys;
 import eu.vranckaert.hear.rate.monitor.shared.WearURL;
 import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.hear.rate.monitor.shared.permission.PermissionUtil;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
 import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.HeartRateApplication;
@@ -85,7 +87,8 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                     Log.d("dirk", "Storing the measurement locally");
                     measurement = mDao.save(measurement);
 
-                    if (!measurement.isFakeHeartRate()) {
+                    boolean hasPermissions = PermissionUtil.hasPermission(this, permission.BODY_SENSORS);
+                    if (hasPermissions && !measurement.isFakeHeartRate()) {
                         boolean hasAggregateHeartRateSummarySubscription =
                                 BusinessService.getInstance().hasFitnessSubscription(FitHelper.DATA_TYPE_HEART_RATE);
                         Log.d("dirk",
@@ -145,7 +148,11 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                             }
                         }
                     } else {
-                        Log.d("dirk", "Fake heart rate! Reason:" + measurement.detectFakeHeartRate());
+                        if (!hasPermissions) {
+                            Log.d("dirk", "Does not have the body sensor permission...!");
+                        } else {
+                            Log.d("dirk", "Fake heart rate! Reason:" + measurement.detectFakeHeartRate());
+                        }
                     }
                 }
             }

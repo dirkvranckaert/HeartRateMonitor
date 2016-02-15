@@ -9,6 +9,8 @@
     <string name="google_fit_setup_connecting">Making a connection...</string>
     <string name="google_fit_setup_setup_fit">Setting up Google Fitness...</string>
 
+    <string name="permission_explanation_body_sensors">This application measures your heart rate throughout the day so you should accept this permission before you can start using the application.</string>
+
     <string name="notification_google_fitness_not_connected_message">Heart Rate Montor is not yet connected to Google Fitness. You can do so right now to start syncing your heart measurements to Google Fitness.</string>
     <string name="notification_google_fitness_not_connected_message_action_connect">Connect Now</string>
 

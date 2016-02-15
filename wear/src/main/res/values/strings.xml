@@ -12,4 +12,5 @@
     <string name="heart_rate_monitor_action_start">Start</string>
     <string name="heart_rate_monitor_action_stop">Stop</string>
     <string name="heart_rate_history_empty">You did not yet measure your heart rate so far.</string>
+    <string name="heart_rate_setup_message">Open the Heart Rate Monitor app on your phone first to setup the application.</string>
 </resources>

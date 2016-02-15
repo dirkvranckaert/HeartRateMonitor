@@ -9,7 +9,11 @@
         android:text="@string/google_fit_setup_connected_summary"
         android:gravity="center_horizontal"
         android:layout_margin="6dp"
-        android:id="@+id/empty"/>
+        android:id="@+id/empty"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"/>
 
     <ListView
         android:layout_width="match_parent"

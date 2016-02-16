@@ -11,9 +11,9 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
-import eu.vranckaert.hear.rate.monitor.shared.WearKeys;
-import eu.vranckaert.hear.rate.monitor.shared.WearURL;
-import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.shared.WearKeys;
+import eu.vranckaert.heart.rate.monitor.shared.WearURL;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 
 import java.util.List;
 

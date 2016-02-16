@@ -2,12 +2,11 @@ package eu.vranckaert.heart.rate.monitor.view;
 
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
-import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.hear.rate.monitor.shared.util.DateUtil;
+import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.shared.util.DateUtil;
 import eu.vranckaert.heart.rate.monitor.R;
 
 import java.util.Date;

@@ -9,18 +9,15 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
-import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.hear.rate.monitor.shared.permission.PermissionUtil;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
 import eu.vranckaert.heart.rate.monitor.util.DeviceUtil;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 

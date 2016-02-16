@@ -1,7 +1,6 @@
-package eu.vranckaert.heart.rate.monitor.dao;
+package eu.vranckaert.heart.rate.monitor.shared.dao;
 
-import eu.vranckaert.hear.rate.monitor.shared.dao.dao.IDao;
-import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 
 import java.util.List;
 

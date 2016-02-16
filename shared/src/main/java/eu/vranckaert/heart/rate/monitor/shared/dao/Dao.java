@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.vranckaert.hear.rate.monitor.shared.dao.dao;
+package eu.vranckaert.heart.rate.monitor.shared.dao;
 
 import android.content.Context;
 import android.util.Log;

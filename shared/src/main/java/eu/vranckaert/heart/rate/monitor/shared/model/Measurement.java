@@ -1,8 +1,7 @@
-package eu.vranckaert.hear.rate.monitor.shared.model;
+package eu.vranckaert.heart.rate.monitor.shared.model;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import eu.vranckaert.heart.rate.monitor.shared.R;

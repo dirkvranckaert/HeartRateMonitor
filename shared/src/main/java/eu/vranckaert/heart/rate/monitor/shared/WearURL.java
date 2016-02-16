@@ -1,4 +1,4 @@
-package eu.vranckaert.hear.rate.monitor.shared;
+package eu.vranckaert.heart.rate.monitor.shared;
 
 public class WearURL {
     public static final String URL_START_ACTIVITY_MONITORING = "/heart/rate/monitor/start/activity/";

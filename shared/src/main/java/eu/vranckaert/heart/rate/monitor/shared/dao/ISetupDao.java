@@ -1,4 +1,4 @@
-package eu.vranckaert.hear.rate.monitor.shared.dao.dao;
+package eu.vranckaert.heart.rate.monitor.shared.dao;
 
 /**
  * Date: 24/03/15

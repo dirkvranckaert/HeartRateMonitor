@@ -1,6 +1,6 @@
-package eu.vranckaert.hear.rate.monitor.shared.model;
+package eu.vranckaert.heart.rate.monitor.shared.model;
 
-import eu.vranckaert.hear.rate.monitor.shared.util.DateUtil;
+import eu.vranckaert.heart.rate.monitor.shared.util.DateUtil;
 
 /**
  * Date: 01/06/15

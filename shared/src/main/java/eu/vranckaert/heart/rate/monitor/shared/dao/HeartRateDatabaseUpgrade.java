@@ -1,6 +1,4 @@
-package eu.vranckaert.heart.rate.monitor.dao;
-
-import eu.vranckaert.hear.rate.monitor.shared.dao.dao.IDatabaseUpgrade;
+package eu.vranckaert.heart.rate.monitor.shared.dao;
 
 /**
  * Date: 20/04/15

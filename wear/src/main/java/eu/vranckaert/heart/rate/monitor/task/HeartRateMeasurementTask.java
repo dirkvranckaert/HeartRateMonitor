@@ -2,7 +2,7 @@ package eu.vranckaert.heart.rate.monitor.task;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.WearBusinessService;
 
 /**

@@ -31,14 +31,14 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessStatusCodes;
 import com.google.android.gms.fitness.data.DataType;
-import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.hear.rate.monitor.shared.permission.PermissionUtil;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
 import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.UserPreferences;
-import eu.vranckaert.heart.rate.monitor.dao.IMeasurementDao;
-import eu.vranckaert.heart.rate.monitor.dao.MeasurementDao;
+import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
+import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -346,7 +346,7 @@ public class MainActivity extends Activity implements OnClickListener {
         @Override
         protected List<Measurement> doInBackground(Void... params) {
             // Retrieve all measurements and filter out the fake heart rate measurements
-            IMeasurementDao dao = new MeasurementDao();
+            IMeasurementDao dao = new MeasurementDao(this);
             List<Measurement> measurements = dao.findAllSorted();
             //            List<Measurement> fakeMeasurements = new ArrayList<>();
             //            int measurementCount = measurements.size();

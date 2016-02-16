@@ -1,11 +1,7 @@
-package eu.vranckaert.heart.rate.monitor.dao;
+package eu.vranckaert.heart.rate.monitor.shared.dao;
 
 import android.content.Context;
-import eu.vranckaert.hear.rate.monitor.shared.dao.dao.DatabaseHelper;
-import eu.vranckaert.hear.rate.monitor.shared.dao.dao.IDatabaseUpgrade;
-import eu.vranckaert.hear.rate.monitor.shared.dao.dao.ITable;
-import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.heart.rate.monitor.HeartRateApplication;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +15,6 @@ import java.util.List;
 public class HeartRateDatabaseHelper extends DatabaseHelper {
     public static final String DB_NAME = "HearRateDatabase";
     public static final int DB_VERSION = 1;
-
-    public HeartRateDatabaseHelper() {
-        this(HeartRateApplication.getContext());
-    }
 
     public HeartRateDatabaseHelper(Context context) {
         super(context, DB_NAME, DB_VERSION);

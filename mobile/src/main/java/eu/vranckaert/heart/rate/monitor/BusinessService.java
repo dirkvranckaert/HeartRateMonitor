@@ -2,37 +2,27 @@ package eu.vranckaert.heart.rate.monitor;
 
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
-import com.google.android.gms.fitness.data.Bucket;
-import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Subscription;
-import com.google.android.gms.fitness.request.DataReadRequest;
-import com.google.android.gms.fitness.result.DataReadResult;
 import com.google.android.gms.fitness.result.ListSubscriptionsResult;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
-import eu.vranckaert.hear.rate.monitor.shared.WearURL;
-import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
+import eu.vranckaert.heart.rate.monitor.shared.WearURL;
+import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.heart.rate.monitor.controller.ActivityRecognitionIntentService;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Date: 12/05/15

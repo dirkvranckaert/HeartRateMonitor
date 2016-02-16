@@ -1,7 +1,7 @@
-package eu.vranckaert.hear.rate.monitor.shared.dao.dao;
+package eu.vranckaert.heart.rate.monitor.shared.dao;
 
 import android.content.Context;
-import eu.vranckaert.hear.rate.monitor.shared.util.ContextUtils;
+import eu.vranckaert.heart.rate.monitor.shared.util.ContextUtils;
 
 /**
  * Date: 24/03/15

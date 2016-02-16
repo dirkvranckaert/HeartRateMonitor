@@ -1,4 +1,4 @@
-package eu.vranckaert.hear.rate.monitor.shared.dao.dao;
+package eu.vranckaert.heart.rate.monitor.shared.dao;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;

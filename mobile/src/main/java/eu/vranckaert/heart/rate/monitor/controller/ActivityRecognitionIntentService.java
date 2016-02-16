@@ -5,9 +5,8 @@ import android.content.Intent;
 import android.util.Log;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
-import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
+import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
-import eu.vranckaert.heart.rate.monitor.UserPreferences;
 
 import java.util.List;
 

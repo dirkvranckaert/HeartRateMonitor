@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import eu.vranckaert.hear.rate.monitor.shared.util.MetricHelper;
+import eu.vranckaert.heart.rate.monitor.shared.util.MetricHelper;
 
 /**
  * Date: 26/03/14

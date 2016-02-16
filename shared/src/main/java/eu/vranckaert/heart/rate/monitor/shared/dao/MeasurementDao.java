@@ -1,11 +1,10 @@
-package eu.vranckaert.heart.rate.monitor.dao;
+package eu.vranckaert.heart.rate.monitor.shared.dao;
 
+import android.content.Context;
 import android.util.Log;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
-import eu.vranckaert.hear.rate.monitor.shared.dao.dao.Dao;
-import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.heart.rate.monitor.HeartRateApplication;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,8 +17,8 @@ import java.util.List;
  * @author Dirk Vranckaert
  */
 public class MeasurementDao extends Dao<Measurement, Integer, HeartRateDatabaseHelper> implements IMeasurementDao {
-    public MeasurementDao() {
-        super(Measurement.class, HeartRateDatabaseHelper.class, HeartRateApplication.getContext());
+    public MeasurementDao(Context context) {
+        super(Measurement.class, HeartRateDatabaseHelper.class, context);
     }
 
     @Override

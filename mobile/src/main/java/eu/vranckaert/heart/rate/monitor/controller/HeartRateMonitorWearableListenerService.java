@@ -20,18 +20,18 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
-import eu.vranckaert.hear.rate.monitor.shared.NotificationId;
-import eu.vranckaert.hear.rate.monitor.shared.WearKeys;
-import eu.vranckaert.hear.rate.monitor.shared.WearURL;
-import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.hear.rate.monitor.shared.permission.PermissionUtil;
+import eu.vranckaert.heart.rate.monitor.shared.NotificationId;
+import eu.vranckaert.heart.rate.monitor.shared.WearKeys;
+import eu.vranckaert.heart.rate.monitor.shared.WearURL;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
 import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.HeartRateApplication;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.UserPreferences;
-import eu.vranckaert.heart.rate.monitor.dao.IMeasurementDao;
-import eu.vranckaert.heart.rate.monitor.dao.MeasurementDao;
+import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
+import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 import eu.vranckaert.heart.rate.monitor.task.ActivityRecognitionTask;
 
 import java.util.Date;
@@ -50,7 +50,7 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
     @Override
     public void onCreate() {
         super.onCreate();
-        mDao = new MeasurementDao();
+        mDao = new MeasurementDao(this);
     }
 
     @Override

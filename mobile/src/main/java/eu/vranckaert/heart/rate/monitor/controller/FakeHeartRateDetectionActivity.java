@@ -6,9 +6,9 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.R;
-import eu.vranckaert.heart.rate.monitor.dao.MeasurementDao;
+import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -51,7 +51,7 @@ public class FakeHeartRateDetectionActivity extends Activity {
         if (item.getItemId() == REFRESH_ID) {
             refreshData();
         } else if (item.getItemId() == DELETA_ALL_ID) {
-            new MeasurementDao().deleteAll();
+            new MeasurementDao(this).deleteAll();
             refreshData();
         }
 
@@ -60,7 +60,7 @@ public class FakeHeartRateDetectionActivity extends Activity {
 
     private void refreshData() {
         mContent.setText("");
-        List<Measurement> measurements = new MeasurementDao().findAll();
+        List<Measurement> measurements = new MeasurementDao(this).findAll();
         Collections.sort(measurements, new Comparator<Measurement>() {
             @Override
             public int compare(Measurement lhs, Measurement rhs) {

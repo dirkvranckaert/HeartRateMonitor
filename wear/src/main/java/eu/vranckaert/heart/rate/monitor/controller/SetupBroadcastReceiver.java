@@ -3,7 +3,7 @@ package eu.vranckaert.heart.rate.monitor.controller;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
+import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
 

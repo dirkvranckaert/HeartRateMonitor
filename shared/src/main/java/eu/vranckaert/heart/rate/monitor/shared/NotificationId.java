@@ -1,4 +1,4 @@
-package eu.vranckaert.hear.rate.monitor.shared;
+package eu.vranckaert.heart.rate.monitor.shared;
 
 /**
  * Date: 03/06/15

@@ -1,4 +1,4 @@
-package eu.vranckaert.hear.rate.monitor.shared.permission;
+package eu.vranckaert.heart.rate.monitor.shared.permission;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

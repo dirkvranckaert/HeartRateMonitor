@@ -5,8 +5,8 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
-import eu.vranckaert.hear.rate.monitor.shared.model.ActivityState;
-import eu.vranckaert.hear.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 
 import java.util.ArrayList;
 import java.util.List;

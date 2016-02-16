@@ -2,8 +2,8 @@ package eu.vranckaert.heart.rate.monitor;
 
 import android.app.Application;
 import android.content.Context;
-import eu.vranckaert.hear.rate.monitor.shared.dao.dao.SetupDao;
-import eu.vranckaert.heart.rate.monitor.dao.HeartRateDatabaseHelper;
+import eu.vranckaert.heart.rate.monitor.shared.dao.SetupDao;
+import eu.vranckaert.heart.rate.monitor.shared.dao.HeartRateDatabaseHelper;
 
 /**
  * Date: 28/05/15

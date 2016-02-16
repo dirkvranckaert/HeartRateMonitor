@@ -88,36 +88,6 @@ public class WearUserPreferences {
         return mSharedPreferences.getInt(KEY_ACCEPTED_ACTIVITY, ActivityState.STILL);
     }
 
-    public List<Measurement> getAllMeasurements() {
-        String value = mSharedPreferences.getString(KEY_ALL_MEASUREMENTS, null);
-        if (TextUtils.isEmpty(value)) {
-            return new ArrayList<>();
-        } else {
-            return Measurement.fromJSONList(value);
-        }
-    }
-
-    public Measurement getLatestMeasurment() {
-        String value = mSharedPreferences.getString(KEY_LATEST_MEASUREMENTS, null);
-        if (TextUtils.isEmpty(value)) {
-            return null;
-        }
-        return Measurement.fromJSON(value);
-    }
-
-    public void addMeasurement(Measurement measurement) {
-        measurement.setActivity(getAcceptedActivity());
-        String latestMeasurement = measurement.toJSON();
-        Log.d("dirk", "Adding heart rate measurement: " + latestMeasurement);
-        List<Measurement> measurements = getAllMeasurements();
-        measurements.add(0, measurement);
-        String measurementList = Measurement.toJSONList(measurements);
-
-        mEditor.putString(KEY_LATEST_MEASUREMENTS, latestMeasurement);
-        mEditor.putString(KEY_ALL_MEASUREMENTS, measurementList);
-        mEditor.commit();
-    }
-
     public void setPhoneSetupCompleted(boolean setupCompleted) {
         mEditor.putBoolean(KEY_PHONE_SETUP_COMPETED, setupCompleted);
         mEditor.commit();

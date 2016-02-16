@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.UUID;
 
 /**
  * Date: 29/05/15
@@ -28,6 +29,7 @@ import java.util.TreeMap;
 public class Measurement implements Serializable {
     public static final String TABLE_NAME = "MEASUREMENT";
     public static final String COLUMN_ID = "ID";
+    public static final String COLUMN_UNIQUE_KEY = "UNIQUE_KEY";
     public static final String COLUMN_AVERAGE = "AVERAGE";
     public static final String COLUMN_MIN = "MIN";
     public static final String COLUMN_MAX = "MAX";
@@ -37,9 +39,12 @@ public class Measurement implements Serializable {
     public static final String COLUMN_MEASURED_VALUES = "MEASURED_VALUES";
     public static final String COLUMN_ACTIVITY = "ACTIVITY";
     public static final String COLUMN_SYNCED_WITH_GOOGLE_FIT = "GOOGLE_FIT";
+    public static final String COLUMN_SYNCED_WITH_PHONE = "SYNCED_WITH_PHONE";
 
     @DatabaseField(generatedId = true, columnName = COLUMN_ID)
     private Integer id;
+    @DatabaseField(columnName = COLUMN_UNIQUE_KEY, unique = true)
+    private String uniqueKey;
     @DatabaseField(columnName = COLUMN_AVERAGE)
     private float averageHeartBeat;
     @DatabaseField(columnName = COLUMN_MIN)
@@ -59,6 +64,106 @@ public class Measurement implements Serializable {
     private int activity;
     @DatabaseField(columnName = COLUMN_SYNCED_WITH_GOOGLE_FIT)
     private boolean syncedWithGoogleFit;
+    @DatabaseField(columnName = COLUMN_SYNCED_WITH_PHONE)
+    private boolean syncedWithPhone;
+
+    public static Measurement fromJSON(String json) {
+        try {
+            JSONObject jsonObject = null;
+            jsonObject = new JSONObject(json);
+            String uniqueKey = jsonObject.optString("uniqueKey");
+            Double heartBeat = jsonObject.optDouble("averageHeartBeat");
+            Double minHeartBeat = jsonObject.optDouble("minimumHeartBeat");
+            Double maxHeartBeat = jsonObject.optDouble("maximumHeartBeat");
+            Measurement measurement = new Measurement();
+            measurement.setUniqueKey(uniqueKey);
+            measurement.setAverageHeartBeat(heartBeat.floatValue());
+            measurement.setMinimumHeartBeat(minHeartBeat.floatValue());
+            measurement.setMaximumHeartBeat(maxHeartBeat.floatValue());
+            measurement.setStartMeasurement(jsonObject.optLong("startMeasurement"));
+            measurement.setEndMeasurement(jsonObject.optLong("endMeasurement"));
+            measurement.setFirstMeasurement(jsonObject.optLong("firstMeasurement"));
+            measurement.setActivity(jsonObject.optInt("activity"));
+
+            String measuredValuesString = jsonObject.optString("measuredValues");
+            Map<Long, Float> measuredValues = measuredValuesFromJson(measuredValuesString);
+            measurement.setMeasuredValues(measuredValues);
+
+            return measurement;
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
+    public static Map<Long, Float> measuredValuesFromJson(String json) {
+        try {
+            JSONArray measuredValuesArray = new JSONArray(json);
+            Map<Long, Float> measuredValues = new HashMap<>();
+            for (int i = 0; i < measuredValuesArray.length(); i++) {
+                JSONObject measuredValue = new JSONObject(measuredValuesArray.optString(i));
+                measuredValues
+                        .put(measuredValue.optLong("key"), ((Double) measuredValue.optDouble("value")).floatValue());
+            }
+            return measuredValues;
+        } catch (JSONException e) {
+            return new HashMap<>();
+        }
+    }
+
+    public static String toJSONList(List<Measurement> measurements) {
+        JSONArray jsonArray = new JSONArray();
+        for (Measurement measurement : measurements) {
+            String json = measurement.toJSON();
+            if (!TextUtils.isEmpty(json)) {
+                jsonArray.put(json);
+            }
+        }
+        return jsonArray.toString();
+    }
+
+    public static List<Measurement> fromJSONList(String json) {
+        try {
+            List<Measurement> measurements = new ArrayList<>();
+            if (!TextUtils.isEmpty(json)) {
+                JSONArray jsonArray = new JSONArray(json);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String jsonObject = jsonArray.getString(i);
+                    Measurement measurement = Measurement.fromJSON(jsonObject.toString());
+                    if (measurement != null) {
+                        measurements.add(measurement);
+                    }
+                }
+            }
+            return measurements;
+        } catch (JSONException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public static String getActivityName(Context context, int activity) {
+        switch (activity) {
+            case ActivityState.IN_VEHICLE:
+                return context.getString(R.string.heart_rate_history_activity_vehicle);
+            case ActivityState.WALKING:
+                return context.getString(R.string.heart_rate_history_activity_walking);
+            case ActivityState.ON_FOOT:
+                return context.getString(R.string.heart_rate_history_activity_on_foot);
+            case ActivityState.ON_BICYCLE:
+                return context.getString(R.string.heart_rate_history_activity_bicycle);
+            case ActivityState.RUNNING:
+                return context.getString(R.string.heart_rate_history_activity_running);
+            case ActivityState.STILL:
+                return context.getString(R.string.heart_rate_history_activity_still);
+            case ActivityState.TILTING:
+                return context.getString(R.string.heart_rate_history_activity_tilting);
+            default:
+                return context.getString(R.string.heart_rate_history_activity_unknown);
+        }
+    }
+
+    public static String generateUniqueKey() {
+        return UUID.randomUUID().toString();
+    }
 
     public Integer getId() {
         return id;
@@ -66,6 +171,14 @@ public class Measurement implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getUniqueKey() {
+        return uniqueKey;
+    }
+
+    public void setUniqueKey(String uniqueKey) {
+        this.uniqueKey = uniqueKey;
     }
 
     public float getAverageHeartBeat() {
@@ -142,9 +255,18 @@ public class Measurement implements Serializable {
         this.syncedWithGoogleFit = syncedWithGoogleFit;
     }
 
+    public boolean isSyncedWithPhone() {
+        return syncedWithPhone;
+    }
+
+    public void setSyncedWithPhone(boolean syncedWithPhone) {
+        this.syncedWithPhone = syncedWithPhone;
+    }
+
     public String toJSON() {
         try {
             JSONObject json = new JSONObject();
+            json.put("uniqueKey", getUniqueKey());
             json.put("averageHeartBeat", getAverageHeartBeat());
             json.put("minimumHeartBeat", getMinimumHeartBeat());
             json.put("maximumHeartBeat", getMaximumHeartBeat());
@@ -152,6 +274,7 @@ public class Measurement implements Serializable {
             json.put("endMeasurement", getEndMeasurement());
             json.put("firstMeasurement", getFirstMeasurement());
             json.put("activity", getActivity());
+            getMeasuredValues(); // Make sure the measured values are filled correctly!
             json.put("measuredValues", measuredValuesToJSON());
 
             return json.toString();
@@ -163,7 +286,7 @@ public class Measurement implements Serializable {
     public String measuredValuesToJSON() {
         try {
             JSONArray measuredValuesArray = new JSONArray();
-            for (Entry<Long, Float> entry : this.measuredValues.entrySet()) {
+            for (Entry<Long, Float> entry : measuredValues.entrySet()) {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("key", entry.getKey());
                 jsonObject.put("value", entry.getValue());
@@ -172,77 +295,6 @@ public class Measurement implements Serializable {
             return measuredValuesArray.toString();
         } catch (JSONException e) {
             return "";
-        }
-    }
-
-    public static Measurement fromJSON(String json) {
-        try {
-            JSONObject jsonObject = null;
-            jsonObject = new JSONObject(json);
-            Double heartBeat = jsonObject.optDouble("averageHeartBeat");
-            Double minHeartBeat = jsonObject.optDouble("minimumHeartBeat");
-            Double maxHeartBeat = jsonObject.optDouble("maximumHeartBeat");
-            Measurement measurement = new Measurement();
-            measurement.setAverageHeartBeat(heartBeat.floatValue());
-            measurement.setMinimumHeartBeat(minHeartBeat.floatValue());
-            measurement.setMaximumHeartBeat(maxHeartBeat.floatValue());
-            measurement.setStartMeasurement(jsonObject.optLong("startMeasurement"));
-            measurement.setEndMeasurement(jsonObject.optLong("endMeasurement"));
-            measurement.setFirstMeasurement(jsonObject.optLong("firstMeasurement"));
-            measurement.setActivity(jsonObject.optInt("activity"));
-
-            String measuredValuesString = jsonObject.optString("measuredValues");
-            Map<Long, Float> measuredValues = measuredValuesFromJson(measuredValuesString);
-            measurement.setMeasuredValues(measuredValues);
-
-            return measurement;
-        } catch (JSONException e) {
-            return null;
-        }
-    }
-
-    public static Map<Long, Float> measuredValuesFromJson(String json) {
-        try {
-            JSONArray measuredValuesArray = new JSONArray(json);
-            Map<Long, Float> measuredValues = new HashMap<>();
-            for (int i = 0; i < measuredValuesArray.length(); i++) {
-                JSONObject measuredValue = new JSONObject(measuredValuesArray.optString(i));
-                measuredValues
-                        .put(measuredValue.optLong("key"), ((Double) measuredValue.optDouble("value")).floatValue());
-            }
-            return measuredValues;
-        } catch (JSONException e) {
-            return new HashMap<>();
-        }
-    }
-
-    public static String toJSONList(List<Measurement> measurements) {
-        JSONArray jsonArray = new JSONArray();
-        for (Measurement measurement : measurements) {
-            String json = measurement.toJSON();
-            if (!TextUtils.isEmpty(json)) {
-                jsonArray.put(json);
-            }
-        }
-        return jsonArray.toString();
-    }
-
-    public static List<Measurement> fromJSONList(String json) {
-        try {
-            List<Measurement> measurements = new ArrayList<>();
-            if (!TextUtils.isEmpty(json)) {
-                JSONArray jsonArray = new JSONArray(json);
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    String jsonObject = jsonArray.getString(i);
-                    Measurement measurement = Measurement.fromJSON(jsonObject.toString());
-                    if (measurement != null) {
-                        measurements.add(measurement);
-                    }
-                }
-            }
-            return measurements;
-        } catch (JSONException e) {
-            return new ArrayList<>();
         }
     }
 
@@ -257,22 +309,13 @@ public class Measurement implements Serializable {
 
         Measurement that = (Measurement) o;
 
-        if (Float.compare(that.averageHeartBeat, averageHeartBeat) != 0) {
-            return false;
-        }
-        if (startMeasurement != that.startMeasurement) {
-            return false;
-        }
-        return endMeasurement == that.endMeasurement;
+        return !(uniqueKey != null ? !uniqueKey.equals(that.uniqueKey) : that.uniqueKey != null);
 
     }
 
     @Override
     public int hashCode() {
-        int result = (averageHeartBeat != +0.0f ? Float.floatToIntBits(averageHeartBeat) : 0);
-        result = 31 * result + (int) (startMeasurement ^ (startMeasurement >>> 32));
-        result = 31 * result + (int) (endMeasurement ^ (endMeasurement >>> 32));
-        return result;
+        return uniqueKey != null ? uniqueKey.hashCode() : 0;
     }
 
     public boolean isFakeHeartRate() {
@@ -299,7 +342,7 @@ public class Measurement implements Serializable {
 
         //
         if (getMeasuredValues() != null && !getMeasuredValues().isEmpty()) {
-            TreeMap<Long,Float> sortedMap = new TreeMap<Long,Float>(new Comparator<Long>() {
+            TreeMap<Long, Float> sortedMap = new TreeMap<Long, Float>(new Comparator<Long>() {
                 @Override
                 public int compare(Long lhs, Long rhs) {
                     return lhs.compareTo(rhs);
@@ -333,7 +376,7 @@ public class Measurement implements Serializable {
         String result = "";
         if (timeCheckFailed) {
             result = addSeperator(result, "|");
-            result += "TIME_CHECK(" + (timeBeforeFirstMeasurement/1000) + "s)";
+            result += "TIME_CHECK(" + (timeBeforeFirstMeasurement / 1000) + "s)";
         } else if (measuredHeartRateCountFailed) {
             result = addSeperator(result, "|");
             result += "HEART_RATE_COUNT(" + heartRateCount + ")";
@@ -357,26 +400,5 @@ public class Measurement implements Serializable {
 
     public String getActivityName(Context context) {
         return getActivityName(context, activity);
-    }
-
-    public static String getActivityName(Context context, int activity) {
-        switch (activity) {
-            case ActivityState.IN_VEHICLE:
-                return context.getString(R.string.heart_rate_history_activity_vehicle);
-            case ActivityState.WALKING:
-                return context.getString(R.string.heart_rate_history_activity_walking);
-            case ActivityState.ON_FOOT:
-                return context.getString(R.string.heart_rate_history_activity_on_foot);
-            case ActivityState.ON_BICYCLE:
-                return context.getString(R.string.heart_rate_history_activity_bicycle);
-            case ActivityState.RUNNING:
-                return context.getString(R.string.heart_rate_history_activity_running);
-            case ActivityState.STILL:
-                return context.getString(R.string.heart_rate_history_activity_still);
-            case ActivityState.TILTING:
-                return context.getString(R.string.heart_rate_history_activity_tilting);
-            default:
-                return context.getString(R.string.heart_rate_history_activity_unknown);
-        }
     }
 }

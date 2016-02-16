@@ -15,6 +15,7 @@ import eu.vranckaert.heart.rate.monitor.shared.WearKeys;
 import eu.vranckaert.heart.rate.monitor.shared.WearURL;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,40 +71,15 @@ public class WearBusinessService {
         sendMessageToAllNodes(WearURL.URL_START_ACTIVITY_MONITORING, null);
     }
 
-    public void registerHeartRate(Measurement measurement) {
+    public void registerHeartRates(List<Measurement> measurements) {
         Log.d("dirk", "Send measured heart rate to phone");
-        PutDataMapRequest putDataMapReq = PutDataMapRequest.create(WearURL.HEART_RATE_MEASUREMENT);
-        putDataMapReq.getDataMap().putString(WearKeys.MEASUREMENT, measurement.toJSON());
-//        if (measurement.getMeasuredValues() != null && !measurement.getMeasuredValues().isEmpty()) {
-//            long[] keys = new long[measurement.getMeasuredValues().size()];
-//            float[] values = new float[measurement.getMeasuredValues().size()];
-//
-//            Set<Long> measuredValuesDates = measurement.getMeasuredValues().keySet();
-//            Iterator<Long> measuredValuesDateIterator = measuredValuesDates.iterator();
-//            int i = 0;
-//            while (measuredValuesDateIterator.hasNext()) {
-//                Long date = measuredValuesDateIterator.next();
-//                keys[i] = date;
-//                i++;
-//            }
-//
-//            Collection<Float> measuredValuesValues = measurement.getMeasuredValues().values();
-//            Iterator<Float> measuredValuesIterator = measuredValuesValues.iterator();
-//            int j = 0;
-//            while (measuredValuesIterator.hasNext()) {
-//                Float value = measuredValuesIterator.next();
-//                values[j] = value;
-//                j++;
-//            }
-//
-//            Log.d("dirk", "Adding all the heart rate measurement");
-//            putDataMapReq.getDataMap().putLongArray(WearKeys.MEASUREMENT_VALUES_KEYS, keys);
-//            putDataMapReq.getDataMap().putFloatArray(WearKeys.MEASUREMENT_VALUES_VALUES, values);
-//        }
+        PutDataMapRequest putDataMapReq = PutDataMapRequest.create(WearURL.HEART_RATE_MEASUREMENTS);
+        putDataMapReq.getDataMap().putString(WearKeys.MEASUREMENTS, Measurement.toJSONList(measurements));
+        putDataMapReq.getDataMap().putLong("timestamp", new Date().getTime());
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataItemResult> pendingResult = Wearable.DataApi.putDataItem(getGoogleApiClient(), putDataReq);
         DataItemResult result = pendingResult.await();
-        Log.d("dirk", "Measured heart rate synced with phone? " + result.getStatus().isSuccess());
+        Log.d("dirk", "Measured heart rates synced with phone? " + result.getStatus().isSuccess());
         getGoogleApiClient().disconnect();
     }
 }

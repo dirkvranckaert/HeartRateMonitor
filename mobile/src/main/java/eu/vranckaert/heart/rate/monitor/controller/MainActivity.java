@@ -31,14 +31,14 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessStatusCodes;
 import com.google.android.gms.fitness.data.DataType;
-import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
 import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.UserPreferences;
 import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,8 +115,11 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        new MenuInflater(this).inflate(R.menu.main_menu, menu);
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+        if (UserPreferences.getInstance().getGoogleFitConnected()) {
+            new MenuInflater(this).inflate(R.menu.main_menu, menu);
+        }
         return true;
     }
 
@@ -317,7 +320,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private void initOverviewOfMeasurements() {
         mCurrentViewSate = VIEW_STATE_MEASUREMENT_LIST;
         setContentView(R.layout.heart_rate_measurements);
-        setMeasurements(new ArrayList<>());
+        setMeasurements(new ArrayList<Measurement>());
         if (mLoadTask != null) {
             mLoadTask.cancel(true);
         }
@@ -346,7 +349,7 @@ public class MainActivity extends Activity implements OnClickListener {
         @Override
         protected List<Measurement> doInBackground(Void... params) {
             // Retrieve all measurements and filter out the fake heart rate measurements
-            IMeasurementDao dao = new MeasurementDao(this);
+            IMeasurementDao dao = new MeasurementDao(MainActivity.this);
             List<Measurement> measurements = dao.findAllSorted();
             //            List<Measurement> fakeMeasurements = new ArrayList<>();
             //            int measurementCount = measurements.size();

@@ -15,13 +15,19 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Subscription;
 import com.google.android.gms.fitness.result.ListSubscriptionsResult;
 import com.google.android.gms.location.ActivityRecognition;
+import com.google.android.gms.wearable.DataApi.DataItemResult;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import eu.vranckaert.heart.rate.monitor.controller.ActivityRecognitionIntentService;
+import eu.vranckaert.heart.rate.monitor.shared.WearKeys;
 import eu.vranckaert.heart.rate.monitor.shared.WearURL;
 import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
-import eu.vranckaert.heart.rate.monitor.controller.ActivityRecognitionIntentService;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -191,5 +197,17 @@ public class BusinessService {
         Log.d("dirk-background", "Adding the heart rate measurement to Fitness was success? " + status.isSuccess());
 
         return status.isSuccess();
+    }
+
+    public void sendHeartRateMeasurementsAck(List<String> measurementUniqueKeys) {
+        Log.d("dirk-ack", "Send measured heart rate ACK to watch");
+        PutDataMapRequest putDataMapReq = PutDataMapRequest.create(WearURL.HEART_RATE_MEASUREMENTS_ACK);
+        putDataMapReq.getDataMap().putStringArrayList(WearKeys.MEASUREMENT_KEYS, (ArrayList<String>) measurementUniqueKeys);
+        putDataMapReq.getDataMap().putLong("timestamp", new Date().getTime());
+        PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
+        PendingResult<DataItemResult> pendingResult = Wearable.DataApi.putDataItem(getWearableGoogleApiClient(), putDataReq);
+        DataItemResult result = pendingResult.await();
+        Log.d("dirk-ack", "Measured heart rates ACK sent to watch? " + result.getStatus().isSuccess());
+        getWearableGoogleApiClient().disconnect();
     }
 }

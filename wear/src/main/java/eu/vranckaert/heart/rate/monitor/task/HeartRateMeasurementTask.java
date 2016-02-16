@@ -2,8 +2,10 @@ package eu.vranckaert.heart.rate.monitor.task;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.WearBusinessService;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
+
+import java.util.List;
 
 /**
  * Date: 03/06/15
@@ -11,17 +13,17 @@ import eu.vranckaert.heart.rate.monitor.WearBusinessService;
  *
  * @author Dirk Vranckaert
  */
-public class HeartRateMeasurementTask extends AsyncTask<Measurement, Void, Void> {
+public class HeartRateMeasurementTask extends AsyncTask<List<Measurement>, Void, Void> {
     @Override
     protected void onPreExecute() {
         Log.d("dirk", "Start heart rate measurement sync task");
     }
 
     @Override
-    protected Void doInBackground(Measurement... params) {
+    protected Void doInBackground(List<Measurement>... params) {
         Log.d("dirk-background", "Heart rate measurement sync task is executing...");
-        Measurement measurements = params[0];
-        WearBusinessService.getInstance().registerHeartRate(measurements);
+        List<Measurement> measurements = params[0];
+        WearBusinessService.getInstance().registerHeartRates(measurements);
         Log.d("dirk-background", "Heart rate measurement sync task is is done...");
         return null;
     }

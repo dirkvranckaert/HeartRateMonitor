@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
+import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.WearHeartRateApplication;
@@ -59,7 +61,7 @@ public class AlarmSchedulingService {
         getAlarmManager().setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), getHeartRateMonitorIntent(REQUEST_CODE_ONE_TIME_HEART_RATE_MEASUREMENT));
     }
 
-    public void rescheduleHeartRateMeasuringAlarms() {
+    public void rescheduleHeartRateMeasuringAlarms(Context context) {
         Log.d("dirk", "Canceling all one time and repeating heart measurment alarms");
         getAlarmManager().cancel(getHeartRateMonitorIntent(REQUEST_CODE_ONE_TIME_HEART_RATE_MEASUREMENT));
         getAlarmManager().cancel(getHeartRateMonitorIntent(REQUEST_CODE_REPEATING_HEART_RATE_MEASUREMENT));
@@ -69,7 +71,8 @@ public class AlarmSchedulingService {
         Log.d("dirk", "interval is " + interval + " millis for activityState " + activityState);
         boolean defaultInterval = interval == ActivityState.DEFAULT_MEASURING_INTERVAL;
         Log.d("dirk", "interval is default interval?" + defaultInterval);
-        Measurement latestMeasurement = WearUserPreferences.getInstance().getLatestMeasurment();
+        IMeasurementDao measurementDao = new MeasurementDao(context);
+        Measurement latestMeasurement = measurementDao.findLatest();
         long currentTime = new Date().getTime();
         long nextExecution = -1;
         if (latestMeasurement != null) {

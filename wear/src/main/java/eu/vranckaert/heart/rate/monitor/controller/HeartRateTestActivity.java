@@ -18,7 +18,9 @@ import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
 import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Date: 28/05/15
@@ -134,7 +136,9 @@ public class HeartRateTestActivity extends WearableActivity implements SensorEve
             measurement.setMaximumHeartBeat(83.0f);
             measurement.setStartMeasurement(new Date().getTime());
             measurement.setEndMeasurement(new Date().getTime());
-            new HeartRateMeasurementTask().execute(measurement);
+            List<Measurement> measurements = new ArrayList<>();
+            measurements.add(measurement);
+            new HeartRateMeasurementTask().execute(measurements);
         }
     }
 

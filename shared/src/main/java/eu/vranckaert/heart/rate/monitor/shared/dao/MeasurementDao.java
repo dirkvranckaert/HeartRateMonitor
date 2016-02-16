@@ -22,11 +22,10 @@ public class MeasurementDao extends Dao<Measurement, Integer, HeartRateDatabaseH
     }
 
     @Override
-    public List<Measurement> findExact(Measurement measurement) {
+    public List<Measurement> findUnique(Measurement measurement) {
         try {
             QueryBuilder<Measurement, Integer> qb = dao.queryBuilder();
-            qb.where().eq(Measurement.COLUMN_START, measurement.getStartMeasurement())
-                    .and().eq(Measurement.COLUMN_END, measurement.getEndMeasurement());
+            qb.where().eq(Measurement.COLUMN_UNIQUE_KEY, measurement.getUniqueKey());
             PreparedQuery<Measurement> pq = qb.prepare();
             return dao.query(pq);
         } catch (SQLException e) {
@@ -38,10 +37,25 @@ public class MeasurementDao extends Dao<Measurement, Integer, HeartRateDatabaseH
     }
 
     @Override
-    public List<Measurement> findMeasurementsToSync() {
+    public List<Measurement> findMeasurementsToSyncWithFit() {
         try {
             QueryBuilder<Measurement, Integer> qb = dao.queryBuilder();
             qb.where().eq(Measurement.COLUMN_SYNCED_WITH_GOOGLE_FIT, false);
+            PreparedQuery<Measurement> pq = qb.prepare();
+            return dao.query(pq);
+        } catch (SQLException e) {
+            Log.e("MeasurementDao", "Could not build the query...");
+            throwFatalException(e);
+        }
+
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<Measurement> findMeasurementsToSyncWithPhone() {
+        try {
+            QueryBuilder<Measurement, Integer> qb = dao.queryBuilder();
+            qb.where().eq(Measurement.COLUMN_SYNCED_WITH_PHONE, false);
             PreparedQuery<Measurement> pq = qb.prepare();
             return dao.query(pq);
         } catch (SQLException e) {
@@ -65,5 +79,35 @@ public class MeasurementDao extends Dao<Measurement, Integer, HeartRateDatabaseH
         }
 
         return new ArrayList<>();
+    }
+
+    @Override
+    public Measurement findLatest() {
+        try {
+            QueryBuilder<Measurement, Integer> qb = dao.queryBuilder();
+            qb.orderBy(Measurement.COLUMN_START, false);
+            PreparedQuery<Measurement> pq = qb.prepare();
+            return dao.queryForFirst(pq);
+        } catch (SQLException e) {
+            Log.e("MeasurementDao", "Could not build the query...");
+            throwFatalException(e);
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<Measurement> findAllByUniqueKey(List<String> uniqueKeys) {
+        try {
+            QueryBuilder<Measurement, Integer> qb = dao.queryBuilder();
+            qb.where().in(Measurement.COLUMN_UNIQUE_KEY, uniqueKeys);
+            PreparedQuery<Measurement> pq = qb.prepare();
+            return dao.query(pq);
+        } catch (SQLException e) {
+            Log.e("MeasurementDao", "Could not build the query...");
+            throwFatalException(e);
+        }
+
+        return null;
     }
 }

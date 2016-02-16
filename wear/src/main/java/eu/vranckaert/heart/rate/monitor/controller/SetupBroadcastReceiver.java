@@ -16,14 +16,14 @@ import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
 public class SetupBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        setupMeasuring();
+        setupMeasuring(context);
     }
 
-    public static void setupMeasuring() {
+    public static void setupMeasuring(Context context) {
         WearUserPreferences.getInstance().storeLatestActivity(ActivityState.STILL);
         WearUserPreferences.getInstance().setAcceptedActivity(ActivityState.STILL);
         if (WearUserPreferences.getInstance().isPhoneSetupCompleted()) {
-            AlarmSchedulingService.getInstance().rescheduleHeartRateMeasuringAlarms();
+            AlarmSchedulingService.getInstance().rescheduleHeartRateMeasuringAlarms(context);
         }
     }
 }

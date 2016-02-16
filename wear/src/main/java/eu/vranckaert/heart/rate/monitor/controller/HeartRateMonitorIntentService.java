@@ -9,9 +9,10 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
+import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
+import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
-import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
 import eu.vranckaert.heart.rate.monitor.util.DeviceUtil;
 
@@ -93,8 +94,10 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
                 measurement.setEndMeasurement(currentTime);
                 measurement.setFirstMeasurement(mFirstMeasurement);
                 measurement.setMeasuredValues(mMeasuredValues);
-                WearUserPreferences.getInstance().addMeasurement(measurement);
-                new HeartRateMeasurementTask().execute(measurement);
+
+                IMeasurementDao measurementDao = new MeasurementDao(this);
+                measurementDao.save(measurement);
+                new HeartRateMeasurementTask().execute(measurementDao.findMeasurementsToSyncWithPhone());
 
                 // TODO notify UI to be updated if visible right now...
 

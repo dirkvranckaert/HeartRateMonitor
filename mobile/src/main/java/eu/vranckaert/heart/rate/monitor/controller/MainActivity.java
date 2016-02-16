@@ -12,6 +12,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -58,8 +61,6 @@ public class MainActivity extends Activity implements OnClickListener {
     private TextView mGoogleFitExplanation;
     private Button mConnect;
     private MeasurementsAdapter mMeasurementsAdapter;
-    // TODO we should have a disconnect button in the list somewhere (can be an action as well)...
-    // private Button mDisconnect;
 
     private GoogleApiClient mGoogleApiClient;
     private LoadMeasurementsTask mLoadTask;
@@ -114,11 +115,25 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        new MenuInflater(this).inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.disconnect) {
+            cancelSubscription();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onClick(View v) {
         if (v.getId() == R.id.connect) {
             setupGoogleFit();
-        } else if (v.getId() == R.id.disconnect) {
-            cancelSubscription();
         }
     }
 
@@ -388,7 +403,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
         @Override
         protected Void doInBackground(Void... params) {
-            BusinessService.getInstance().cancelFitnessSubscription(FitHelper.DATA_TYPE_HEART_RATE);
+            BusinessService businessService = BusinessService.getInstance();
+            businessService.setPhoneSetupCompletionStatus(false);
+            businessService.cancelFitnessSubscription(FitHelper.DATA_TYPE_HEART_RATE);
             UserPreferences.getInstance().setGoogleFitConnected(false);
             return null;
         }

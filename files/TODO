@@ -4,10 +4,9 @@ Version 1.0.0
   * Add UI button to sync all measurements to Google Fit if not yet done
   * Google Fit connection: when making a connection, we show a progress dialog, but it's a simple dialog instead of a progress...
   * Error handling during the setup of the GoogleApiClient when setting up the Google Fit connection (see TODO's)
-  * Option item menu (when google fit is enabled) to disconnect from Google fit
 * Wear
-  * Remove storage of measurements in the preferences (keep the json stuff to sync between phone and watch)
-  * As long as setup on phone is not completed show an init screen
+  * If list contains measurements that are not yet synced with the phone, show an extra button to start the syncing right away
+
 
 Version 1.0.0 DONE
 ******************
@@ -19,6 +18,10 @@ Version 1.0.0 DONE
   * List of saved measurements on phone (with Google Fit sync status)
   * Reverse the list of the measurements to have the latest on top
   * Disable activity tracking
+  * Option item menu (when google fit is enabled) to disconnect from Google fit
 * Wear
   * Fix bug of duplicate measurement saving with manual measurements
   * Add the current activity to the main screen
+  * Remove storage of measurements in the preferences (keep the json stuff to sync between phone and watch)
+  * As long as setup on phone is not completed show an init screen
+  * When sending measurements to the phone, only sent those that are not acknowledged by the phone to be received before

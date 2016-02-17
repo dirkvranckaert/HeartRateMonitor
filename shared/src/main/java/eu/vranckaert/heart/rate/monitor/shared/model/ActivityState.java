@@ -17,7 +17,7 @@ public class ActivityState {
      * a vehicle (your car, the bus, the train,...) we measure every 15 minutes.
      */
     public static final long DEFAULT_MEASURING_INTERVAL = DateUtil.convertMinutesToMillis(60);
-    public static final int DEFAULT_MEASURING_DURATION = 15000L;
+    public static final int DEFAULT_MEASURING_DURATION = 15000;
     public static final long DETECTION_INTERVAL = 30000; // 30 seconds
     public static final int TRUSTED_FACTOR = 6; // TRUSTED_FACTOR * DETECTION_INTERVAL = time before an activity is accepted. So 6 * 30000 = 180000 millis or 180 seconds or 3 minutes before we accept that a user is running/bicycling/driving/still/...
 

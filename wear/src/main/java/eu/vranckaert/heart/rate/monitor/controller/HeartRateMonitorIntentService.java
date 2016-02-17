@@ -87,6 +87,7 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
                 stopHearRateMonitor();
                 float heartBeat = calculateAverageHeartBeat();
                 Measurement measurement = new Measurement();
+                measurement.updateUniqueKey();
                 measurement.setAverageHeartBeat(heartBeat);
                 measurement.setMinimumHeartBeat(mMinimumHeartBeat);
                 measurement.setMaximumHeartBeat(mMaximumHeartBeat);

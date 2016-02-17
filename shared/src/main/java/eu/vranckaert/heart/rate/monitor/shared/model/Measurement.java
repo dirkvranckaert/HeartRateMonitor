@@ -76,7 +76,7 @@ public class Measurement implements Serializable {
             Double minHeartBeat = jsonObject.optDouble("minimumHeartBeat");
             Double maxHeartBeat = jsonObject.optDouble("maximumHeartBeat");
             Measurement measurement = new Measurement();
-            measurement.setUniqueKey(uniqueKey);
+            measurement.uniqueKey = uniqueKey;
             measurement.setAverageHeartBeat(heartBeat.floatValue());
             measurement.setMinimumHeartBeat(minHeartBeat.floatValue());
             measurement.setMaximumHeartBeat(maxHeartBeat.floatValue());
@@ -161,7 +161,7 @@ public class Measurement implements Serializable {
         }
     }
 
-    public static String generateUniqueKey() {
+    private static String generateUniqueKey() {
         return UUID.randomUUID().toString();
     }
 
@@ -177,8 +177,8 @@ public class Measurement implements Serializable {
         return uniqueKey;
     }
 
-    public void setUniqueKey(String uniqueKey) {
-        this.uniqueKey = uniqueKey;
+    public void updateUniqueKey() {
+        this.uniqueKey = generateUniqueKey();
     }
 
     public float getAverageHeartBeat() {

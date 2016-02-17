@@ -1,8 +1,12 @@
 package eu.vranckaert.heart.rate.monitor.task;
 
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 import eu.vranckaert.heart.rate.monitor.WearBusinessService;
+import eu.vranckaert.heart.rate.monitor.WearHeartRateApplication;
+import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
+import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 
 import java.util.List;
@@ -36,6 +40,18 @@ public class HeartRateMeasurementTask extends AsyncTask<List<Measurement>, Void,
     protected Boolean doInBackground(List<Measurement>... params) {
         Log.d("dirk-background", "Heart rate measurement sync task is executing...");
         List<Measurement> measurements = params[0];
+
+        // Make sure if we forget anywhere to set a unique key to the measurement that we update this here
+        IMeasurementDao measurementDao = new MeasurementDao(WearHeartRateApplication.getContext());
+        int size = measurements.size();
+        for (int i=0; i<size; i++) {
+            Measurement measurement = measurements.get(i);
+            if (TextUtils.isEmpty(measurement.getUniqueKey())) {
+                measurement.updateUniqueKey();
+                measurementDao.update(measurement);
+            }
+        }
+
         boolean result = WearBusinessService.getInstance().registerHeartRates(measurements);
         Log.d("dirk-background", "Heart rate measurement sync task is is done...");
         return result;

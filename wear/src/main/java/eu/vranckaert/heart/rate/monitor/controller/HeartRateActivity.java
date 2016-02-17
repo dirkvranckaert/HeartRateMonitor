@@ -210,7 +210,7 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
         if (mMeasuredValues != null && !mMeasuredValues.isEmpty()) {
             final float averageHeartBeat = calculateAverageHeartBeat();
             Measurement measurement = new Measurement();
-            measurement.setUniqueKey(Measurement.generateUniqueKey());
+            measurement.updateUniqueKey();
             measurement.setAverageHeartBeat(averageHeartBeat);
             measurement.setMinimumHeartBeat(mMinimumHeartBeat);
             measurement.setMaximumHeartBeat(mMaximumHeartBeat);

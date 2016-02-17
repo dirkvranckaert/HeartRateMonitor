@@ -2,12 +2,15 @@ package eu.vranckaert.heart.rate.monitor.view;
 
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.shared.util.DateUtil;
+import eu.vranckaert.heart.rate.monitor.view.HeartRateView.HeartRateListener;
 
 import java.util.Date;
 import java.util.Map;
@@ -18,7 +21,9 @@ import java.util.Map;
  *
  * @author Dirk Vranckaert
  */
-public class HeartRateHistoryItemView extends AbstractViewHolder {
+public class HeartRateHistoryItemView extends AbstractViewHolder implements OnLongClickListener {
+    private final HeartRateListener mListener;
+
     private final TextView mBpm;
     private final TextView mDuration;
     private final TextView mDate;
@@ -26,11 +31,13 @@ public class HeartRateHistoryItemView extends AbstractViewHolder {
     private final TextView mActivity;
     private final TextView mPhoneSyncedState;
 
+    private Measurement mMeasurement;
     int mOriginalPaddingTop = -1;
     int mOriginalPaddingBottom = -1;
 
-    public HeartRateHistoryItemView(LayoutInflater inflater, ViewGroup parent) {
+    public HeartRateHistoryItemView(LayoutInflater inflater, ViewGroup parent, HeartRateListener listener) {
         super(inflater, parent, R.layout.heart_rate_history_item);
+        mListener = listener;
 
         mBpm = findViewById(R.id.bpm);
         mDuration = findViewById(R.id.duration);
@@ -39,9 +46,12 @@ public class HeartRateHistoryItemView extends AbstractViewHolder {
         mActivity = findViewById(R.id.activity);
         mPhoneSyncedState = findViewById(R.id.phone_sync_state);
         findViewById(R.id.fake_heart_rate).setVisibility(GONE);
+        itemView.setClickable(true);
+        itemView.setOnLongClickListener(this);
     }
 
     public void setMeasurement(Measurement measurement) {
+        mMeasurement = measurement;
         int heartBeat = (int) measurement.getAverageHeartBeat();
         mBpm.setText("" + heartBeat);
         Date start = new Date(measurement.getStartMeasurement());
@@ -84,5 +94,11 @@ public class HeartRateHistoryItemView extends AbstractViewHolder {
         int paddingTop = itemView.getPaddingTop();
 
         itemView.setPadding(paddingLeft, paddingTop, paddingRight, newPaddingBottom);
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        mListener.onItemSelected(mMeasurement);
+        return true;
     }
 }

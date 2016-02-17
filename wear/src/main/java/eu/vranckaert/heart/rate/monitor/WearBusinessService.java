@@ -71,7 +71,7 @@ public class WearBusinessService {
         sendMessageToAllNodes(WearURL.URL_START_ACTIVITY_MONITORING, null);
     }
 
-    public void registerHeartRates(List<Measurement> measurements) {
+    public boolean registerHeartRates(List<Measurement> measurements) {
         Log.d("dirk", "Send measured heart rate to phone");
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create(WearURL.HEART_RATE_MEASUREMENTS);
         putDataMapReq.getDataMap().putString(WearKeys.MEASUREMENTS, Measurement.toJSONList(measurements));
@@ -79,7 +79,9 @@ public class WearBusinessService {
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataItemResult> pendingResult = Wearable.DataApi.putDataItem(getGoogleApiClient(), putDataReq);
         DataItemResult result = pendingResult.await();
-        Log.d("dirk", "Measured heart rates synced with phone? " + result.getStatus().isSuccess());
+        boolean success = result.getStatus().isSuccess();
+        Log.d("dirk", "Measured heart rates synced with phone? " + success);
         getGoogleApiClient().disconnect();
+        return success;
     }
 }

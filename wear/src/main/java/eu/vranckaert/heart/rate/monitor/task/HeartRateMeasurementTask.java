@@ -13,23 +13,44 @@ import java.util.List;
  *
  * @author Dirk Vranckaert
  */
-public class HeartRateMeasurementTask extends AsyncTask<List<Measurement>, Void, Void> {
+public class HeartRateMeasurementTask extends AsyncTask<List<Measurement>, Void, Boolean> {
+    private final HeartRateMeasurementTaskListener mListener;
+
+    public HeartRateMeasurementTask() {
+        this(null);
+    }
+
+    public HeartRateMeasurementTask(HeartRateMeasurementTaskListener listener) {
+        mListener = listener;
+    }
+
     @Override
     protected void onPreExecute() {
         Log.d("dirk", "Start heart rate measurement sync task");
+        if (mListener != null) {
+            mListener.beforeSync();
+        }
     }
 
     @Override
-    protected Void doInBackground(List<Measurement>... params) {
+    protected Boolean doInBackground(List<Measurement>... params) {
         Log.d("dirk-background", "Heart rate measurement sync task is executing...");
         List<Measurement> measurements = params[0];
-        WearBusinessService.getInstance().registerHeartRates(measurements);
+        boolean result = WearBusinessService.getInstance().registerHeartRates(measurements);
         Log.d("dirk-background", "Heart rate measurement sync task is is done...");
-        return null;
+        return result;
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        Log.d("dirk", "Heart rate measurement sync task has executed");
+    protected void onPostExecute(Boolean result) {
+        Log.d("dirk", "Heart rate measurement sync task has executed (success?" + result + ")");
+        if (mListener != null) {
+            mListener.afterSync(result);
+        }
+    }
+
+    public interface HeartRateMeasurementTaskListener {
+        void beforeSync();
+        void afterSync(boolean success);
     }
 }

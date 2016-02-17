@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.view.HeartRateView.HeartRateListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +19,15 @@ import java.util.List;
  */
 public class HeartRateHistoryAdapter extends Adapter {
     private final LayoutInflater mLayoutInflater;
+    private final HeartRateListener mListener;
     private final List<Measurement> mMeasurements = new ArrayList<>();
 
     private int mPaddingTop;
     private int mPaddingBottom;
 
-    public HeartRateHistoryAdapter(Context context) {
+    public HeartRateHistoryAdapter(Context context, HeartRateListener listener) {
         mLayoutInflater = LayoutInflater.from(context);
+        mListener = listener;
     }
 
     public void setMeasurements(List<Measurement> measurements) {
@@ -35,7 +38,7 @@ public class HeartRateHistoryAdapter extends Adapter {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new HeartRateHistoryItemView(mLayoutInflater, parent);
+        return new HeartRateHistoryItemView(mLayoutInflater, parent, mListener);
     }
 
     @Override

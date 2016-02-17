@@ -6,6 +6,7 @@ import android.support.wearable.view.GridViewPager;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import eu.vranckaert.heart.rate.monitor.R;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 
 /**
  * Date: 28/05/15
@@ -42,7 +43,11 @@ public class HeartRateView extends AbstractViewHolder {
 
     public interface HeartRateListener {
         void onHearRateViewCreated(AbstractViewHolder view);
+
         View getBoxInsetReferenceView();
+
         boolean toggleHeartRateMonitor();
+
+        void onItemSelected(Measurement measurement);
     }
 }

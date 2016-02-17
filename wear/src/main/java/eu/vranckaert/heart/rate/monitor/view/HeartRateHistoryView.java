@@ -36,7 +36,7 @@ public class HeartRateHistoryView extends AbstractViewHolder {
         mList = findViewById(R.id.list);
         mLayoutManager = new LinearLayoutManager(getContext());
         mList.setLayoutManager(mLayoutManager);
-        mAdapter = new HeartRateHistoryAdapter(getContext());
+        mAdapter = new HeartRateHistoryAdapter(getContext(), listener);
         mList.setAdapter(mAdapter);
 
         mListener.getBoxInsetReferenceView().getViewTreeObserver().addOnGlobalLayoutListener(

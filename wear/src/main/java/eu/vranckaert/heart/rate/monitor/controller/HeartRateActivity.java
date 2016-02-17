@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
@@ -18,6 +19,7 @@ import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
 import eu.vranckaert.heart.rate.monitor.task.ActivitySetupTask;
 import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
+import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask.HeartRateMeasurementTaskListener;
 import eu.vranckaert.heart.rate.monitor.util.DeviceUtil;
 import eu.vranckaert.heart.rate.monitor.view.AbstractViewHolder;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateHistoryView;
@@ -27,8 +29,10 @@ import eu.vranckaert.heart.rate.monitor.view.HeartRateUnavailableView;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateView;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateView.HeartRateListener;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -38,7 +42,8 @@ import java.util.Map.Entry;
  *
  * @author Dirk Vranckaert
  */
-public class HeartRateActivity extends WearableActivity implements SensorEventListener, HeartRateListener {
+public class HeartRateActivity extends WearableActivity implements SensorEventListener, HeartRateListener,
+        HeartRateMeasurementTaskListener {
     private static final int REQUEST_CODE_PERMISSION_BODY_SENSOR = 0;
 
     private HeartRateView mView;
@@ -56,6 +61,7 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     private HeartRateMonitorView mMonitorView;
     private HeartRateHistoryView mHistoryView;
     private boolean mInputLocked;
+    private Toast mPhoneSyncToast;
 
     // TODO start using the maximum heart rate (MHR): http://www.calculatenow.biz/sport/heart.php?age=28&submit=Calculate+MHR#mhr
     // This is based on the users age (below 30 or above 30). If average measured heart beat is significantly higher than
@@ -292,5 +298,31 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
             mInputLocked = false;
         }
         return mMeasuring;
+    }
+
+    @Override
+    public void onItemSelected(Measurement measurement) {
+        List<Measurement> measurements = new ArrayList<>();
+        measurements.add(measurement);
+        new HeartRateMeasurementTask(this).execute(measurements);
+    }
+
+    @Override
+    public void beforeSync() {
+        if (mPhoneSyncToast != null) {
+            mPhoneSyncToast.cancel();
+        }
+        mPhoneSyncToast = Toast.makeText(this, "Start syncing measurement", Toast.LENGTH_SHORT);
+        mPhoneSyncToast.show();
+    }
+
+    @Override
+    public void afterSync(boolean success) {
+        if (mPhoneSyncToast != null) {
+            mPhoneSyncToast.cancel();
+        }
+        mPhoneSyncToast =
+                Toast.makeText(this, success ? "Measurement synced!" : "Measurement sync failed!", Toast.LENGTH_SHORT);
+        mPhoneSyncToast.show();
     }
 }

@@ -11,10 +11,10 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
-import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.heart.rate.monitor.shared.util.DateUtil;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.shared.util.DateUtil;
 import eu.vranckaert.heart.rate.monitor.util.BoxInsetLayoutUtil;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateView.HeartRateListener;
 
@@ -27,8 +27,6 @@ import java.util.Date;
  * @author Dirk Vranckaert
  */
 public class HeartRateMonitorView extends AbstractViewHolder implements OnClickListener {
-    private static final int DEFAULT_HEART_BEATING_ANIMATION_BPM = 75;
-
     private final HeartRateListener mListener;
 
     private final TextView mTitle;
@@ -65,6 +63,11 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
 
     public void setMeasuringHeartBeat(int heartBeat) {
         mBeatingBpm = heartBeat;
+        if (heartBeat > 0 && !mBeating) {
+            mBeating = true;
+            playHeartBeat();
+        }
+
         mTitle.setText(R.string.heart_rate_monitor_title_measuring);
         mBpm.setText("" + heartBeat);
         mAction.setText(R.string.heart_rate_monitor_action_stop);
@@ -119,8 +122,6 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
                 mBpm.setText(R.string.heart_rate_monitor_empty_heart_beat);
                 mAction.setText(R.string.heart_rate_monitor_action_stop);
                 setMeasuringVisibility();
-                mBeatingBpm = DEFAULT_HEART_BEATING_ANIMATION_BPM;
-                playHeartBeat();
             }
         }
     }
@@ -129,6 +130,11 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
         if (mBeatingAnimation != null) {
             mBeatingAnimation.cancel();
             mBeatingAnimation = null;
+        }
+
+        if (mBeatingBpm == 0) {
+            mBeating = false;
+            return;
         }
 
         long beatDuration = 60000 / mBeatingBpm;

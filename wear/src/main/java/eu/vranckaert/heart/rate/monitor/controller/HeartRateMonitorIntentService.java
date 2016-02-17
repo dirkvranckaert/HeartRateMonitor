@@ -11,6 +11,7 @@ import android.hardware.SensorManager;
 import android.util.Log;
 import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
+import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
 import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
@@ -60,7 +61,7 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
             if (mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE) != null) {
                 mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
                 if (!DeviceUtil.isCharging()) {
-                    startHearRateMonitor();
+                    startHeartRateMonitor();
                 } else {
                     Log.d("dirk-background", "Will not start heart rate monitoring as device is currently charging");
                     stopSelf();
@@ -78,13 +79,13 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
             Log.d("dirk-background", "checkDuration (set initial values)");
             // Determine the end time of the measurement (aka the duration)
             Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MILLISECOND, 15000);
+            calendar.add(Calendar.MILLISECOND, ActivityState.DEFAULT_MEASURING_DURATION);
             mEndTime = calendar.getTimeInMillis();
         } else {
             Log.d("dirk-background", "checkDuration");
             long currentTime = new Date().getTime();
             if (currentTime >= mEndTime) {
-                stopHearRateMonitor();
+                stopHeartRateMonitor();
                 float heartBeat = calculateAverageHeartBeat();
                 Measurement measurement = new Measurement();
                 measurement.updateUniqueKey();
@@ -122,13 +123,13 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
         return averageHearBeat;
     }
 
-    private void startHearRateMonitor() {
-        Log.d("dirk-background", "startHearRateMonitor");
+    private void startHeartRateMonitor() {
+        Log.d("dirk-background", "startHeartRateMonitor");
         mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_UI);
     }
 
-    private void stopHearRateMonitor() {
-        Log.d("dirk-background", "stopHearRateMonitor");
+    private void stopHeartRateMonitor() {
+        Log.d("dirk-background", "stopHeartRateMonitor");
         mMeasuring = false;
         mSensorManager.unregisterListener(this, mHeartRateSensor);
     }

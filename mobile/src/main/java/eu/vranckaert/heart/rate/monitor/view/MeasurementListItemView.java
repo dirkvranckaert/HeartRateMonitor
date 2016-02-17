@@ -58,6 +58,7 @@ public class MeasurementListItemView extends AbstractViewHolder {
 
         mActivity.setText(measurement.getActivityName(getContext()));
 
+        mFitSyncState.setVisibility(VISIBLE);
         mFitSyncState.setText(measurement.isSyncedWithGoogleFit() ? "Synced to Google Fit" : "Not yet synced to Google Fit");
 
         String fakeHeartRate = measurement.detectFakeHeartRate();

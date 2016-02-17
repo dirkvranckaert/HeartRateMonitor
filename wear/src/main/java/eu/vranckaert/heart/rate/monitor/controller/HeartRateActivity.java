@@ -12,6 +12,7 @@ import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
@@ -312,7 +313,7 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
         if (mPhoneSyncToast != null) {
             mPhoneSyncToast.cancel();
         }
-        mPhoneSyncToast = Toast.makeText(this, "Start syncing measurement", Toast.LENGTH_SHORT);
+        mPhoneSyncToast = Toast.makeText(this, R.string.heart_rate_manual_sync_start, Toast.LENGTH_SHORT);
         mPhoneSyncToast.show();
     }
 
@@ -322,7 +323,8 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
             mPhoneSyncToast.cancel();
         }
         mPhoneSyncToast =
-                Toast.makeText(this, success ? "Measurement synced!" : "Measurement sync failed!", Toast.LENGTH_SHORT);
+                Toast.makeText(this, success ? R.string.heart_rate_manual_sync_finished_success :
+                        R.string.heart_rate_manual_sync_finished_failure, Toast.LENGTH_SHORT);
         mPhoneSyncToast.show();
     }
 }

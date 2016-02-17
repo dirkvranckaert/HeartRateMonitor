@@ -57,6 +57,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/activity"
         android:id="@+id/fit_sync_state"
+        android:visibility="gone"
         tools:text="synced to google fit"/>
 
     <TextView
@@ -72,5 +73,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/phone_sync_state"
         android:id="@+id/fake_heart_rate"
+        android:visibility="gone"
         tools:text="This heart rate is detected to be fake. Reason is: BLABLABLA"/>
 </RelativeLayout>

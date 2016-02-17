@@ -62,6 +62,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/fit_sync_state"
+        android:id="@+id/phone_sync_state"
+        android:visibility="gone"
+        tools:text="synced to your phone"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/phone_sync_state"
         android:id="@+id/fake_heart_rate"
         tools:text="This heart rate is detected to be fake. Reason is: BLABLABLA"/>
 </RelativeLayout>

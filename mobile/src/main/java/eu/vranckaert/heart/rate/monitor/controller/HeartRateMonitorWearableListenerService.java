@@ -20,18 +20,18 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
-import eu.vranckaert.heart.rate.monitor.shared.NotificationId;
-import eu.vranckaert.heart.rate.monitor.shared.WearKeys;
-import eu.vranckaert.heart.rate.monitor.shared.WearURL;
-import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
 import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.HeartRateApplication;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.UserPreferences;
+import eu.vranckaert.heart.rate.monitor.shared.NotificationId;
+import eu.vranckaert.heart.rate.monitor.shared.WearKeys;
+import eu.vranckaert.heart.rate.monitor.shared.WearURL;
 import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
+import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
 import eu.vranckaert.heart.rate.monitor.task.ActivityRecognitionTask;
 
 import java.util.ArrayList;
@@ -81,9 +81,8 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                     int size = measurements.size();
                     Log.d("dirk", "number of measurements is " + size);
                     BusinessService businessService = BusinessService.getInstance();
-                    for (int i = 0; i<size; i++) {
+                    for (int i = 0; i < size; i++) {
                         Measurement measurement = measurements.get(i);
-                        measurementUniqueKeys.add(measurement.getUniqueKey());
                         measurement.setSyncedWithGoogleFit(false);
                         Log.d("dirk", "measurement=" + measurement.toJSON());
                         List<Measurement> matchingMeasurements = mDao.findUnique(measurement);
@@ -94,6 +93,7 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
 
                         Log.d("dirk", "Storing the measurement locally");
                         measurement = mDao.save(measurement);
+                        measurementUniqueKeys.add(measurement.getUniqueKey());
 
                         boolean hasPermissions = PermissionUtil.hasPermission(this, permission.BODY_SENSORS);
                         if (hasPermissions && !measurement.isFakeHeartRate()) {
@@ -180,7 +180,7 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
     private void syncPostponedMeasurements() {
         List<Measurement> measurements = mDao.findMeasurementsToSyncWithFit();
         Log.d("dirk", "Sycning all postponed measurements, found " + measurements.size() + " measurement(s)");
-        for (int i=0; i<measurements.size(); i++) {
+        for (int i = 0; i < measurements.size(); i++) {
             Measurement measurement = measurements.get(i);
             if (!measurement.isFakeHeartRate()) {
                 DataSet dataSet = getGoogleFitDataSet(measurement);
@@ -211,7 +211,8 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
         DataSet dataSet = DataSet.create(dataSource);
         Log.d("dirk", "Building DataPoint");
         DataPoint dataPoint = dataSet.createDataPoint();
-        dataPoint.setTimeInterval(measurement.getStartMeasurement(), measurement.getEndMeasurement(), TimeUnit.MILLISECONDS);
+        dataPoint.setTimeInterval(measurement.getStartMeasurement(), measurement.getEndMeasurement(),
+                TimeUnit.MILLISECONDS);
         //dataPoint.getValue(Field.FIELD_MIN).setFloat(measurement.getMinimumHeartBeat());
         dataPoint.getValue(Field.FIELD_BPM).setFloat(measurement.getAverageHeartBeat());
         //dataPoint.getValue(Field.FIELD_AVERAGE).setFloat(measurement.getAverageHeartBeat());

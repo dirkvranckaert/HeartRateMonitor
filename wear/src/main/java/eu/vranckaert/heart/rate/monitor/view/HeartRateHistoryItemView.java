@@ -1,6 +1,7 @@
 package eu.vranckaert.heart.rate.monitor.view;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
@@ -23,6 +24,7 @@ public class HeartRateHistoryItemView extends AbstractViewHolder {
     private final TextView mDate;
     private final TextView mTime;
     private final TextView mActivity;
+    private final TextView mPhoneSyncedState;
 
     int mOriginalPaddingTop = -1;
     int mOriginalPaddingBottom = -1;
@@ -35,6 +37,7 @@ public class HeartRateHistoryItemView extends AbstractViewHolder {
         mDate = findViewById(R.id.date);
         mTime = findViewById(R.id.time);
         mActivity = findViewById(R.id.activity);
+        mPhoneSyncedState = findViewById(R.id.phone_sync_state);
         findViewById(R.id.fake_heart_rate).setVisibility(GONE);
     }
 
@@ -53,6 +56,8 @@ public class HeartRateHistoryItemView extends AbstractViewHolder {
         }
         durationText += "" + minutes;
         mDuration.setText(durationText);
+        mPhoneSyncedState.setVisibility(VISIBLE);
+        mPhoneSyncedState.setText(measurement.isSyncedWithPhone() ? "Already synced!" : "Not yet synced!");
 
         mActivity.setText(measurement.getActivityName(getContext()));
     }

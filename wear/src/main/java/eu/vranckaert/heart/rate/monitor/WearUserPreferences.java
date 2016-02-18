@@ -25,6 +25,7 @@ public class WearUserPreferences {
     private static final String KEY_ALL_MEASUREMENTS = "all_measurements";
     private static final String KEY_LATEST_MEASUREMENTS = "latest_measurements";
     private static final String KEY_PHONE_SETUP_COMPETED = "phone_setup_completed";
+    private static final String KEY_HEART_RATE_MEASURING_INTERVAL = "heart_rate_measuring_interval";
 
     private static WearUserPreferences INSTANCE;
     
@@ -95,5 +96,13 @@ public class WearUserPreferences {
 
     public boolean isPhoneSetupCompleted() {
         return mSharedPreferences.getBoolean(KEY_PHONE_SETUP_COMPETED, false);
+    }
+
+    public long getHeartRateMeasuringInterval() {
+        String interval = mSharedPreferences.getString(KEY_HEART_RATE_MEASURING_INTERVAL, null);
+        if (TextUtils.isEmpty(interval)) {
+            return ActivityState.DEFAULT_MEASURING_INTERVAL;
+        }
+        return Long.valueOf(interval);
     }
 }

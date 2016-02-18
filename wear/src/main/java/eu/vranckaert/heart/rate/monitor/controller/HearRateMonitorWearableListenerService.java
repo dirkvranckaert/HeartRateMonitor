@@ -61,39 +61,6 @@ public class HearRateMonitorWearableListenerService extends WearableListenerServ
 
         final WearUserPreferences preferences = WearUserPreferences.getInstance();
         switch (path) {
-            case WearURL.URL_ACTIVITY_MONITORING_RESULT:
-                Log.d("dirk", "Activity monitoring update");
-                int currentActivity = Integer.parseInt(path.replace(WearURL.URL_ACTIVITY_MONITORING_RESULT, ""));
-
-                boolean useActivity = true;
-                switch (currentActivity) {
-                    case ActivityState.UNKNOWN:
-                    case ActivityState.TILTING:
-                        useActivity = false;
-                }
-
-                Log.d("dirk", "Activity found is " + currentActivity + ", will ignore this activity? " + !useActivity);
-                if (useActivity) {
-                    int previousActivity = preferences.getLatestActivity();
-                    preferences.storeLatestActivity(currentActivity);
-                    Log.d("dirk", "Activity is same as previous activity, so possible a trusted activity");
-                    if (currentActivity == previousActivity) {
-                        int previousActivityCount = preferences.getLatestActivityCount();
-                        int acceptedActivity = preferences.getAcceptedActivity();
-                        Log.d("dirk", "Activity has been seen now for " + previousActivityCount +
-                                " times and the currentActivity is different from the acceptedActivity? " +
-                                (acceptedActivity != currentActivity));
-                        if (previousActivityCount >= ActivityState.TRUSTED_FACTOR &&
-                                acceptedActivity != currentActivity) {
-                            preferences.setAcceptedActivity(currentActivity);
-                            if (ActivityState.getMeasuringIntervalForActivity(acceptedActivity) !=
-                                    ActivityState.getMeasuringIntervalForActivity(currentActivity)) {
-                                AlarmSchedulingService.getInstance().rescheduleHeartRateMeasuringAlarms(this);
-                            }
-                        }
-                    }
-                }
-                break;
             case WearURL.URL_SETUP_COMPLETED:
                 preferences.setPhoneSetupCompleted(true);
                 preferences.setHasntRunBefore();

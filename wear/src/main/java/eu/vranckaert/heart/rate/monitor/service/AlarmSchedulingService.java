@@ -67,10 +67,8 @@ public class AlarmSchedulingService {
         getAlarmManager().cancel(getHeartRateMonitorIntent(REQUEST_CODE_REPEATING_HEART_RATE_MEASUREMENT));
         
         int activityState = WearUserPreferences.getInstance().getAcceptedActivity();
-        long interval = ActivityState.getMeasuringIntervalForActivity(activityState);
+        long interval = WearUserPreferences.getInstance().getHeartRateMeasuringInterval();
         Log.d("dirk", "interval is " + interval + " millis for activityState " + activityState);
-        boolean defaultInterval = interval == ActivityState.DEFAULT_MEASURING_INTERVAL;
-        Log.d("dirk", "interval is default interval?" + defaultInterval);
         IMeasurementDao measurementDao = new MeasurementDao(context);
         Measurement latestMeasurement = measurementDao.findLatest();
         long currentTime = new Date().getTime();
@@ -93,14 +91,12 @@ public class AlarmSchedulingService {
             nextExecution = currentTime + interval;
             Log.d("dirk", "First repeating measurement scheduled at " + new Date(nextExecution).toString());
         }
-        
-        if (defaultInterval) {
-            Log.d("dirk", "Optimizing measurement start time at quarter of hour...");
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(nextExecution);
-            nextExecution = getNextExecutionAtQuarterOfHours(calendar);
-            Log.d("dirk", "Measurement optimized to run at " + new Date(nextExecution).toString());
-        }
+
+        Log.d("dirk", "Optimizing measurement start time at quarter of hour...");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(nextExecution);
+        nextExecution = getNextExecutionAtQuarterOfHours(calendar);
+        Log.d("dirk", "Measurement optimized to run at " + new Date(nextExecution).toString());
         
         getAlarmManager().setRepeating(AlarmManager.RTC_WAKEUP, nextExecution, interval, getHeartRateMonitorIntent(REQUEST_CODE_REPEATING_HEART_RATE_MEASUREMENT));
     }

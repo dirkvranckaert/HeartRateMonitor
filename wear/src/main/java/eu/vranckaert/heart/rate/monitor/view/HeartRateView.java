@@ -48,6 +48,8 @@ public class HeartRateView extends AbstractViewHolder {
 
         boolean toggleHeartRateMonitor();
 
+        void openSettings();
+
         void onItemSelected(Measurement measurement);
     }
 }

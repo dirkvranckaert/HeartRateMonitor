@@ -2,6 +2,7 @@ package eu.vranckaert.heart.rate.monitor.controller;
 
 import android.Manifest.permission;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -299,6 +300,12 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
             mInputLocked = false;
         }
         return mMeasuring;
+    }
+
+    @Override
+    public void openSettings() {
+        Intent intent = new Intent(this, HeartRateSettingsActivity.class);
+        startActivity(intent);
     }
 
     @Override

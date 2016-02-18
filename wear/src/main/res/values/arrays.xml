@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="settings_measuring_interval_entries">
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>2 hours</item>
+        <item>4 hours</item>
+        <item>12 hours</item>
+    </string-array>
+    <string-array name="settings_measuring_interval_entry_values">
+        <item>30000</item>
+        <item>60000</item>
+        <item>120000</item>
+        <item>240000</item>
+        <item>720000</item>
+    </string-array>
+</resources>

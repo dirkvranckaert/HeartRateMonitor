@@ -96,9 +96,13 @@ public class Measurement implements Serializable {
     }
 
     public static Map<Long, Float> measuredValuesFromJson(String json) {
+        Map<Long, Float> measuredValues = new HashMap<>();
+        if (TextUtils.isEmpty(json)) {
+            return measuredValues;
+        }
+
         try {
             JSONArray measuredValuesArray = new JSONArray(json);
-            Map<Long, Float> measuredValues = new HashMap<>();
             for (int i = 0; i < measuredValuesArray.length(); i++) {
                 JSONObject measuredValue = new JSONObject(measuredValuesArray.optString(i));
                 measuredValues

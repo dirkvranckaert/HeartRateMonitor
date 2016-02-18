@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.wearable.view.ActionPage
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/actionpage"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:src="@drawable/ic_settings_white_48dp"
+    android:text="@string/heart_rate_settings_action"
+    android:maxLines="1"/>

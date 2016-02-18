@@ -29,25 +29,4 @@ public class ActivityState {
     public static final int TILTING = 5;
     public static final int WALKING = 7;
     public static final int RUNNING = 8;
-
-    public static long getMeasuringIntervalForActivity(int activity) {
-        long interval = DEFAULT_MEASURING_INTERVAL;
-
-        // For now disabling the activity detection, should be configurable in the application
-        if (false) {
-            switch (activity) {
-                case ActivityState.IN_VEHICLE:
-                    interval = DateUtil.convertMinutesToMillis(15);
-                    break;
-                case ActivityState.ON_BICYCLE:
-                    interval = DateUtil.convertMinutesToMillis(5);
-                    break;
-                case ActivityState.RUNNING:
-                    interval = DateUtil.convertMinutesToMillis(5);
-                    break;
-            }
-        }
-
-        return interval;
-    }
 }

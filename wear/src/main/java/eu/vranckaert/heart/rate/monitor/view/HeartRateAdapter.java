@@ -19,6 +19,7 @@ public class HeartRateAdapter extends GridPagerAdapter {
 
     private HeartRateMonitorView mMonitorView;
     private HeartRateHistoryView mHistoryView;
+    private HeartRateSettingsView mSettingsView;
 
     public HeartRateAdapter(Context context, HeartRateListener listener) {
         mLayoutInflater = LayoutInflater.from(context);
@@ -32,7 +33,7 @@ public class HeartRateAdapter extends GridPagerAdapter {
 
     @Override
     public int getColumnCount(int i) {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -49,6 +50,11 @@ public class HeartRateAdapter extends GridPagerAdapter {
                 mHistoryView = new HeartRateHistoryView(mLayoutInflater, viewGroup, mListener);
             }
             view = mHistoryView;
+        } else if (column == 2) {
+            if (mSettingsView == null) {
+                mSettingsView = new HeartRateSettingsView(mLayoutInflater, viewGroup, mListener);
+            }
+            view = mSettingsView;
         }
 
         if (view != null) {

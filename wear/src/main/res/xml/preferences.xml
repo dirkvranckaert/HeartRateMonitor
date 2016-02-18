@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <ListPreference
         android:title="@string/settings_measuring_interval_title"
-        android:summary="@string/settings_measuring_interval_summary"
         android:icon="@drawable/ic_timer_white_36dp"
         android:entries="@array/settings_measuring_interval_entries"
         android:entryValues="@array/settings_measuring_interval_entry_values"
         android:key="heart_rate_measuring_interval"
-        android:defaultValue="60000"/>
+        app:wear_entryAsSummary="false"
+        android:defaultValue="3600000"/>
+
+    <SwitchPreference
+        android:title="@string/settings_notification_title"
+        app:wear_iconOn="@drawable/ic_notifications_white_36dp"
+        app:wear_iconOff="@drawable/ic_notifications_off_white_36dp"
+        android:key="heart_rate_measuring_notification"
+        android:defaultValue="false"/>
 </PreferenceScreen>

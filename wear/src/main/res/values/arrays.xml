@@ -8,10 +8,10 @@
         <item>12 hours</item>
     </string-array>
     <string-array name="settings_measuring_interval_entry_values">
-        <item>30000</item>
-        <item>60000</item>
-        <item>120000</item>
-        <item>240000</item>
-        <item>720000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+        <item>7200000</item>
+        <item>14400000</item>
+        <item>43200000</item>
     </string-array>
 </resources>

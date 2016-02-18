@@ -22,10 +22,9 @@ public class WearUserPreferences {
     private static final String KEY_LATEST_ACTIVITY = "latest_activity";
     private static final String KEY_LATEST_ACTIVITY_COUNT = "latest_activity_count";
     private static final String KEY_ACCEPTED_ACTIVITY = "accepted_activity";
-    private static final String KEY_ALL_MEASUREMENTS = "all_measurements";
-    private static final String KEY_LATEST_MEASUREMENTS = "latest_measurements";
     private static final String KEY_PHONE_SETUP_COMPETED = "phone_setup_completed";
     private static final String KEY_HEART_RATE_MEASURING_INTERVAL = "heart_rate_measuring_interval";
+    private static final String KEY_HEART_RATE_MEASURING_NOTIFICATION = "heart_rate_measuring_notification";
 
     private static WearUserPreferences INSTANCE;
     
@@ -104,5 +103,9 @@ public class WearUserPreferences {
             return ActivityState.DEFAULT_MEASURING_INTERVAL;
         }
         return Long.valueOf(interval);
+    }
+
+    public boolean showHeartRateMeasuementNotification() {
+        return mSharedPreferences.getBoolean(KEY_HEART_RATE_MEASURING_NOTIFICATION, false);
     }
 }

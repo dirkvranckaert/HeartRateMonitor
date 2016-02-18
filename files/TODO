@@ -6,6 +6,7 @@ Version 1.0.0
   * Error handling during the setup of the GoogleApiClient when setting up the Google Fit connection (see TODO's)
 * Wear
   * If list contains measurements that are not yet synced with the phone, show an extra button to start the syncing right away
+  * Show notification on watch while measuring heart rate (can be disabled through settings: 'heart_rate_measuring_notification')
 
 
 Version 1.0.0 DONE

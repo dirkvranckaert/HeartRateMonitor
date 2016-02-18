@@ -10,6 +10,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
@@ -29,16 +30,20 @@ import java.util.Date;
 public class HeartRateMonitorView extends AbstractViewHolder implements OnClickListener {
     private final HeartRateListener mListener;
 
+    private final TextView mTimeLabel;
     private final TextView mTitle;
-    private final View mHeartImage;
+    private final ImageView mHeartImage;
     private final TextView mBpm;
+    private final TextView mBpmLabel;
     private final View mBpmLabelContainer;
     private final TextView mTimestamp;
     private final TextView mCurrentActivity;
     private final Button mAction;
 
     private Animator mBeatingAnimation;
+    private boolean mMeasuring = false;
     private boolean mBeating = false;
+    private boolean mAmbientMode = false;
     private int mBeatingBpm;
 
     public HeartRateMonitorView(LayoutInflater inflater, ViewGroup parent, HeartRateListener listener) {
@@ -47,9 +52,11 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
         BoxInsetLayoutUtil.setReferenceBoxInsetLayoutView(getView(), true, true, false, false,
                 listener.getBoxInsetReferenceView());
 
+        mTimeLabel = findViewById(R.id.time_label);
         mTitle = findViewById(R.id.title);
         mHeartImage = findViewById(R.id.heart_rate_img);
         mBpm = findViewById(R.id.heart_rate);
+        mBpmLabel = findViewById(R.id.bpm_label);
         mBpmLabelContainer = findViewById(R.id.bpm_label_container);
         mTimestamp = findViewById(R.id.timestamp);
         mCurrentActivity = findViewById(R.id.current_activity);
@@ -59,6 +66,33 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
         mAction.setText(R.string.heart_rate_monitor_action_start);
 
         mAction.setOnClickListener(this);
+
+        updateUIForAmbientMode();
+    }
+
+    private void updateUIForAmbientMode() {
+        mTitle.setTextColor(getResources().getColor(mAmbientMode ? R.color.ambient_text_color : R.color.non_ambient_text_color));
+        mTitle.getPaint().setAntiAlias(!mAmbientMode);
+        mTitle.setVisibility((mAmbientMode && !mMeasuring) ? GONE : VISIBLE);
+
+        mHeartImage.setImageTintList(getResources().getColorStateList(mAmbientMode ? R.color.ambient_text_color : R.color.non_ambient_text_color));
+
+        mBpm.setTextColor(getResources().getColor(mAmbientMode ? R.color.ambient_text_color : R.color.non_ambient_text_color));
+        mBpm.getPaint().setAntiAlias(!mAmbientMode);
+
+        mBpmLabel.setTextColor(getResources().getColor(mAmbientMode ? R.color.ambient_text_color : R.color.non_ambient_text_color));
+        mBpmLabel.getPaint().setAntiAlias(!mAmbientMode);
+
+        mTimestamp.setTextColor(getResources().getColor(mAmbientMode ? R.color.ambient_text_color : R.color.non_ambient_text_color));
+        mTimestamp.getPaint().setAntiAlias(!mAmbientMode);
+
+        mCurrentActivity.setTextColor(getResources().getColor(mAmbientMode ? R.color.ambient_text_color : R.color.non_ambient_text_color));
+        mCurrentActivity.getPaint().setAntiAlias(!mAmbientMode);
+
+        mAction.setVisibility(mAmbientMode ? GONE : VISIBLE);
+
+        mTimeLabel.setVisibility(mAmbientMode ? VISIBLE : GONE);
+        mTimeLabel.setText(DateUtil.formatTime(new Date()));
     }
 
     public void setMeasuringHeartBeat(int heartBeat) {
@@ -68,10 +102,15 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
             playHeartBeat();
         }
 
-        mTitle.setText(R.string.heart_rate_monitor_title_measuring);
-        mBpm.setText("" + heartBeat);
-        mAction.setText(R.string.heart_rate_monitor_action_stop);
+        if (!mAmbientMode) {
+            updateHeartBeatMeasurement();
+        }
+    }
 
+    private void updateHeartBeatMeasurement() {
+        mTitle.setText(R.string.heart_rate_monitor_title_measuring);
+        mBpm.setText("" + mBeatingBpm);
+        mAction.setText(R.string.heart_rate_monitor_action_stop);
         setMeasuringVisibility();
     }
 
@@ -80,7 +119,7 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
         mBpmLabelContainer.setVisibility(VISIBLE);
         mTimestamp.setVisibility(INVISIBLE);
         mCurrentActivity.setVisibility(VISIBLE);
-        mAction.setVisibility(VISIBLE);
+        mAction.setVisibility(mAmbientMode ? GONE : VISIBLE);
     }
 
     public void setLatestMeasurement(Measurement measurement) {
@@ -91,7 +130,6 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
             mBpmLabelContainer.setVisibility(GONE);
             mTimestamp.setVisibility(INVISIBLE);
             mCurrentActivity.setVisibility(INVISIBLE);
-            mAction.setVisibility(VISIBLE);
         } else {
             mTitle.setText(R.string.heart_rate_monitor_title_recent);
             int heartBeat = (int) measurement.getAverageHeartBeat();
@@ -102,7 +140,6 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
             mBpmLabelContainer.setVisibility(VISIBLE);
             mTimestamp.setVisibility(VISIBLE);
             mCurrentActivity.setVisibility(VISIBLE);
-            mAction.setVisibility(VISIBLE);
         }
     }
 
@@ -116,7 +153,8 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
     public void onClick(View v) {
         updateCurrentActivity();
         if (v.getId() == R.id.action) {
-            mBeating = mListener.toggleHeartRateMonitor();
+            mMeasuring = mListener.toggleHeartRateMonitor();
+            mBeating = mMeasuring;
             if (mBeating) {
                 mTitle.setText(R.string.heart_rate_monitor_title_setup);
                 mBpm.setText(R.string.heart_rate_monitor_empty_heart_beat);
@@ -155,7 +193,7 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (!cancelled && mBeating) {
+                if (!cancelled && mBeating && !mAmbientMode) {
                     playHeartBeat();
                 }
             }
@@ -172,5 +210,28 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
         });
         animatorSet.start();
         mBeatingAnimation = animatorSet;
+    }
+
+    public void startAmbientMode() {
+        mAmbientMode = true;
+        updateTime();
+        updateUIForAmbientMode();
+    }
+
+    public void stopAmbientMode() {
+        mAmbientMode = false;
+        updateUIForAmbientMode();
+        if (mBeating) {
+            playHeartBeat();
+        }
+    }
+
+    public void updateInAmbient() {
+        updateTime();
+        updateHeartBeatMeasurement();
+    }
+
+    private void updateTime() {
+        mTimeLabel.setText(DateUtil.formatTime(new Date()));
     }
 }

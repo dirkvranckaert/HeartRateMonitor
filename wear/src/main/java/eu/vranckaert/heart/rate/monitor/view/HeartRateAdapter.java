@@ -79,4 +79,22 @@ public class HeartRateAdapter extends GridPagerAdapter {
 
         return false;
     }
+
+    public void startAmbientMode() {
+        if (mMonitorView != null) {
+            mMonitorView.startAmbientMode();
+        }
+    }
+
+    public void stopAmbientMode() {
+        if (mMonitorView != null) {
+            mMonitorView.stopAmbientMode();
+        }
+    }
+
+    public void updateInAmbient() {
+        if (mMonitorView != null) {
+            mMonitorView.updateInAmbient();
+        }
+    }
 }

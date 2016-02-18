@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ambient_bg_color">#000000</color>
+    <color name="ambient_text_color">#FFFFFF</color>
+    <color name="transparent">@android:color/transparent</color>
+    <color name="non_ambient_text_color">#000000</color>
+</resources>

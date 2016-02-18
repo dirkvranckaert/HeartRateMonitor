@@ -107,6 +107,7 @@
     <orderEntry type="library" exported="" name="play-services-basement-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-23.0.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="mockable-android-23" level="project" />
+    <orderEntry type="library" exported="" name="wearable-1.0.0" level="project" />
     <orderEntry type="module" module-name="shared" exported="" />
   </component>
 </module>

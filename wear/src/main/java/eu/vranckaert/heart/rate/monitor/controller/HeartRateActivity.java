@@ -113,11 +113,13 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     public void onEnterAmbient(Bundle ambientDetails) {
         Log.d("dirk", "onEnterAmbient");
         Log.d("dirk", "isAmbient=" + isAmbient());
-        if (mMeasuring) {
-            // TODO notify views to enter ambient mode
-        } else {
-            finish();
-        }
+        mView.startAmbientMode();
+
+//        if (mMeasuring) {
+//
+//        } else {
+//            finish();
+//        }
 
         super.onEnterAmbient(ambientDetails);
     }
@@ -126,9 +128,18 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     public void onExitAmbient() {
         Log.d("dirk", "onExitAmbient");
         Log.d("dirk", "isAmbient=" + isAmbient());
-        // TODO notify views to exit ambient mode
+        mView.stopAmbientMode();
 
         super.onExitAmbient();
+    }
+
+    @Override
+    public void onUpdateAmbient() {
+        Log.d("dirk", "onUpdateAmbient");
+        Log.d("dirk", "isAmbient=" + isAmbient());
+        mView.updateInAmbient();
+
+        super.onUpdateAmbient();
     }
 
     @Override

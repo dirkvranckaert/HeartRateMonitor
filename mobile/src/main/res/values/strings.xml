@@ -8,6 +8,7 @@
     <string name="google_fit_setup_disconnect">Disconnect from Google Fit</string>
     <string name="google_fit_setup_connecting">Making a connection...</string>
     <string name="google_fit_setup_setup_fit">Setting up Google Fitness...</string>
+    <string name="debug_settings">Debug Settings</string>
 
     <string name="permission_explanation_body_sensors">This application measures your heart rate throughout the day so you should accept this permission before you can start using the application.</string>
 
@@ -16,4 +17,6 @@
 
     <string name="refresh">Refresh</string> <!-- TODO remove -->
     <string name="delete_all">Clear DB</string> <!-- TODO remove -->
+
+    <string name="debug_settings_title">Development Settings</string>
 </resources>

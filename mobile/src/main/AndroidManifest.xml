@@ -28,6 +28,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".controller.DebugSettingsActivity"
+                  android:theme="@android:style/Theme.Material"/>
+
         <receiver
             android:name=".controller.RebootDeviceReceiver"
             android:enabled="true"

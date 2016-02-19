@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="debug_sync_with_google_fit"
+        android:summaryOff="Don't sync any new measurements with Google Fit"
+        android:summaryOn="Sync all measurements with Google Fit"
+        android:title="Sync with Google Fit" />
+</PreferenceScreen>

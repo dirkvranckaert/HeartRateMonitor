@@ -117,8 +117,9 @@ public class MainActivity extends Activity implements OnClickListener {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
-        if (UserPreferences.getInstance().getGoogleFitConnected()) {
-            new MenuInflater(this).inflate(R.menu.main_menu, menu);
+        new MenuInflater(this).inflate(R.menu.main_menu, menu);
+        if (!UserPreferences.getInstance().getGoogleFitConnected()) {
+            menu.removeItem(R.id.disconnect);
         }
         return true;
     }
@@ -127,6 +128,10 @@ public class MainActivity extends Activity implements OnClickListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.disconnect) {
             cancelSubscription();
+            return true;
+        } else if (item.getItemId() == R.id.debug_settings) {
+            Intent intent = new Intent(this, DebugSettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 

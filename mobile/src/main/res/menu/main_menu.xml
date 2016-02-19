@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/debug_settings"
+        android:title="@string/debug_settings"
+        android:icon="@drawable/ic_bug_report_white_36dp"
+        android:showAsAction="always"/>
     <item android:id="@+id/disconnect"
           android:title="@string/google_fit_setup_disconnect"
           android:showAsAction="never"/>

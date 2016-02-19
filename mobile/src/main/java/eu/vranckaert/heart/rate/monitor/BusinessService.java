@@ -111,8 +111,11 @@ public class BusinessService {
     }
 
     private List<Node> getConnectedNodes() {
-        NodeApi.GetConnectedNodesResult connectedNodesResult = Wearable.NodeApi.getConnectedNodes(
-                getWearableGoogleApiClient()).await();
+        GoogleApiClient googleApiClient = getWearableGoogleApiClient();
+        if (googleApiClient == null) {
+            return new ArrayList<>();
+        }
+        NodeApi.GetConnectedNodesResult connectedNodesResult = Wearable.NodeApi.getConnectedNodes(googleApiClient).await();
         return connectedNodesResult.getNodes();
     }
 
@@ -140,7 +143,7 @@ public class BusinessService {
         for (Node node : nodes) {
             Wearable.MessageApi.sendMessage(getWearableGoogleApiClient(), node.getId(), WearURL.URL_ACTIVITY_MONITORING_RESULT + activityState, null);
         }
-        getWearableGoogleApiClient().disconnect();
+        disconnectWearalbeApiClient();
     }
 
     public void setPhoneSetupCompletionStatus(boolean completed) {
@@ -150,7 +153,14 @@ public class BusinessService {
         for (Node node : nodes) {
             Wearable.MessageApi.sendMessage(getWearableGoogleApiClient(), node.getId(), url, null);
         }
-        getWearableGoogleApiClient().disconnect();
+        disconnectWearalbeApiClient();
+    }
+
+    private void disconnectWearalbeApiClient() {
+        GoogleApiClient googleApiClient = getWearableGoogleApiClient();
+        if (googleApiClient != null) {
+            googleApiClient.disconnect();
+        }
     }
 
     public boolean hasFitnessSubscription(DataType type) {
@@ -208,6 +218,6 @@ public class BusinessService {
         PendingResult<DataItemResult> pendingResult = Wearable.DataApi.putDataItem(getWearableGoogleApiClient(), putDataReq);
         DataItemResult result = pendingResult.await();
         Log.d("dirk-ack", "Measured heart rates ACK sent to watch? " + result.getStatus().isSuccess());
-        getWearableGoogleApiClient().disconnect();
+        disconnectWearalbeApiClient();
     }
 }

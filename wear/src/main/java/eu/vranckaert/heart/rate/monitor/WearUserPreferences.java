@@ -19,9 +19,6 @@ import java.util.List;
  */
 public class WearUserPreferences {
     private static final String KEY_HAS_RUN_BEFORE = "has_run_before";
-    private static final String KEY_LATEST_ACTIVITY = "latest_activity";
-    private static final String KEY_LATEST_ACTIVITY_COUNT = "latest_activity_count";
-    private static final String KEY_ACCEPTED_ACTIVITY = "accepted_activity";
     private static final String KEY_PHONE_SETUP_COMPETED = "phone_setup_completed";
     private static final String KEY_HEART_RATE_MEASURING_INTERVAL = "heart_rate_measuring_interval";
     private static final String KEY_HEART_RATE_MEASURING_NOTIFICATION = "heart_rate_measuring_notification";
@@ -55,37 +52,6 @@ public class WearUserPreferences {
 
     public boolean hasRunBefore() {
         return mSharedPreferences.getBoolean(KEY_HAS_RUN_BEFORE, false);
-    }
-
-    public void storeLatestActivity(int activityState) {
-        int previousActivity = getLatestActivity();
-        int count;
-        if (previousActivity == activityState) {
-            count = getLatestActivityCount() + 1;
-        } else {
-            count = 1;
-        }
-        Log.d("dirk", "Storing activity (" + activityState + ") and count (" + count + ")");
-        mEditor.putInt(KEY_LATEST_ACTIVITY_COUNT, count);
-        mEditor.putInt(KEY_LATEST_ACTIVITY, activityState);
-        mEditor.commit();
-    }
-
-    public int getLatestActivity() {
-        return mSharedPreferences.getInt(KEY_LATEST_ACTIVITY, ActivityState.STILL);
-    }
-
-    public int getLatestActivityCount() {
-        return mSharedPreferences.getInt(KEY_LATEST_ACTIVITY_COUNT, 0);
-    }
-
-    public void setAcceptedActivity(int activityState) {
-        mEditor.putInt(KEY_ACCEPTED_ACTIVITY, activityState);
-        mEditor.commit();
-    }
-
-    public int getAcceptedActivity() {
-        return mSharedPreferences.getInt(KEY_ACCEPTED_ACTIVITY, ActivityState.STILL);
     }
 
     public void setPhoneSetupCompleted(boolean setupCompleted) {

@@ -1,7 +1,5 @@
 package eu.vranckaert.heart.rate.monitor;
 
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
@@ -14,17 +12,14 @@ import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Subscription;
 import com.google.android.gms.fitness.result.ListSubscriptionsResult;
-import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.wearable.DataApi.DataItemResult;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
-import eu.vranckaert.heart.rate.monitor.controller.ActivityRecognitionIntentService;
 import eu.vranckaert.heart.rate.monitor.shared.WearKeys;
 import eu.vranckaert.heart.rate.monitor.shared.WearURL;
-import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,7 +34,6 @@ import java.util.List;
 public class BusinessService {
     private static BusinessService INSTANCE;
     private GoogleApiClient mWearableGoogleApiClient;
-    private GoogleApiClient mActivityRecognitionApiClient;
     private GoogleApiClient mFitnessApiClient;
 
     public static BusinessService getInstance() {
@@ -67,32 +61,12 @@ public class BusinessService {
             }
         }
 
-        Log.d("dirk-background", "mFitnessApiClient.connected=" + (mFitnessApiClient != null && mFitnessApiClient.isConnected()));
+        Log.d("dirk-background",
+                "mFitnessApiClient.connected=" + (mFitnessApiClient != null && mFitnessApiClient.isConnected()));
         if (mFitnessApiClient != null && mFitnessApiClient.isConnected()) {
             return mFitnessApiClient;
         } else {
             return null;
-        }
-    }
-
-    private GoogleApiClient getActivityRecognitionApiClient() {
-        if (mActivityRecognitionApiClient == null || !mActivityRecognitionApiClient.isConnected()){
-            Log.d("dirk-background", "No mActivityRecognitionApiClient or not connected anymore");
-            GoogleApiClient googleApiClient = new GoogleApiClient.Builder(HeartRateApplication.getContext())
-                    .addApi(ActivityRecognition.API)
-                    .build();
-            ConnectionResult connectionResult = googleApiClient.blockingConnect();
-            if (connectionResult.isSuccess()) {
-                Log.d("dirk-background", "mActivityRecognitionApiClient connected");
-                mActivityRecognitionApiClient = googleApiClient;
-                connectActivityRecognitionApiClient();
-            }
-
-            return null;
-        } else {
-            Log.d("dirk-background",
-                    "mActivityRecognitionApiClient.connected=" + mActivityRecognitionApiClient.isConnected());
-            return mActivityRecognitionApiClient;
         }
     }
 
@@ -115,33 +89,16 @@ public class BusinessService {
         if (googleApiClient == null) {
             return new ArrayList<>();
         }
-        NodeApi.GetConnectedNodesResult connectedNodesResult = Wearable.NodeApi.getConnectedNodes(googleApiClient).await();
+        NodeApi.GetConnectedNodesResult connectedNodesResult =
+                Wearable.NodeApi.getConnectedNodes(googleApiClient).await();
         return connectedNodesResult.getNodes();
-    }
-
-    public void connectActivityRecognitionApiClient() {
-        Intent intent = new Intent(HeartRateApplication.getContext(), ActivityRecognitionIntentService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(HeartRateApplication.getContext(), 0, intent, 0);
-
-        if (getActivityRecognitionApiClient() != null) {
-            PendingResult<Status> pendingResult = ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
-                    mActivityRecognitionApiClient,
-                    ActivityState.DETECTION_INTERVAL,
-                    pendingIntent
-            );
-            Status status = pendingResult.await();
-            Log.d("dirk-background", "status.success=" + status.isSuccess());
-            Log.d("dirk-background", "status.statusMessage=" + status.getStatusMessage());
-            Log.d("dirk-background", "status.statusCode=" + status.getStatusCode());
-        } else {
-            Log.d("dirk-background", "Google api client for activity recognition is null");
-        }
     }
 
     public void setActivityUpdate(int activityState) {
         List<Node> nodes = getConnectedNodes();
         for (Node node : nodes) {
-            Wearable.MessageApi.sendMessage(getWearableGoogleApiClient(), node.getId(), WearURL.URL_ACTIVITY_MONITORING_RESULT + activityState, null);
+            Wearable.MessageApi.sendMessage(getWearableGoogleApiClient(), node.getId(),
+                    WearURL.URL_ACTIVITY_MONITORING_RESULT + activityState, null);
         }
         disconnectWearalbeApiClient();
     }
@@ -171,9 +128,11 @@ public class BusinessService {
             return false;
         }
 
-        ListSubscriptionsResult listSubscriptionsResult = Fitness.RecordingApi.listSubscriptions(googleApiClient, type).await();
+        ListSubscriptionsResult listSubscriptionsResult =
+                Fitness.RecordingApi.listSubscriptions(googleApiClient, type).await();
         if (listSubscriptionsResult.getStatus().isSuccess()) {
-            Log.d("dirk-background", "listSubscriptionsResult.subscriptions.size=" + listSubscriptionsResult.getSubscriptions().size());
+            Log.d("dirk-background",
+                    "listSubscriptionsResult.subscriptions.size=" + listSubscriptionsResult.getSubscriptions().size());
             for (Subscription subscription : listSubscriptionsResult.getSubscriptions()) {
                 DataType dataType = subscription.getDataType();
                 if (dataType.equals(type)) {
@@ -212,10 +171,12 @@ public class BusinessService {
     public void sendHeartRateMeasurementsAck(List<String> measurementUniqueKeys) {
         Log.d("dirk-ack", "Send measured heart rate ACK to watch");
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create(WearURL.HEART_RATE_MEASUREMENTS_ACK);
-        putDataMapReq.getDataMap().putStringArrayList(WearKeys.MEASUREMENT_KEYS, (ArrayList<String>) measurementUniqueKeys);
+        putDataMapReq.getDataMap()
+                .putStringArrayList(WearKeys.MEASUREMENT_KEYS, (ArrayList<String>) measurementUniqueKeys);
         putDataMapReq.getDataMap().putLong("timestamp", new Date().getTime());
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
-        PendingResult<DataItemResult> pendingResult = Wearable.DataApi.putDataItem(getWearableGoogleApiClient(), putDataReq);
+        PendingResult<DataItemResult> pendingResult =
+                Wearable.DataApi.putDataItem(getWearableGoogleApiClient(), putDataReq);
         DataItemResult result = pendingResult.await();
         Log.d("dirk-ack", "Measured heart rates ACK sent to watch? " + result.getStatus().isSuccess());
         disconnectWearalbeApiClient();

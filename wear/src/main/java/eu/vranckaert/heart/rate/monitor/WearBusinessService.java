@@ -66,11 +66,6 @@ public class WearBusinessService {
         getGoogleApiClient().disconnect();
     }
 
-    public void requestActivityUpdates() {
-        Log.d("dirk", "Request phone to start monitoring activity");
-        sendMessageToAllNodes(WearURL.URL_START_ACTIVITY_MONITORING, null);
-    }
-
     public boolean registerHeartRates(List<Measurement> measurements) {
         Log.d("dirk", "Send measured heart rate to phone");
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create(WearURL.HEART_RATE_MEASUREMENTS);

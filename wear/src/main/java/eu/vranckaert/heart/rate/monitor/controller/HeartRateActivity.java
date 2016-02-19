@@ -19,7 +19,6 @@ import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
-import eu.vranckaert.heart.rate.monitor.task.ActivitySetupTask;
 import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
 import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask.HeartRateMeasurementTaskListener;
 import eu.vranckaert.heart.rate.monitor.util.DeviceUtil;
@@ -87,7 +86,6 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
 
                     if (!WearUserPreferences.getInstance().hasRunBefore()) {
                         WearUserPreferences.getInstance().setHasRunBefore();
-                        new ActivitySetupTask().execute();
                         SetupBroadcastReceiver.setupMeasuring(this);
                     }
                 } else {

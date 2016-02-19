@@ -1,10 +1,8 @@
 package eu.vranckaert.heart.rate.monitor.shared.model;
 
-import android.content.Context;
 import android.text.TextUtils;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import eu.vranckaert.heart.rate.monitor.shared.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,7 +35,6 @@ public class Measurement implements Serializable {
     public static final String COLUMN_FIRST_MEASUREMENT = "FIRST_MEASUREMENT";
     public static final String COLUMN_END = "END";
     public static final String COLUMN_MEASURED_VALUES = "MEASURED_VALUES";
-    public static final String COLUMN_ACTIVITY = "ACTIVITY";
     public static final String COLUMN_SYNCED_WITH_GOOGLE_FIT = "GOOGLE_FIT";
     public static final String COLUMN_SYNCED_WITH_PHONE = "SYNCED_WITH_PHONE";
 
@@ -60,8 +57,6 @@ public class Measurement implements Serializable {
     private Map<Long, Float> measuredValues;
     @DatabaseField(columnName = COLUMN_MEASURED_VALUES)
     private String measuredValuesString;
-    @DatabaseField(columnName = COLUMN_ACTIVITY)
-    private int activity;
     @DatabaseField(columnName = COLUMN_SYNCED_WITH_GOOGLE_FIT)
     private boolean syncedWithGoogleFit;
     @DatabaseField(columnName = COLUMN_SYNCED_WITH_PHONE)
@@ -83,7 +78,6 @@ public class Measurement implements Serializable {
             measurement.setStartMeasurement(jsonObject.optLong("startMeasurement"));
             measurement.setEndMeasurement(jsonObject.optLong("endMeasurement"));
             measurement.setFirstMeasurement(jsonObject.optLong("firstMeasurement"));
-            measurement.setActivity(jsonObject.optInt("activity"));
 
             String measuredValuesString = jsonObject.optString("measuredValues");
             Map<Long, Float> measuredValues = measuredValuesFromJson(measuredValuesString);
@@ -141,27 +135,6 @@ public class Measurement implements Serializable {
             return measurements;
         } catch (JSONException e) {
             return new ArrayList<>();
-        }
-    }
-
-    public static String getActivityName(Context context, int activity) {
-        switch (activity) {
-            case ActivityState.IN_VEHICLE:
-                return context.getString(R.string.heart_rate_history_activity_vehicle);
-            case ActivityState.WALKING:
-                return context.getString(R.string.heart_rate_history_activity_walking);
-            case ActivityState.ON_FOOT:
-                return context.getString(R.string.heart_rate_history_activity_on_foot);
-            case ActivityState.ON_BICYCLE:
-                return context.getString(R.string.heart_rate_history_activity_bicycle);
-            case ActivityState.RUNNING:
-                return context.getString(R.string.heart_rate_history_activity_running);
-            case ActivityState.STILL:
-                return context.getString(R.string.heart_rate_history_activity_still);
-            case ActivityState.TILTING:
-                return context.getString(R.string.heart_rate_history_activity_tilting);
-            default:
-                return context.getString(R.string.heart_rate_history_activity_unknown);
         }
     }
 
@@ -243,14 +216,6 @@ public class Measurement implements Serializable {
         measuredValuesString = measuredValuesToJSON();
     }
 
-    public int getActivity() {
-        return activity;
-    }
-
-    public void setActivity(int activity) {
-        this.activity = activity;
-    }
-
     public boolean isSyncedWithGoogleFit() {
         return syncedWithGoogleFit;
     }
@@ -277,7 +242,6 @@ public class Measurement implements Serializable {
             json.put("startMeasurement", getStartMeasurement());
             json.put("endMeasurement", getEndMeasurement());
             json.put("firstMeasurement", getFirstMeasurement());
-            json.put("activity", getActivity());
             getMeasuredValues(); // Make sure the measured values are filled correctly!
             json.put("measuredValues", measuredValuesToJSON());
 
@@ -400,9 +364,5 @@ public class Measurement implements Serializable {
             result += seperator;
         }
         return result;
-    }
-
-    public String getActivityName(Context context) {
-        return getActivityName(context, activity);
     }
 }

@@ -2,13 +2,11 @@ package eu.vranckaert.heart.rate.monitor.view;
 
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
-import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.R;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.shared.util.DateUtil;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateView.HeartRateListener;
 
@@ -28,12 +26,10 @@ public class HeartRateHistoryItemView extends AbstractViewHolder implements OnLo
     private final TextView mDuration;
     private final TextView mDate;
     private final TextView mTime;
-    private final TextView mActivity;
     private final TextView mPhoneSyncedState;
-
-    private Measurement mMeasurement;
     int mOriginalPaddingTop = -1;
     int mOriginalPaddingBottom = -1;
+    private Measurement mMeasurement;
 
     public HeartRateHistoryItemView(LayoutInflater inflater, ViewGroup parent, HeartRateListener listener) {
         super(inflater, parent, R.layout.heart_rate_history_item);
@@ -43,7 +39,6 @@ public class HeartRateHistoryItemView extends AbstractViewHolder implements OnLo
         mDuration = findViewById(R.id.duration);
         mDate = findViewById(R.id.date);
         mTime = findViewById(R.id.time);
-        mActivity = findViewById(R.id.activity);
         mPhoneSyncedState = findViewById(R.id.phone_sync_state);
         findViewById(R.id.fake_heart_rate).setVisibility(GONE);
         itemView.setClickable(true);
@@ -58,7 +53,8 @@ public class HeartRateHistoryItemView extends AbstractViewHolder implements OnLo
         mDate.setText(DateUtil.formatDate(start));
         mTime.setText(DateUtil.formatTime(start));
         long duration = measurement.getEndMeasurement() - measurement.getStartMeasurement();
-        Map<String, Long> calculatedDuration = DateUtil.calculateDuration(duration, DateUtil.DURATION_TYPE_MINUTES, DateUtil.DURATION_TYPE_SECONDS);
+        Map<String, Long> calculatedDuration =
+                DateUtil.calculateDuration(duration, DateUtil.DURATION_TYPE_MINUTES, DateUtil.DURATION_TYPE_SECONDS);
         String durationText = "" + calculatedDuration.get(DateUtil.MINUTES) + ":";
         long minutes = calculatedDuration.get(DateUtil.SECONDS);
         if (minutes < 10) {
@@ -68,8 +64,6 @@ public class HeartRateHistoryItemView extends AbstractViewHolder implements OnLo
         mDuration.setText(durationText);
         mPhoneSyncedState.setVisibility(VISIBLE);
         mPhoneSyncedState.setText(measurement.isSyncedWithPhone() ? "Already synced!" : "Not yet synced!");
-
-        mActivity.setText(measurement.getActivityName(getContext()));
     }
 
     public void setPaddingTop(int paddingTop) {

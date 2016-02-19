@@ -20,8 +20,6 @@ public class SetupBroadcastReceiver extends BroadcastReceiver {
     }
 
     public static void setupMeasuring(Context context) {
-        WearUserPreferences.getInstance().storeLatestActivity(ActivityState.STILL);
-        WearUserPreferences.getInstance().setAcceptedActivity(ActivityState.STILL);
         if (WearUserPreferences.getInstance().isPhoneSetupCompleted()) {
             AlarmSchedulingService.getInstance().rescheduleHeartRateMeasuringAlarms(context);
         }

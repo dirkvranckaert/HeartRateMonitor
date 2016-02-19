@@ -18,7 +18,6 @@ import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
 import eu.vranckaert.heart.rate.monitor.DebugUserPreferences;
@@ -33,7 +32,6 @@ import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
-import eu.vranckaert.heart.rate.monitor.task.ActivityRecognitionTask;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,16 +51,6 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
     public void onCreate() {
         super.onCreate();
         mDao = new MeasurementDao(this);
-    }
-
-    @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
-        String path = messageEvent.getPath();
-        Log.d("dirk", "Message received on " + path);
-
-        if (WearURL.URL_START_ACTIVITY_MONITORING.equals(path)) {
-            new ActivityRecognitionTask().execute();
-        }
     }
 
     @Override
@@ -120,7 +108,8 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
         final BusinessService businessService = BusinessService.getInstance();
         final UserPreferences userPreferences = UserPreferences.getInstance();
 
-        boolean hasAggregateHeartRateSummarySubscription = businessService.hasFitnessSubscription(FitHelper.DATA_TYPE_HEART_RATE);
+        boolean hasAggregateHeartRateSummarySubscription =
+                businessService.hasFitnessSubscription(FitHelper.DATA_TYPE_HEART_RATE);
         if (!hasAggregateHeartRateSummarySubscription) {
             userPreferences.setGoogleFitConnected(false);
             businessService.setPhoneSetupCompletionStatus(false);
@@ -133,7 +122,8 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                 userPreferences.setGoogleFitActivationErrorCount(0);
 
                 Intent intent = new Intent(HeartRateApplication.getContext(), MainActivity.class);
-                PendingIntent pendingIntent = PendingIntent.getActivity(HeartRateApplication.getContext(), 0, intent, 0);
+                PendingIntent pendingIntent =
+                        PendingIntent.getActivity(HeartRateApplication.getContext(), 0, intent, 0);
 
                 Notification notification =
                         new Notification.Builder(HeartRateApplication.getContext())
@@ -154,7 +144,8 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                                                 R.string.notification_google_fitness_not_connected_message_action_connect),
                                         pendingIntent)
                                 .build();
-                NotificationManager notificationManager = (NotificationManager) HeartRateApplication.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationManager notificationManager = (NotificationManager) HeartRateApplication.getContext()
+                        .getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.notify(NotificationId.GOOGLE_FITNESS_NOT_CONNECTED, notification);
             } else {
                 Log.d("dirk", "Not showing notification to logon to Google Fit right now");
@@ -171,7 +162,8 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
                 UserPreferences.getInstance().setGoogleFitActivationErrorCount(-1);
                 DataSet dataSet = getGoogleFitDataSet(measurement);
                 boolean success = businessService.addFitnessHeartRateMeasurement(dataSet);
-                Log.d("dirk", "Measurement from " + new Date(measurement.getStartMeasurement()) + " has been synced with Google Fit. Result is success? " + success);
+                Log.d("dirk", "Measurement from " + new Date(measurement.getStartMeasurement()) +
+                        " has been synced with Google Fit. Result is success? " + success);
                 if (success) {
                     Log.d("dirk", "Storing the BPM in Google Fit was successful, updating local DB");
                     measurement.setSyncedWithGoogleFit(true);
@@ -199,7 +191,8 @@ public class HeartRateMonitorWearableListenerService extends WearableListenerSer
         DataSet dataSet = DataSet.create(dataSource);
         Log.d("dirk", "Building DataPoint");
         DataPoint dataPoint = dataSet.createDataPoint();
-        dataPoint.setTimeInterval(measurement.getStartMeasurement(), measurement.getEndMeasurement(), TimeUnit.MILLISECONDS);
+        dataPoint.setTimeInterval(measurement.getStartMeasurement(), measurement.getEndMeasurement(),
+                TimeUnit.MILLISECONDS);
         //dataPoint.getValue(Field.FIELD_MIN).setFloat(measurement.getMinimumHeartBeat());
         dataPoint.getValue(Field.FIELD_BPM).setFloat(measurement.getAverageHeartBeat());
         //dataPoint.getValue(Field.FIELD_AVERAGE).setFloat(measurement.getAverageHeartBeat());

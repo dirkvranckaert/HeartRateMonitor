@@ -4,10 +4,9 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
+import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.shared.util.DateUtil;
-import eu.vranckaert.heart.rate.monitor.R;
 
 import java.util.Date;
 import java.util.Map;
@@ -23,7 +22,6 @@ public class MeasurementListItemView extends AbstractViewHolder {
     private final TextView mDuration;
     private final TextView mDate;
     private final TextView mTime;
-    private final TextView mActivity;
     private final TextView mFitSyncState;
     private final TextView mFakeHeartRate;
 
@@ -34,7 +32,6 @@ public class MeasurementListItemView extends AbstractViewHolder {
         mDuration = findViewById(R.id.duration);
         mDate = findViewById(R.id.date);
         mTime = findViewById(R.id.time);
-        mActivity = findViewById(R.id.activity);
         mFitSyncState = findViewById(R.id.fit_sync_state);
         mFakeHeartRate = findViewById(R.id.fake_heart_rate);
     }
@@ -46,7 +43,8 @@ public class MeasurementListItemView extends AbstractViewHolder {
         mDate.setText(DateUtil.formatDate(start));
         mTime.setText(DateUtil.formatTime(start));
         long duration = measurement.getEndMeasurement() - measurement.getStartMeasurement();
-        Map<String, Long> calculatedDuration = DateUtil.calculateDuration(duration, DateUtil.DURATION_TYPE_MINUTES, DateUtil.DURATION_TYPE_SECONDS);
+        Map<String, Long> calculatedDuration =
+                DateUtil.calculateDuration(duration, DateUtil.DURATION_TYPE_MINUTES, DateUtil.DURATION_TYPE_SECONDS);
         String durationText = "" + calculatedDuration.get(DateUtil.MINUTES) + ":";
         long minutes = calculatedDuration.get(DateUtil.SECONDS);
         if (minutes < 10) {
@@ -56,10 +54,9 @@ public class MeasurementListItemView extends AbstractViewHolder {
 
         mDuration.setText(durationText);
 
-        mActivity.setText(measurement.getActivityName(getContext()));
-
         mFitSyncState.setVisibility(VISIBLE);
-        mFitSyncState.setText(measurement.isSyncedWithGoogleFit() ? "Synced to Google Fit" : "Not yet synced to Google Fit");
+        mFitSyncState
+                .setText(measurement.isSyncedWithGoogleFit() ? "Synced to Google Fit" : "Not yet synced to Google Fit");
 
         String fakeHeartRate = measurement.detectFakeHeartRate();
         mFakeHeartRate.setText(fakeHeartRate);

@@ -66,9 +66,7 @@ public class AlarmSchedulingService {
         getAlarmManager().cancel(getHeartRateMonitorIntent(REQUEST_CODE_ONE_TIME_HEART_RATE_MEASUREMENT));
         getAlarmManager().cancel(getHeartRateMonitorIntent(REQUEST_CODE_REPEATING_HEART_RATE_MEASUREMENT));
         
-        int activityState = WearUserPreferences.getInstance().getAcceptedActivity();
         long interval = WearUserPreferences.getInstance().getHeartRateMeasuringInterval();
-        Log.d("dirk", "interval is " + interval + " millis for activityState " + activityState);
         IMeasurementDao measurementDao = new MeasurementDao(context);
         Measurement latestMeasurement = measurementDao.findLatest();
         long currentTime = new Date().getTime();

@@ -12,10 +12,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.heart.rate.monitor.task.ActivitySetupTask;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
+import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
 
 import java.util.ArrayList;
@@ -45,7 +44,6 @@ public class HeartRateTestActivity extends WearableActivity implements SensorEve
 
         setAmbientEnabled();
     }
-
 
 
     @Override
@@ -81,9 +79,6 @@ public class HeartRateTestActivity extends WearableActivity implements SensorEve
         }
         if (findViewById(R.id.schedule_test) != null) {
             findViewById(R.id.schedule_test).setOnClickListener(this);
-        }
-        if (findViewById(R.id.activity_test) != null) {
-            findViewById(R.id.activity_test).setOnClickListener(this);
         }
         if (findViewById(R.id.fitness_test) != null) {
             findViewById(R.id.fitness_test).setOnClickListener(this);
@@ -127,8 +122,6 @@ public class HeartRateTestActivity extends WearableActivity implements SensorEve
             }
         } else if (v.getId() == R.id.schedule_test) {
             AlarmSchedulingService.getInstance().scheduleHeartRateMonitorInXMillis(30000);
-        } else if (v.getId() == R.id.activity_test) {
-            new ActivitySetupTask().execute();
         } else if (v.getId() == R.id.fitness_test) {
             Measurement measurement = new Measurement();
             measurement.setAverageHeartBeat(71.3f);

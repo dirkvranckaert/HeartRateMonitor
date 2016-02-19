@@ -7,6 +7,7 @@ Version 1.0.0
 * Wear
   * If list contains measurements that are not yet synced with the phone, show an extra button to start the syncing right away
   * Show notification on watch while measuring heart rate (can be disabled through settings: 'heart_rate_measuring_notification')
+  * Refresh data on resume
 
 
 Version 1.0.0 DONE
@@ -26,3 +27,4 @@ Version 1.0.0 DONE
   * Remove storage of measurements in the preferences (keep the json stuff to sync between phone and watch)
   * As long as setup on phone is not completed show an init screen
   * When sending measurements to the phone, only sent those that are not acknowledged by the phone to be received before
+  * Ambient mode

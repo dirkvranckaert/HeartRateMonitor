@@ -2,13 +2,21 @@ package eu.vranckaert.heart.rate.monitor.controller;
 
 import android.Manifest.permission;
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.Notification.BigTextStyle;
+import android.app.Notification.WearableExtender;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
+import eu.vranckaert.heart.rate.monitor.R;
+import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.model.ActivityState;
@@ -30,6 +38,8 @@ import java.util.Map.Entry;
  * @author Dirk Vranckaert
  */
 public class HeartRateMonitorIntentService extends IntentService implements SensorEventListener {
+    private static final int MEASURING_NOTIFICATION = 1;
+
     private long mStartTime = -1;
     private long mFirstMeasurement = -1;
     private long mEndTime = -1;
@@ -125,11 +135,38 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
 
     private void startHeartRateMonitor() {
         Log.d("dirk-background", "startHeartRateMonitor");
+
+        if (WearUserPreferences.getInstance().showHeartRateMeasuementNotification()) {
+            Log.d("dirk", "Sending notification to user...");
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+
+            Notification.Builder notificationBuilder = new Notification.Builder(this)
+                    .setContentTitle(getString(R.string.notification_measuring_title))
+                    .setContentText(getString(R.string.notification_measuring_message))
+                    .setStyle(new BigTextStyle().bigText(getString(R.string.notification_measuring_message)))
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setLargeIcon(background)
+                    .setDefaults(Notification.DEFAULT_VIBRATE)
+                    .extend(new WearableExtender().setBackground(background));
+            notificationManager.notify(MEASURING_NOTIFICATION, notificationBuilder.build());
+        }
+
         mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_UI);
     }
 
     private void stopHeartRateMonitor() {
         Log.d("dirk-background", "stopHeartRateMonitor");
+
+        if (WearUserPreferences.getInstance().showHeartRateMeasuementNotification()) {
+            Log.d("dirk", "Dismissing notification...");
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancel(MEASURING_NOTIFICATION);
+        }
+
         mMeasuring = false;
         mSensorManager.unregisterListener(this, mHeartRateSensor);
     }

@@ -49,9 +49,9 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:text="Fitness Test"
+            android:text="Notification Test"
             android:layout_below="@+id/start_stop"
-            android:id="@+id/fitness_test"
+            android:id="@+id/notification_test"
             android:layout_centerHorizontal="true"/>
     </LinearLayout>
 </android.support.wearable.view.BoxInsetLayout>

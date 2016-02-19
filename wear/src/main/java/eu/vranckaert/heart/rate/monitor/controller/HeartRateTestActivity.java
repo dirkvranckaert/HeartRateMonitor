@@ -1,6 +1,12 @@
 package eu.vranckaert.heart.rate.monitor.controller;
 
+import android.app.Notification;
+import android.app.Notification.BigTextStyle;
+import android.app.Notification.WearableExtender;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,12 +20,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
-import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
-import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Date: 28/05/15
@@ -80,8 +80,8 @@ public class HeartRateTestActivity extends WearableActivity implements SensorEve
         if (findViewById(R.id.schedule_test) != null) {
             findViewById(R.id.schedule_test).setOnClickListener(this);
         }
-        if (findViewById(R.id.fitness_test) != null) {
-            findViewById(R.id.fitness_test).setOnClickListener(this);
+        if (findViewById(R.id.notification_test) != null) {
+            findViewById(R.id.notification_test).setOnClickListener(this);
         }
     }
 
@@ -122,16 +122,21 @@ public class HeartRateTestActivity extends WearableActivity implements SensorEve
             }
         } else if (v.getId() == R.id.schedule_test) {
             AlarmSchedulingService.getInstance().scheduleHeartRateMonitorInXMillis(30000);
-        } else if (v.getId() == R.id.fitness_test) {
-            Measurement measurement = new Measurement();
-            measurement.setAverageHeartBeat(71.3f);
-            measurement.setMinimumHeartBeat(60.3f);
-            measurement.setMaximumHeartBeat(83.0f);
-            measurement.setStartMeasurement(new Date().getTime());
-            measurement.setEndMeasurement(new Date().getTime());
-            List<Measurement> measurements = new ArrayList<>();
-            measurements.add(measurement);
-            new HeartRateMeasurementTask().execute(measurements);
+        } else if (v.getId() == R.id.notification_test) {
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+
+            Notification.Builder notificationBuilder = new Notification.Builder(this)
+                    .setContentTitle(getString(R.string.notification_measuring_title))
+                    .setContentText(getString(R.string.notification_measuring_message))
+                    .setStyle(new BigTextStyle().bigText(getString(R.string.notification_measuring_message)))
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setLargeIcon(background)
+                    .setDefaults(Notification.DEFAULT_VIBRATE)
+                    .extend(new WearableExtender().setBackground(background));
+            notificationManager.notify(1, notificationBuilder.build());
         }
     }
 

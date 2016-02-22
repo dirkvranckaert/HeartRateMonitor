@@ -348,7 +348,7 @@ public class MainActivity extends Activity implements OnClickListener,
     private void initOverviewOfMeasurements() {
         mCurrentViewSate = VIEW_STATE_MEASUREMENT_LIST;
         setContentView(R.layout.heart_rate_measurements);
-        setMeasurements(new ArrayList<Measurement>());
+        setMeasurements(new ArrayList<Measurement>(), true);
         if (mLoadTask != null) {
             mLoadTask.cancel(true);
         }
@@ -356,13 +356,15 @@ public class MainActivity extends Activity implements OnClickListener,
         mLoadTask.execute();
     }
 
-    private void setMeasurements(List<Measurement> measurements) {
+    private void setMeasurements(List<Measurement> measurements, boolean loading) {
         if (mCurrentViewSate == VIEW_STATE_MEASUREMENT_LIST) {
             ListView list = (ListView) findViewById(R.id.list);
             list.setAdapter(mMeasurementsAdapter);
-            mMeasurementsAdapter.setMeasurements(measurements);
+            if (!loading) {
+                mMeasurementsAdapter.setMeasurements(measurements);
+            }
             TextView empty = (TextView) findViewById(R.id.empty);
-            if (measurements == null || measurements.isEmpty()) {
+            if (!loading && (measurements == null || measurements.isEmpty())) {
                 list.setVisibility(View.GONE);
                 empty.setVisibility(View.VISIBLE);
             } else {
@@ -400,7 +402,7 @@ public class MainActivity extends Activity implements OnClickListener,
 
         @Override
         protected void onPostExecute(List<Measurement> measurements) {
-            setMeasurements(measurements);
+            setMeasurements(measurements, false);
         }
     }
 

@@ -35,6 +35,7 @@ import eu.vranckaert.heart.rate.monitor.BusinessService;
 import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.UserPreferences;
+import eu.vranckaert.heart.rate.monitor.controller.HeartRateObserver.HeartRateObservable;
 import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
@@ -49,10 +50,11 @@ import java.util.List;
  *
  * @author Dirk Vranckaert
  */
-public class MainActivity extends Activity implements OnClickListener {
+public class MainActivity extends Activity implements OnClickListener,
+        HeartRateObservable {
     private static final int REQUEST_OAUTH = 1;
     private static final int REQUEST_SUBSCRIPTION = 2;
-    private static final int REQUEST_CODE_PERMISSON_BODY_SENSORS = 3;
+    private static final int REQUEST_CODE_PERMISSION_BODY_SENSORS = 3;
     private static final int VIEW_STATE_GOOGLE_FIT_CONNECTION = 0;
     private static final int VIEW_STATE_MEASUREMENT_LIST = 1;
 
@@ -64,6 +66,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
     private GoogleApiClient mGoogleApiClient;
     private LoadMeasurementsTask mLoadTask;
+    private SyncGoogleFitMeasurementsTask mSyncTask;
+    private boolean mContainsNotSyncedMeasurements;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +78,15 @@ public class MainActivity extends Activity implements OnClickListener {
     protected void onResume() {
         super.onResume();
 
+        HeartRateObserver.register(this);
         setupView();
+    }
+
+    @Override
+    protected void onPause() {
+        HeartRateObserver.unregister(this);
+
+        super.onPause();
     }
 
     private void setupView() {
@@ -97,13 +109,13 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     private boolean checkPermissions() {
-        return PermissionUtil.requestPermission(this, REQUEST_CODE_PERMISSON_BODY_SENSORS, permission.BODY_SENSORS,
+        return PermissionUtil.requestPermission(this, REQUEST_CODE_PERMISSION_BODY_SENSORS, permission.BODY_SENSORS,
                 getString(R.string.permission_explanation_body_sensors));
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == REQUEST_CODE_PERMISSON_BODY_SENSORS) {
+        if (requestCode == REQUEST_CODE_PERMISSION_BODY_SENSORS) {
             if (permission.BODY_SENSORS.equals(permissions[0]) &&
                     PackageManager.PERMISSION_GRANTED == grantResults[0]) {
                 setupView();
@@ -121,6 +133,10 @@ public class MainActivity extends Activity implements OnClickListener {
         if (!UserPreferences.getInstance().getGoogleFitConnected()) {
             menu.removeItem(R.id.disconnect);
         }
+        if (!mContainsNotSyncedMeasurements) {
+            MenuItem menuItem = menu.findItem(R.id.sync_now);
+            menuItem.setIcon(R.drawable.ic_sync_disabled_white_36dp);
+        }
         return true;
     }
 
@@ -133,9 +149,19 @@ public class MainActivity extends Activity implements OnClickListener {
             Intent intent = new Intent(this, DebugSettingsActivity.class);
             startActivity(intent);
             return true;
+        } else if (item.getItemId() == R.id.sync_now) {
+            syncAllMeasurements();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void syncAllMeasurements() {
+        if (mSyncTask != null) {
+            mSyncTask.cancel(true);
+        }
+        mSyncTask = new SyncGoogleFitMeasurementsTask(this);
+        mSyncTask.execute();
     }
 
     @Override
@@ -154,11 +180,7 @@ public class MainActivity extends Activity implements OnClickListener {
      * multiple accounts on the device and needing to specify which account to use, etc.
      */
     private void setupGoogleFit() {
-        // TODO is not yet a progress dialog with a spinning wheel
-        final AlertDialog progress = new ProgressDialog.Builder(this)
-                .setMessage(R.string.google_fit_setup_connecting)
-                .setCancelable(false)
-                .show();
+        final AlertDialog progress = ProgressDialog.show(this, null, getString(R.string.google_fit_setup_connecting), true, false);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Fitness.HISTORY_API)
@@ -229,11 +251,7 @@ public class MainActivity extends Activity implements OnClickListener {
      * a special success code.
      */
     public void subscribe() {
-        // TODO is not yet a progress dialog with a spinning wheel
-        final AlertDialog progress = new ProgressDialog.Builder(this)
-                .setMessage(R.string.google_fit_setup_setup_fit)
-                .setCancelable(false)
-                .show();
+        final AlertDialog progress = ProgressDialog.show(this, null, getString(R.string.google_fit_setup_setup_fit), true, false);
 
         // To create a subscription, invoke the Recording API. As soon as the subscription is
         // active, fitness data will start recording.
@@ -319,6 +337,11 @@ public class MainActivity extends Activity implements OnClickListener {
             mLoadTask = null;
         }
 
+        if (mSyncTask != null) {
+            mSyncTask.cancel(true);
+            mSyncTask = null;
+        }
+
         super.onDestroy();
     }
 
@@ -346,7 +369,23 @@ public class MainActivity extends Activity implements OnClickListener {
                 list.setVisibility(View.VISIBLE);
                 empty.setVisibility(View.GONE);
             }
+
+            mContainsNotSyncedMeasurements = false;
+            int size = measurements.size();
+            for (int i = 0; i < size; i++) {
+                Measurement measurement = measurements.get(i);
+                if (!measurement.isSyncedWithGoogleFit() && !measurement.isFakeHeartRate()) {
+                    mContainsNotSyncedMeasurements = true;
+                    break;
+                }
+            }
+            invalidateOptionsMenu();
         }
+    }
+
+    @Override
+    public void onMeasurementsSynced() {
+        initScreen(false);
     }
 
     private class LoadMeasurementsTask extends AsyncTask<Void, Void, List<Measurement>> {
@@ -356,15 +395,6 @@ public class MainActivity extends Activity implements OnClickListener {
             // Retrieve all measurements and filter out the fake heart rate measurements
             IMeasurementDao dao = new MeasurementDao(MainActivity.this);
             List<Measurement> measurements = dao.findAllSorted();
-            //            List<Measurement> fakeMeasurements = new ArrayList<>();
-            //            int measurementCount = measurements.size();
-            //            for (int i=0; i<measurementCount; i++) {
-            //                Measurement measurement = measurements.get(i);
-            //                if (measurement.isFakeHeartRate()) {
-            //                    fakeMeasurements.add(measurement);
-            //                }
-            //            }
-            //            measurements.removeAll(fakeMeasurements);
             return measurements;
         }
 

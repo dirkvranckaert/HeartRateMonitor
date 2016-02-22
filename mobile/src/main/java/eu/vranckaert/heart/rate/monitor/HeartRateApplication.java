@@ -2,6 +2,9 @@ package eu.vranckaert.heart.rate.monitor;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import eu.vranckaert.heart.rate.monitor.shared.dao.SetupDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.HeartRateDatabaseHelper;
 
@@ -13,6 +16,8 @@ import eu.vranckaert.heart.rate.monitor.shared.dao.HeartRateDatabaseHelper;
  */
 public class HeartRateApplication extends Application {
     private static HeartRateApplication INSTANCE;
+
+    private static final Handler mHandler = new Handler();
 
     public HeartRateApplication() {
         INSTANCE = this;
@@ -35,5 +40,16 @@ public class HeartRateApplication extends Application {
 
     public static Context getContext() {
         return getInstance().getApplicationContext();
+    }
+
+    public static final void runOnUiThread(Runnable runnable) {
+        Log.d(HeartRateApplication.class.getSimpleName(), "runOnUiThread");
+        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+            Log.d(HeartRateApplication.class.getSimpleName(), "runnable.run()");
+            runnable.run();
+        } else {
+            Log.d(HeartRateApplication.class.getSimpleName(), "handler.post()");
+            mHandler.post(runnable);
+        }
     }
 }

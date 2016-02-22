@@ -2,18 +2,27 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <ListPreference
-        android:title="@string/settings_measuring_interval_title"
-        android:icon="@drawable/ic_timer_white_36dp"
+        android:defaultValue="3600000"
         android:entries="@array/settings_measuring_interval_entries"
         android:entryValues="@array/settings_measuring_interval_entry_values"
+        android:icon="@drawable/ic_timer_white_36dp"
         android:key="heart_rate_measuring_interval"
-        app:wear_entryAsSummary="false"
-        android:defaultValue="3600000"/>
+        android:title="@string/settings_measuring_interval_title"
+        app:wear_entryAsSummary="false" />
 
     <SwitchPreference
-        android:title="@string/settings_notification_title"
-        app:wear_iconOn="@drawable/ic_notifications_white_36dp"
-        app:wear_iconOff="@drawable/ic_notifications_off_white_36dp"
+        android:defaultValue="false"
         android:key="heart_rate_measuring_notification"
-        android:defaultValue="false"/>
+        android:title="@string/settings_notification_title"
+        app:wear_iconOff="@drawable/ic_notifications_off_white_36dp"
+        app:wear_iconOn="@drawable/ic_notifications_white_36dp" />
+
+    <ListPreference
+        android:defaultValue="10000"
+        android:entries="@array/settings_ambient_mode_ui_update_interval_entries"
+        android:entryValues="@array/settings_ambient_mode_ui_update_interval_entry_values"
+        android:icon="@drawable/ic_update_white_36dp"
+        android:key="heart_rate_measuring_ui_update_time_lapse"
+        android:title="@string/settings_ambient_ui_update_time_lapse_title"
+        app:wear_entryAsSummary="false" />
 </PreferenceScreen>

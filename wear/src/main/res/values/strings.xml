@@ -17,6 +17,7 @@
     <string name="heart_rate_manual_sync_finished_success">Sync done!</string>
     <string name="heart_rate_manual_sync_finished_failure">Sync failed!</string>
     <string name="settings_measuring_interval_title">Measure interval</string>
+    <string name="settings_ambient_ui_update_time_lapse_title">Ambient update frequency</string>
     <string name="settings_notification_title">Measurement notification</string>
     <string name="notification_measuring_title">Measuring...</string>
     <string name="notification_measuring_message">Heart Rate Monitor is currently measuring your heart rate</string>

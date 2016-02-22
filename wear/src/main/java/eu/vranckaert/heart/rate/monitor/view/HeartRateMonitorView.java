@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import eu.vranckaert.heart.rate.monitor.R;
+import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.shared.util.DateUtil;
 import eu.vranckaert.heart.rate.monitor.util.BoxInsetLayoutUtil;
@@ -29,7 +30,6 @@ import java.util.Date;
  */
 public class HeartRateMonitorView extends AbstractViewHolder implements OnClickListener {
     private static final int MINIMUM_BPM = 50;
-    private static final long AMBIENT_UI_UPDATE_TIME_LAPSE = 10000L;
 
     private final HeartRateListener mListener;
     private final TextView mTimeLabel;
@@ -106,10 +106,12 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
         mBeatingBpm = heartBeat;
 
         long measuringTimeLapse = 0L;
+        long ambientModeUiUpdateTimelapse = WearUserPreferences.getInstance().getAmbientModeUiUpdateTimeLapse();
         if (mAmbientMode) {
             if (mPrevMeasuringTime == null) {
                 Log.d("dirk", "Setting prev measure time");
-                mPrevMeasuringTime = new Date().getTime() - AMBIENT_UI_UPDATE_TIME_LAPSE;
+                mPrevMeasuringTime = new Date().getTime() -
+                        ambientModeUiUpdateTimelapse;
             }
 
             long currentTime = new Date().getTime();
@@ -117,7 +119,7 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
             Log.d("dirk", "measuringTimeLapse=" + measuringTimeLapse);
         }
 
-        if (!mAmbientMode || measuringTimeLapse >= AMBIENT_UI_UPDATE_TIME_LAPSE) {
+        if (!mAmbientMode || measuringTimeLapse >= ambientModeUiUpdateTimelapse) {
             updateHeartRateMonitorView();
             Log.d("dirk", "Setting prev measure time");
             mPrevMeasuringTime = new Date().getTime();

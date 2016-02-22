@@ -14,4 +14,14 @@
         <item>14400000</item>
         <item>43200000</item>
     </string-array>
+    <string-array name="settings_ambient_mode_ui_update_interval_entries">
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>20 seconds</item>
+    </string-array>
+    <string-array name="settings_ambient_mode_ui_update_interval_entry_values">
+        <item>5000</item>
+        <item>10000</item>
+        <item>20000</item>
+    </string-array>
 </resources>

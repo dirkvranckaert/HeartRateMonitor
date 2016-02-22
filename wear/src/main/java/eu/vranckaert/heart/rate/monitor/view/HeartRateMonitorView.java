@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,10 +28,10 @@ import java.util.Date;
  * @author Dirk Vranckaert
  */
 public class HeartRateMonitorView extends AbstractViewHolder implements OnClickListener {
-    private final HeartRateListener mListener;
-
     private static final int MINIMUM_BPM = 50;
+    private static final long AMBIENT_UI_UPDATE_TIME_LAPSE = 10000L;
 
+    private final HeartRateListener mListener;
     private final TextView mTimeLabel;
     private final TextView mTitle;
     private final ImageView mHeartImage;
@@ -46,7 +47,9 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
     private boolean mFirstMeasurementDetected = false;
     private boolean mBeating = false;
     private boolean mAmbientMode = false;
+    private Long mPrevMeasuringTime = null;
     private int mBeatingBpm;
+    private boolean mStartedFollowingHeartBeat;
 
     public HeartRateMonitorView(LayoutInflater inflater, ViewGroup parent, HeartRateListener listener) {
         super(inflater, parent, R.layout.heart_rate_monitor);
@@ -102,8 +105,22 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
         mFirstMeasurementDetected = true;
         mBeatingBpm = heartBeat;
 
-        if (!mAmbientMode) {
+        long measuringTimeLapse = 0L;
+        if (mAmbientMode) {
+            if (mPrevMeasuringTime == null) {
+                Log.d("dirk", "Setting prev measure time");
+                mPrevMeasuringTime = new Date().getTime() - AMBIENT_UI_UPDATE_TIME_LAPSE;
+            }
+
+            long currentTime = new Date().getTime();
+            measuringTimeLapse =  currentTime - mPrevMeasuringTime;
+            Log.d("dirk", "measuringTimeLapse=" + measuringTimeLapse);
+        }
+
+        if (!mAmbientMode || measuringTimeLapse >= AMBIENT_UI_UPDATE_TIME_LAPSE) {
             updateHeartRateMonitorView();
+            Log.d("dirk", "Setting prev measure time");
+            mPrevMeasuringTime = new Date().getTime();
         }
     }
 
@@ -137,12 +154,50 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.action) {
+            mStartedFollowingHeartBeat = false;
             mMeasuring = mListener.toggleHeartRateMonitor();
             mFirstMeasurementDetected = false;
             mBeating = mMeasuring;
-            playHeartBeat();
             updateHeartRateMonitorView();
+            if (mMeasuring) {
+                playHeartBeat();
+            }
         }
+    }
+
+    private void toggleFollowingHeartBeat(boolean started) {
+        if (!mStartedFollowingHeartBeat && mMeasuring) {
+            return;
+        }
+
+        mAction.setEnabled(!started);
+        mStartedFollowingHeartBeat = started;
+        mMeasuring = started;
+        mFirstMeasurementDetected = false;
+        mBeating = started;
+        updateHeartRateMonitorView();
+        if (mMeasuring && !mAmbientMode) {
+            playHeartBeat();
+        }
+    }
+
+    public void startFollowingHeartBeat() {
+        toggleFollowingHeartBeat(true);
+    }
+
+    public void stopFollowingHeartBeat() {
+        toggleFollowingHeartBeat(false);
+    }
+
+    public void followingHeartBeat(int bpm) {
+        if (!mStartedFollowingHeartBeat && mMeasuring) {
+            return;
+        }
+
+        if (!mStartedFollowingHeartBeat) {
+            startFollowingHeartBeat();
+        }
+        setMeasuringHeartBeat(bpm);
     }
 
     private void playHeartBeat() {

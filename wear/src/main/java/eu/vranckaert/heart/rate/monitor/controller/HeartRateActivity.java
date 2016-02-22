@@ -15,6 +15,8 @@ import android.view.View;
 import android.widget.Toast;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
+import eu.vranckaert.heart.rate.monitor.controller.ConfigObserver.ConfigObservable;
+import eu.vranckaert.heart.rate.monitor.controller.HeartRateObserver.HeartRateObservable;
 import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
@@ -44,7 +46,7 @@ import java.util.Map.Entry;
  * @author Dirk Vranckaert
  */
 public class HeartRateActivity extends WearableActivity implements SensorEventListener, HeartRateListener,
-        HeartRateMeasurementTaskListener {
+        HeartRateMeasurementTaskListener, HeartRateObservable, ConfigObservable {
     private static final int REQUEST_CODE_PERMISSION_BODY_SENSOR = 0;
 
     private HeartRateView mView;
@@ -71,6 +73,10 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initView();
+    }
+
+    private void initView() {
         if (getSystemService(Context.SENSOR_SERVICE) != null) {
             mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             if (mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE) != null) {
@@ -113,11 +119,11 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
         Log.d("dirk", "isAmbient=" + isAmbient());
         mView.startAmbientMode();
 
-//        if (mMeasuring) {
-//
-//        } else {
-//            finish();
-//        }
+        //        if (mMeasuring) {
+        //
+        //        } else {
+        //            finish();
+        //        }
 
         super.onEnterAmbient(ambientDetails);
     }
@@ -342,5 +348,52 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
                 Toast.makeText(this, success ? R.string.heart_rate_manual_sync_finished_success :
                         R.string.heart_rate_manual_sync_finished_failure, Toast.LENGTH_SHORT);
         mPhoneSyncToast.show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        HeartRateObserver.register(this);
+        ConfigObserver.register(this);
+    }
+
+    @Override
+    protected void onPause() {
+        HeartRateObserver.unregister(this);
+        ConfigObserver.unregister(this);
+
+        super.onPause();
+    }
+
+    @Override
+    public void onHeartBeatMeasured(float bpm) {
+        mMonitorView.followingHeartBeat((int) bpm);
+    }
+
+    @Override
+    public void onStartMeasuringHeartBeat() {
+        mMonitorView.startFollowingHeartBeat();
+    }
+
+    @Override
+    public void onStopMeasuringHeartBeat() {
+        mMonitorView.stopFollowingHeartBeat();
+        loadHistoricalData();
+    }
+
+    @Override
+    public void onHeartRateMeasurementsSentToPhone() {
+        loadHistoricalData();
+    }
+
+    @Override
+    public void onMeasurementsAckReceived() {
+        loadHistoricalData();
+    }
+
+    @Override
+    public void onPhoneSetupCompletionChanged() {
+        initView();
     }
 }

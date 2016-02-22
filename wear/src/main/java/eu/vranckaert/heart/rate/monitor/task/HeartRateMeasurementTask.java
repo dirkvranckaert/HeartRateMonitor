@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import eu.vranckaert.heart.rate.monitor.WearBusinessService;
 import eu.vranckaert.heart.rate.monitor.WearHeartRateApplication;
+import eu.vranckaert.heart.rate.monitor.controller.HeartRateObserver;
 import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
@@ -54,6 +55,7 @@ public class HeartRateMeasurementTask extends AsyncTask<List<Measurement>, Void,
 
         boolean result = WearBusinessService.getInstance().registerHeartRates(measurements);
         Log.d("dirk-background", "Heart rate measurement sync task is is done...");
+        HeartRateObserver.onHeartRateMeasurmentsSentToPhone();
         return result;
     }
 

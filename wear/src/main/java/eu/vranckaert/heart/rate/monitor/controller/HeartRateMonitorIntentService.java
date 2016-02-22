@@ -154,6 +154,7 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
             notificationManager.notify(MEASURING_NOTIFICATION, notificationBuilder.build());
         }
 
+        HeartRateObserver.onStartMeasuringHeartBeat();
         mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_UI);
     }
 
@@ -169,6 +170,7 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
 
         mMeasuring = false;
         mSensorManager.unregisterListener(this, mHeartRateSensor);
+        HeartRateObserver.onStopMeasuringHeartBeat();
     }
 
     @Override
@@ -187,6 +189,7 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
             }
             float value = event.values[event.values.length - 1];
             mMeasuredValues.put(currentTime, value);
+            HeartRateObserver.onHeartBeatMeasured(value);
             if (mMinimumHeartBeat == -1 || value < mMinimumHeartBeat) {
                 mMinimumHeartBeat = value;
             }

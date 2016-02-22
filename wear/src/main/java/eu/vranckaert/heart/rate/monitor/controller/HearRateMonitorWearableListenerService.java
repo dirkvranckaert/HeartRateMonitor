@@ -46,6 +46,8 @@ public class HearRateMonitorWearableListenerService extends WearableListenerServ
                         measurement.setSyncedWithPhone(true);
                         measurementDao.update(measurement);
                     }
+
+                    HeartRateObserver.onMeasurementsAckReceived();
                 }
             }
         }
@@ -62,10 +64,12 @@ public class HearRateMonitorWearableListenerService extends WearableListenerServ
                 preferences.setPhoneSetupCompleted(true);
                 preferences.setHasntRunBefore();
                 SetupBroadcastReceiver.setupMeasuring(this);
+                ConfigObserver.onPhoneSetupCompletionChanged();
                 break;
             case WearURL.URL_SETUP_UNCOMPLETED:
                 preferences.setPhoneSetupCompleted(false);
                 preferences.setHasntRunBefore();
+                ConfigObserver.onPhoneSetupCompletionChanged();
                 break;
         }
     }

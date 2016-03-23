@@ -134,7 +134,7 @@ public class MainActivity extends Activity implements OnClickListener,
         if (!UserPreferences.getInstance().getGoogleFitConnected()) {
             menu.removeItem(R.id.disconnect);
         }
-        if (true || !BuildConfig.DEBUG) {
+        if (!BuildConfig.DEBUG) {
             menu.removeItem(R.id.debug_settings);
         }
         if (!mContainsNotSyncedMeasurements) {

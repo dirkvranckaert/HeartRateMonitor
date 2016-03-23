@@ -439,10 +439,7 @@ public class MainActivity extends Activity implements OnClickListener,
 
         @Override
         protected void onPreExecute() {
-            mProgress = new ProgressDialog.Builder(mActivity)
-                    .setMessage(R.string.google_fit_setup_setup_fit)
-                    .setCancelable(false)
-                    .show();
+            mProgress = ProgressDialog.show(mActivity, null, getString(R.string.google_fit_setup_disconnecting), true, false);
         }
 
         @Override
@@ -457,7 +454,7 @@ public class MainActivity extends Activity implements OnClickListener,
         @Override
         protected void onPostExecute(Void mVoid) {
             mProgress.dismiss();
-            mActivity.initScreen(false);
+            mActivity.initScreen(true);
         }
     }
 

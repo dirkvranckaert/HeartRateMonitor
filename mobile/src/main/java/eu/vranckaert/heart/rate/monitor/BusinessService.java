@@ -151,7 +151,7 @@ public class BusinessService {
             return;
         }
 
-        Status status = Fitness.RecordingApi.unsubscribe(googleApiClient, DataType.TYPE_ACTIVITY_SAMPLE).await();
+        Status status = Fitness.RecordingApi.unsubscribe(googleApiClient, type).await();
         if (status.isSuccess()) {
             Log.i("dirk-background", "Successfully unsubscribed for data type: " + type.toString());
         } else {

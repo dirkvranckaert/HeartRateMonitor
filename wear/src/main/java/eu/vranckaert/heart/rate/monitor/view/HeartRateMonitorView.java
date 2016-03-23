@@ -136,7 +136,7 @@ public class HeartRateMonitorView extends AbstractViewHolder implements OnClickL
                 "" + (int) mLastMeasurement.getAverageHeartBeat());
         mAction.setText(
                 mMeasuring ? R.string.heart_rate_monitor_action_stop : R.string.heart_rate_monitor_action_start);
-        mTimestamp.setText(DateUtil.formatDateTime(new Date(mLastMeasurement.getStartMeasurement())));
+        mTimestamp.setText(mLastMeasurement == null ? "" : DateUtil.formatDateTime(new Date(mLastMeasurement.getStartMeasurement())));
         updateVisibilities();
     }
 

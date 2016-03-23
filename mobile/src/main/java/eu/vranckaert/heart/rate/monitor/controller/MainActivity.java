@@ -31,6 +31,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessStatusCodes;
 import com.google.android.gms.fitness.data.DataType;
+import eu.vranckaert.heart.rate.monitor.BuildConfig;
 import eu.vranckaert.heart.rate.monitor.BusinessService;
 import eu.vranckaert.heart.rate.monitor.FitHelper;
 import eu.vranckaert.heart.rate.monitor.R;
@@ -132,6 +133,9 @@ public class MainActivity extends Activity implements OnClickListener,
         new MenuInflater(this).inflate(R.menu.main_menu, menu);
         if (!UserPreferences.getInstance().getGoogleFitConnected()) {
             menu.removeItem(R.id.disconnect);
+        }
+        if (true || !BuildConfig.DEBUG) {
+            menu.removeItem(R.id.debug_settings);
         }
         if (!mContainsNotSyncedMeasurements) {
             MenuItem menuItem = menu.findItem(R.id.sync_now);

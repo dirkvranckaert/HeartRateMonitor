@@ -131,16 +131,22 @@ public class MainActivity extends Activity implements OnClickListener,
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
         new MenuInflater(this).inflate(R.menu.main_menu, menu);
-        if (!UserPreferences.getInstance().getGoogleFitConnected()) {
+
+        boolean hasGoogleFitConnection = UserPreferences.getInstance().getGoogleFitConnected();
+
+        if (!hasGoogleFitConnection) {
             menu.removeItem(R.id.disconnect);
+            menu.removeItem(R.id.sync_now);
+        } else {
+            if (!mContainsNotSyncedMeasurements) {
+                MenuItem menuItem = menu.findItem(R.id.sync_now);
+                menuItem.setIcon(R.drawable.ic_sync_disabled_white_36dp);
+            }
         }
         if (!BuildConfig.DEBUG) {
             menu.removeItem(R.id.debug_settings);
         }
-        if (!mContainsNotSyncedMeasurements) {
-            MenuItem menuItem = menu.findItem(R.id.sync_now);
-            menuItem.setIcon(R.drawable.ic_sync_disabled_white_36dp);
-        }
+
         return true;
     }
 

@@ -10,5 +10,6 @@
         android:showAsAction="always"/>
     <item android:id="@+id/disconnect"
           android:title="@string/google_fit_setup_disconnect"
+        android:icon="@drawable/ic_bug_report_white_36dp"
           android:showAsAction="never"/>
 </menu>

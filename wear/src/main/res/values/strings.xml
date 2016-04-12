@@ -21,4 +21,7 @@
     <string name="settings_notification_title">Measurement notification</string>
     <string name="notification_measuring_title">Measuring...</string>
     <string name="notification_measuring_message">Heart Rate Monitor is currently measuring your heart rate</string>
+    <string name="heart_rate_body_sensor_permission_denied">You should grant the application permission to the body sensors in order to work correctly.</string>
+    <string name="heart_rate_body_sensor_permission_grant">Grant now</string>
+    <string name="heart_rate_body_sensor_permission_denied_open_settings">Open your device settings and check the permission for this app to enable the body sensors permission. Without the app cannot run.</string>
 </resources>

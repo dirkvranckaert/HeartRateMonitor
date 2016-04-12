@@ -121,7 +121,7 @@ public class HeartRateTestActivity extends WearableActivity implements SensorEve
                 stopHearRateMonitor();
             }
         } else if (v.getId() == R.id.schedule_test) {
-            AlarmSchedulingService.getInstance().scheduleHeartRateMonitorInXMillis(30000);
+            AlarmSchedulingService.getInstance().scheduleHeartRateMonitorInXMillis(this, 30000);
         } else if (v.getId() == R.id.notification_test) {
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

@@ -10,20 +10,29 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_box="all"
-        android:layout_gravity="center_vertical">
+        android:gravity="center"
+        android:layout_gravity="center">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="6dp"
-            android:src="@drawable/ic_info"
+            android:src="@drawable/ic_warning"
             android:tint="@color/grey"/>
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/heart_rate_unavailable"/>
+            android:id="@+id/message"
+            android:text="@string/heart_rate_body_sensor_permission_denied"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:id="@+id/grant"
+            android:text="@string/heart_rate_body_sensor_permission_grant"/>
     </LinearLayout>
 </android.support.wearable.view.BoxInsetLayout>

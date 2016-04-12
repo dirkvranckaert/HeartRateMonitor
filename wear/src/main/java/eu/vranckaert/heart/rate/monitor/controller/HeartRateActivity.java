@@ -8,7 +8,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +19,7 @@ import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.controller.ConfigObserver.ConfigObservable;
 import eu.vranckaert.heart.rate.monitor.controller.HeartRateObserver.HeartRateObservable;
+import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
 import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
@@ -25,6 +28,8 @@ import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
 import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask.HeartRateMeasurementTaskListener;
 import eu.vranckaert.heart.rate.monitor.util.DeviceUtil;
 import eu.vranckaert.heart.rate.monitor.view.AbstractViewHolder;
+import eu.vranckaert.heart.rate.monitor.view.HeartRateBodySensorPermissionDenied;
+import eu.vranckaert.heart.rate.monitor.view.HeartRateBodySensorPermissionDenied.HeartRateBodySensorPermissionDeniedListener;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateHistoryView;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateMonitorView;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateSetupView;
@@ -46,7 +51,8 @@ import java.util.Map.Entry;
  * @author Dirk Vranckaert
  */
 public class HeartRateActivity extends WearableActivity implements SensorEventListener, HeartRateListener,
-        HeartRateMeasurementTaskListener, HeartRateObservable, ConfigObservable {
+        HeartRateMeasurementTaskListener, HeartRateObservable, ConfigObservable,
+        HeartRateBodySensorPermissionDeniedListener {
     private static final int REQUEST_CODE_PERMISSION_BODY_SENSOR = 0;
 
     private HeartRateView mView;
@@ -73,32 +79,41 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initView();
+        initView(true);
     }
 
-    private void initView() {
+    private void initView(boolean askForPermission) {
         if (getSystemService(Context.SENSOR_SERVICE) != null) {
             mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-            if (mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE) != null) {
-                mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
 
-                boolean phoneSetupCompleted = WearUserPreferences.getInstance().isPhoneSetupCompleted();
-                if (phoneSetupCompleted) {
-                    setAmbientEnabled();
-                    if (mView == null) {
-                        mView = new HeartRateView(this, this);
-                    }
-                    setContentView(mView.getView());
+            boolean hasPermission = PermissionUtil.hasPermission(this, permission.BODY_SENSORS);
+            if (hasPermission) {
+                if (mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE) != null) {
+                    mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
 
-                    if (!WearUserPreferences.getInstance().hasRunBefore()) {
-                        WearUserPreferences.getInstance().setHasRunBefore();
-                        SetupBroadcastReceiver.setupMeasuring(this);
+                    boolean phoneSetupCompleted = WearUserPreferences.getInstance().isPhoneSetupCompleted();
+                    if (phoneSetupCompleted) {
+                        setAmbientEnabled();
+                        if (mView == null) {
+                            mView = new HeartRateView(this, this);
+                        }
+                        setContentView(mView.getView());
+
+                        if (!WearUserPreferences.getInstance().hasRunBefore()) {
+                            WearUserPreferences.getInstance().setHasRunBefore();
+                            SetupBroadcastReceiver.setupMeasuring(this);
+                        }
+                    } else {
+                        phoneSetupNotYetCompleted();
                     }
                 } else {
-                    phoneSetupNotYetCompleted();
+                    heartRateSensorNotSupported();
                 }
             } else {
-                heartRateSensorNotSupported();
+                heartRatePermissionDenied();
+                if (askForPermission) {
+                    PermissionUtil.requestPermission(this, REQUEST_CODE_PERMISSION_BODY_SENSOR, permission.BODY_SENSORS, null);
+                }
             }
         } else {
             heartRateSensorNotSupported();
@@ -109,6 +124,11 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
         setContentView(new HeartRateUnavailableView(this).getView());
     }
 
+    private void heartRatePermissionDenied() {
+        boolean canShowPermissionRequest = PermissionUtil.shouldShowRequestPermissionRationale(this, permission.BODY_SENSORS);
+        setContentView(new HeartRateBodySensorPermissionDenied(this, this, canShowPermissionRequest).getView());
+    }
+
     private void phoneSetupNotYetCompleted() {
         setContentView(new HeartRateSetupView(this).getView());
     }
@@ -117,13 +137,11 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     public void onEnterAmbient(Bundle ambientDetails) {
         Log.d("dirk", "onEnterAmbient");
         Log.d("dirk", "isAmbient=" + isAmbient());
-        mView.startAmbientMode();
-
-        //        if (mMeasuring) {
-        //
-        //        } else {
-        //            finish();
-        //        }
+        if (mView != null) {
+            mView.startAmbientMode();
+        } else {
+            finish();
+        }
 
         super.onEnterAmbient(ambientDetails);
     }
@@ -132,7 +150,11 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
     public void onExitAmbient() {
         Log.d("dirk", "onExitAmbient");
         Log.d("dirk", "isAmbient=" + isAmbient());
-        mView.stopAmbientMode();
+        if (mView != null) {
+            mView.stopAmbientMode();
+        } else {
+            finish();
+        }
 
         super.onExitAmbient();
     }
@@ -155,7 +177,7 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
         }
 
         if (DeviceUtil.isCharging()) {
-            // TODO show message to the user somehow that while charging the heart rate cannot be measured...
+            // Silently stop measuring as the device is charging
             clearMeasuredValues();
             mMinimumHeartBeat = -1;
             mMaximumHeartBeat = -1;
@@ -288,13 +310,10 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == REQUEST_CODE_PERMISSION_BODY_SENSOR) {
-            if (permission.BODY_SENSORS.equals(permissions[0]) &&
-                    PackageManager.PERMISSION_GRANTED == grantResults[0]) {
-                toggleHeartRateMonitor();
-            }
-            return;
+        if (permissions[0].equals(permission.BODY_SENSORS) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            AlarmSchedulingService.getInstance().rescheduleHeartRateMeasuringAlarms(this);
         }
+        initView(false);
     }
 
     @Override
@@ -394,6 +413,11 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
 
     @Override
     public void onPhoneSetupCompletionChanged() {
-        initView();
+        initView(true);
+    }
+
+    @Override
+    public void grantBodySensorPermission() {
+        PermissionUtil.requestPermission(this, REQUEST_CODE_PERMISSION_BODY_SENSOR, permission.BODY_SENSORS, null);
     }
 }

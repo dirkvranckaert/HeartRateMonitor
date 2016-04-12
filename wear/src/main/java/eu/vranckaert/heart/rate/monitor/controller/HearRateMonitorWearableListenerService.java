@@ -9,6 +9,7 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
+import eu.vranckaert.heart.rate.monitor.service.AlarmSchedulingService;
 import eu.vranckaert.heart.rate.monitor.shared.WearKeys;
 import eu.vranckaert.heart.rate.monitor.shared.WearURL;
 import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
@@ -63,12 +64,13 @@ public class HearRateMonitorWearableListenerService extends WearableListenerServ
             case WearURL.URL_SETUP_COMPLETED:
                 preferences.setPhoneSetupCompleted(true);
                 preferences.setHasntRunBefore();
-                SetupBroadcastReceiver.setupMeasuring(this);
+                AlarmSchedulingService.getInstance().rescheduleHeartRateMeasuringAlarms(this);
                 ConfigObserver.onPhoneSetupCompletionChanged();
                 break;
             case WearURL.URL_SETUP_UNCOMPLETED:
                 preferences.setPhoneSetupCompleted(false);
                 preferences.setHasntRunBefore();
+                AlarmSchedulingService.getInstance().cancelAllHeartRateMeasuringAlarms();
                 ConfigObserver.onPhoneSetupCompletionChanged();
                 break;
         }

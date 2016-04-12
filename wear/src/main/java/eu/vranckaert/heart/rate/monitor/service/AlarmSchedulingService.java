@@ -1,9 +1,12 @@
 package eu.vranckaert.heart.rate.monitor.service;
 
+import android.Manifest.permission;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.util.Log;
 import eu.vranckaert.heart.rate.monitor.shared.dao.IMeasurementDao;
 import eu.vranckaert.heart.rate.monitor.shared.dao.MeasurementDao;
@@ -12,6 +15,7 @@ import eu.vranckaert.heart.rate.monitor.shared.model.Measurement;
 import eu.vranckaert.heart.rate.monitor.WearHeartRateApplication;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.controller.HeartRateMonitorIntentService;
+import eu.vranckaert.heart.rate.monitor.shared.permission.PermissionUtil;
 import eu.vranckaert.heart.rate.monitor.shared.util.DateUtil;
 
 import java.util.Calendar;
@@ -42,6 +46,24 @@ public class AlarmSchedulingService {
                 Context.ALARM_SERVICE);
     }
 
+    private boolean cannotScheduleHeartRateAlarm(Context context) {
+        if (!PermissionUtil.hasPermission(context, permission.BODY_SENSORS)) {
+            Log.d("dirk", "The body sensors permission have not been granted");
+            return true;
+        }
+        if (WearUserPreferences.getInstance().isPhoneSetupCompleted()) {
+            Log.d("dirk", "The phone setup is not yet completed");
+            return true;
+        }
+        SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE) == null) {
+            Log.d("dirk", "No heart rate sensor is found on the device");
+            return true;
+        }
+
+        return false;
+    }
+
     private PendingIntent getHeartRateMonitorIntent(int requestCode) {
         Context context = WearHeartRateApplication.getInstance().getApplicationContext();
         Intent intent = new Intent(context, HeartRateMonitorIntentService.class);
@@ -49,7 +71,12 @@ public class AlarmSchedulingService {
         return operation;
     }
 
-    public void scheduleHeartRateMonitorInXMillis(int delay) {
+    public void scheduleHeartRateMonitorInXMillis(Context context, int delay) {
+        if (cannotScheduleHeartRateAlarm(context)) {
+            Log.d("dirk", "Not scheduling one-time heart rate measuring alarm!");
+            return;
+        }
+
         Log.d("dirk", "Executing one time heart rate measurement in " + delay + " millis");
         getAlarmManager().cancel(getHeartRateMonitorIntent(REQUEST_CODE_ONE_TIME_HEART_RATE_MEASUREMENT));
 
@@ -62,9 +89,12 @@ public class AlarmSchedulingService {
     }
 
     public void rescheduleHeartRateMeasuringAlarms(Context context) {
-        Log.d("dirk", "Canceling all one time and repeating heart measurment alarms");
-        getAlarmManager().cancel(getHeartRateMonitorIntent(REQUEST_CODE_ONE_TIME_HEART_RATE_MEASUREMENT));
-        getAlarmManager().cancel(getHeartRateMonitorIntent(REQUEST_CODE_REPEATING_HEART_RATE_MEASUREMENT));
+        if (cannotScheduleHeartRateAlarm(context)) {
+            Log.d("dirk", "Not scheduling repeated heart rate measuring alarms!");
+            return;
+        }
+
+        cancelAllHeartRateMeasuringAlarms();
         
         long interval = WearUserPreferences.getInstance().getHeartRateMeasuringInterval();
         IMeasurementDao measurementDao = new MeasurementDao(context);
@@ -75,7 +105,7 @@ public class AlarmSchedulingService {
             Log.d("dirk", "Previous measurement found (previous execution: " + new Date(latestMeasurement.getStartMeasurement()).toString() + ")");
             if ((latestMeasurement.getStartMeasurement() + interval) <= currentTime) {
                 Log.d("dirk", "Next execution will be in past");
-                scheduleHeartRateMonitorInXMillis(0);
+                scheduleHeartRateMonitorInXMillis(context, 0);
                 nextExecution = latestMeasurement.getStartMeasurement() + (2 * interval);
                 while (nextExecution < currentTime) {
                     nextExecution += interval;
@@ -86,7 +116,7 @@ public class AlarmSchedulingService {
                 Log.d("dirk", "Next repeating measurement scheduled at " + new Date(nextExecution).toString());
             }
         } else {
-            nextExecution = currentTime + interval;
+            nextExecution = currentTime + 1000;
             Log.d("dirk", "First repeating measurement scheduled at " + new Date(nextExecution).toString());
         }
 
@@ -97,6 +127,12 @@ public class AlarmSchedulingService {
         Log.d("dirk", "Measurement optimized to run at " + new Date(nextExecution).toString());
         
         getAlarmManager().setRepeating(AlarmManager.RTC_WAKEUP, nextExecution, interval, getHeartRateMonitorIntent(REQUEST_CODE_REPEATING_HEART_RATE_MEASUREMENT));
+    }
+
+    public void cancelAllHeartRateMeasuringAlarms() {
+        Log.d("dirk", "Canceling all one time and repeating heart measurement alarms");
+        getAlarmManager().cancel(getHeartRateMonitorIntent(REQUEST_CODE_ONE_TIME_HEART_RATE_MEASUREMENT));
+        getAlarmManager().cancel(getHeartRateMonitorIntent(REQUEST_CODE_REPEATING_HEART_RATE_MEASUREMENT));
     }
 
     private long getNextExecutionAtQuarterOfHours(Calendar calendar) {

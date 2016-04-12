@@ -51,7 +51,7 @@ public class AlarmSchedulingService {
             Log.d("dirk", "The body sensors permission have not been granted");
             return true;
         }
-        if (WearUserPreferences.getInstance().isPhoneSetupCompleted()) {
+        if (!WearUserPreferences.getInstance().isPhoneSetupCompleted()) {
             Log.d("dirk", "The phone setup is not yet completed");
             return true;
         }

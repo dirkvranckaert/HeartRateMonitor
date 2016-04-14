@@ -14,6 +14,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.CountDownTimer;
 import android.util.Log;
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
@@ -32,8 +33,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Date: 28/05/15
- * Time: 09:33
+ * The HeartRateMonitorIntentService get started by the repeated or one time measuring alarm and is responsible for all
+ * background heart rate measurements. It does some checks to decide weater or not he can start measuring and has
+ * security checks to end measurements after a maximum of {@link ActivityState#DEFAULT_MEASURING_TIMEOUT} or if values
+ * are received after {@link ActivityState#DEFAULT_MEASURING_DURATION}.
  *
  * @author Dirk Vranckaert
  */
@@ -84,6 +87,10 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
         }
     }
 
+    /**
+     * This method is run every time the sensor returns a new heart beat and it checks if maximum duration of
+     * {@link ActivityState#DEFAULT_MEASURING_DURATION} milliseconds is passed or not.
+     */
     private void checkDuration() {
         if (mEndTime == -1) {
             Log.d("dirk-background", "checkDuration (set initial values)");
@@ -95,29 +102,41 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
             Log.d("dirk-background", "checkDuration");
             long currentTime = new Date().getTime();
             if (currentTime >= mEndTime) {
-                stopHeartRateMonitor();
-                float heartBeat = calculateAverageHeartBeat();
-                Measurement measurement = new Measurement();
-                measurement.updateUniqueKey();
-                measurement.setAverageHeartBeat(heartBeat);
-                measurement.setMinimumHeartBeat(mMinimumHeartBeat);
-                measurement.setMaximumHeartBeat(mMaximumHeartBeat);
-                measurement.setStartMeasurement(mStartTime);
-                measurement.setEndMeasurement(currentTime);
-                measurement.setFirstMeasurement(mFirstMeasurement);
-                measurement.setMeasuredValues(mMeasuredValues);
-
-                IMeasurementDao measurementDao = new MeasurementDao(this);
-                measurementDao.save(measurement);
-                new HeartRateMeasurementTask().execute(measurementDao.findMeasurementsToSyncWithPhone());
-
-                // TODO notify UI to be updated if visible right now...
-
-                stopSelf();
+                doStopHeartRateMonitor();
             }
         }
     }
 
+    /**
+     * Stop the heart rate measuring right away. If any heart rates have been measured they will be saved and
+     * synchronisation to the phone will be launched for all measurements that have not yet been synced.
+     */
+    private void doStopHeartRateMonitor() {
+        stopHeartRateMonitor();
+        if (mMeasuring) {
+            float heartBeat = calculateAverageHeartBeat();
+            Measurement measurement = new Measurement();
+            measurement.updateUniqueKey();
+            measurement.setAverageHeartBeat(heartBeat);
+            measurement.setMinimumHeartBeat(mMinimumHeartBeat);
+            measurement.setMaximumHeartBeat(mMaximumHeartBeat);
+            measurement.setStartMeasurement(mStartTime);
+            measurement.setEndMeasurement(new Date().getTime());
+            measurement.setFirstMeasurement(mFirstMeasurement);
+            measurement.setMeasuredValues(mMeasuredValues);
+
+            IMeasurementDao measurementDao = new MeasurementDao(this);
+            measurementDao.save(measurement);
+            new HeartRateMeasurementTask().execute(measurementDao.findMeasurementsToSyncWithPhone());
+        }
+
+        stopSelf();
+    }
+
+    /**
+     * Calculates the average heart beat that has been measured.
+     * @return The average heart beat of the measured values.
+     */
     private float calculateAverageHeartBeat() {
         Log.d("dirk-background", "calculateAverageHeartBeat");
         Log.d("dirk-background", "mMeasuredValues.size=" + mMeasuredValues.size());
@@ -133,6 +152,13 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
         return averageHearBeat;
     }
 
+    /**
+     * Starts heart rate sensor on the device by registering a listener on the sensor manager.<br/>
+     * If setup in the preferences a notification will also be shown to the user indicating that measurement has
+     * started.<br/>
+     * A timer also gets started with a maximum duration of {@link ActivityState#DEFAULT_MEASURING_TIMEOUT} milliseconds
+     * after which the measurement will be force stopped.
+     */
     private void startHeartRateMonitor() {
         Log.d("dirk-background", "startHeartRateMonitor");
 
@@ -155,16 +181,41 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
         }
 
         HeartRateObserver.onStartMeasuringHeartBeat();
+
+        new CountDownTimer(ActivityState.DEFAULT_MEASURING_TIMEOUT, 100) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                if (!mMeasuring) {
+                    // In a good case measuring will have stopped after +/- 15 seconds. If so the timer can be
+                    // cancelled.
+                    cancel();
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                if (mMeasuring) {
+                    // If still measuring after x minutes, then measurement should be cancelled.
+                    doStopHeartRateMonitor();
+                }
+            }
+        }.start();
+
         mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_UI);
     }
 
+    /**
+     * Stops the heart rate measuring on the sensor manager and removes the notification if it has been setup in the
+     * settings.
+     */
     private void stopHeartRateMonitor() {
         Log.d("dirk-background", "stopHeartRateMonitor");
 
         if (WearUserPreferences.getInstance().showHeartRateMeasuementNotification()) {
             Log.d("dirk", "Dismissing notification...");
 
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(MEASURING_NOTIFICATION);
         }
 
@@ -202,6 +253,6 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        // Not necessary for this purpose
     }
 }

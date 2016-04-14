@@ -342,13 +342,14 @@ public class Measurement implements Serializable {
         }
 
         String result = "";
-        if (timeCheckFailed) {
-            result = addSeperator(result, "|");
-            result += "TIME_CHECK(" + (timeBeforeFirstMeasurement / 1000) + "s)";
-        } else if (measuredHeartRateCountFailed) {
-            result = addSeperator(result, "|");
-            result += "HEART_RATE_COUNT(" + heartRateCount + ")";
-        } else if (measurementHeartRateDropCheckFailed) {
+//        if (timeCheckFailed) {
+//            result = addSeperator(result, "|");
+//            result += "TIME_CHECK(" + (timeBeforeFirstMeasurement / 1000) + "s)";
+//        } else if (measuredHeartRateCountFailed) {
+//            result = addSeperator(result, "|");
+//            result += "HEART_RATE_COUNT(" + heartRateCount + ")";
+//        } else
+        if (measurementHeartRateDropCheckFailed) {
             result = addSeperator(result, "|");
             result += "HEART_RATE_DROP";
         } else if (measuremntCannotAwakeFromDeathCheckFailed) {

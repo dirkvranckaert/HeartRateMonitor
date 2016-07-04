@@ -2,6 +2,7 @@ package eu.vranckaert.heart.rate.monitor;
 
 import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.wearable.DataApi.DataItemResult;
@@ -44,6 +45,7 @@ public class WearBusinessService {
                     .build();
             ConnectionResult connectionResult = mGoogleApiClient.blockingConnect();
             if (!connectionResult.isSuccess()) {
+                GooglePlayServicesUtil.showErrorNotification(connectionResult.getErrorCode(), WearHeartRateApplication.getContext());
                 return null;
             }
         }
@@ -72,11 +74,15 @@ public class WearBusinessService {
         putDataMapReq.getDataMap().putString(WearKeys.MEASUREMENTS, Measurement.toJSONList(measurements));
         putDataMapReq.getDataMap().putLong("timestamp", new Date().getTime());
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
-        PendingResult<DataItemResult> pendingResult = Wearable.DataApi.putDataItem(getGoogleApiClient(), putDataReq);
-        DataItemResult result = pendingResult.await();
-        boolean success = result.getStatus().isSuccess();
-        Log.d("dirk", "Measured heart rates synced with phone? " + success);
-        getGoogleApiClient().disconnect();
-        return success;
+        GoogleApiClient googleApiClient = getGoogleApiClient();
+        if (googleApiClient != null) {
+            PendingResult<DataItemResult> pendingResult = Wearable.DataApi.putDataItem(googleApiClient, putDataReq);
+            DataItemResult result = pendingResult.await();
+            boolean success = result.getStatus().isSuccess();
+            Log.d("dirk", "Measured heart rates synced with phone? " + success);
+            getGoogleApiClient().disconnect();
+            return success;
+        }
+        return false;
     }
 }

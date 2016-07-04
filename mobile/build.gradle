@@ -39,6 +39,6 @@ dependencies {
     //wearApp project(':wear')
     wearApp files('../wear/build/outputs/apk/wearable.apk')
     compile project(':shared')
-    compile 'com.google.android.gms:play-services:+'
-    compile 'com.google.android.gms:play-services-fitness:+'
+    compile 'com.google.android.gms:play-services:9.0.2'
+    compile 'com.google.android.gms:play-services-fitness:9.0.2'
 }

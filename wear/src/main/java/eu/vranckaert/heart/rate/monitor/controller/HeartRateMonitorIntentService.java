@@ -34,9 +34,8 @@ import java.util.Map.Entry;
 
 /**
  * The HeartRateMonitorIntentService get started by the repeated or one time measuring alarm and is responsible for all
- * background heart rate measurements. It does some checks to decide weater or not he can start measuring and has
- * security checks to end measurements after a maximum of {@link ActivityState#DEFAULT_MEASURING_TIMEOUT} or if values
- * are received after {@link ActivityState#DEFAULT_MEASURING_DURATION}.
+ * background heart rate measurements. It does some checks to decide if he can start measuring and has
+ * security checks to end measurements if values are received after {@link ActivityState#DEFAULT_MEASURING_DURATION}.
  *
  * @author Dirk Vranckaert
  */
@@ -112,8 +111,9 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
      * synchronisation to the phone will be launched for all measurements that have not yet been synced.
      */
     private void doStopHeartRateMonitor() {
+        boolean wasMeasuring = mMeasuring;
         stopHeartRateMonitor();
-        if (mMeasuring) {
+        if (wasMeasuring) {
             float heartBeat = calculateAverageHeartBeat();
             Measurement measurement = new Measurement();
             measurement.updateUniqueKey();
@@ -181,25 +181,6 @@ public class HeartRateMonitorIntentService extends IntentService implements Sens
         }
 
         HeartRateObserver.onStartMeasuringHeartBeat();
-
-        new CountDownTimer(ActivityState.DEFAULT_MEASURING_TIMEOUT, 100) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                if (!mMeasuring) {
-                    // In a good case measuring will have stopped after +/- 15 seconds. If so the timer can be
-                    // cancelled.
-                    cancel();
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                if (mMeasuring) {
-                    // If still measuring after x minutes, then measurement should be cancelled.
-                    doStopHeartRateMonitor();
-                }
-            }
-        }.start();
 
         mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_UI);
     }

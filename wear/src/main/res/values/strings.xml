@@ -24,4 +24,5 @@
     <string name="heart_rate_body_sensor_permission_denied">You should grant the application permission to the body sensors in order to work correctly.</string>
     <string name="heart_rate_body_sensor_permission_grant">Grant now</string>
     <string name="heart_rate_body_sensor_permission_denied_open_settings">Open your device settings and check the permission for this app to enable the body sensors permission. Without the app cannot run.</string>
+    <string name="google_play_services_issue">For this app to work correctly your Google Play Services should be up-to-date. Take your phone and go the Google Play store to verify it\'s up-to-date.</string>
 </resources>

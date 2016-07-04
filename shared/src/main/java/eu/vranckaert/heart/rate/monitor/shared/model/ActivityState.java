@@ -18,7 +18,6 @@ public class ActivityState {
      */
     public static final long DEFAULT_MEASURING_INTERVAL = DateUtil.convertMinutesToMillis(60);
     public static final int DEFAULT_MEASURING_DURATION = 15000;
-    public static final int DEFAULT_MEASURING_TIMEOUT = 120000;
 
     public static final int IN_VEHICLE = 0;
     public static final int ON_BICYCLE = 1;

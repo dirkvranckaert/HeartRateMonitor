@@ -15,6 +15,10 @@ import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import eu.vranckaert.heart.rate.monitor.R;
 import eu.vranckaert.heart.rate.monitor.WearUserPreferences;
 import eu.vranckaert.heart.rate.monitor.controller.ConfigObserver.ConfigObservable;
@@ -28,6 +32,7 @@ import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask;
 import eu.vranckaert.heart.rate.monitor.task.HeartRateMeasurementTask.HeartRateMeasurementTaskListener;
 import eu.vranckaert.heart.rate.monitor.util.DeviceUtil;
 import eu.vranckaert.heart.rate.monitor.view.AbstractViewHolder;
+import eu.vranckaert.heart.rate.monitor.view.GooglePlayServicesIssueView;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateBodySensorPermissionDenied;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateBodySensorPermissionDenied.HeartRateBodySensorPermissionDeniedListener;
 import eu.vranckaert.heart.rate.monitor.view.HeartRateHistoryView;
@@ -91,20 +96,25 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
                 if (mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE) != null) {
                     mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
 
-                    boolean phoneSetupCompleted = WearUserPreferences.getInstance().isPhoneSetupCompleted();
-                    if (phoneSetupCompleted) {
-                        setAmbientEnabled();
-                        if (mView == null) {
-                            mView = new HeartRateView(this, this);
-                        }
-                        setContentView(mView.getView());
+                    int googlePlayServicesCheck = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+                    if (googlePlayServicesCheck == ConnectionResult.SUCCESS) {
+                        boolean phoneSetupCompleted = WearUserPreferences.getInstance().isPhoneSetupCompleted();
+                        if (phoneSetupCompleted) {
+                            setAmbientEnabled();
+                            if (mView == null) {
+                                mView = new HeartRateView(this, this);
+                            }
+                            setContentView(mView.getView());
 
-                        if (!WearUserPreferences.getInstance().hasRunBefore()) {
-                            WearUserPreferences.getInstance().setHasRunBefore();
-                            SetupBroadcastReceiver.setupMeasuring(this);
+                            if (!WearUserPreferences.getInstance().hasRunBefore()) {
+                                WearUserPreferences.getInstance().setHasRunBefore();
+                                SetupBroadcastReceiver.setupMeasuring(this);
+                            }
+                        } else {
+                            phoneSetupNotYetCompleted();
                         }
                     } else {
-                        phoneSetupNotYetCompleted();
+                        googlePlayServicesNotSupported(googlePlayServicesCheck);
                     }
                 } else {
                     heartRateSensorNotSupported();
@@ -118,6 +128,11 @@ public class HeartRateActivity extends WearableActivity implements SensorEventLi
         } else {
             heartRateSensorNotSupported();
         }
+    }
+
+    private void googlePlayServicesNotSupported(int errorCode) {
+        GooglePlayServicesUtil.showErrorNotification(errorCode, this);
+        setContentView(new GooglePlayServicesIssueView(this).getView());
     }
 
     private void heartRateSensorNotSupported() {

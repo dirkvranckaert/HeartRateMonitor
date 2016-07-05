@@ -51,7 +51,9 @@
 
         <service android:name=".controller.HearRateMonitorWearableListenerService">
             <intent-filter>
-                <action android:name="com.google.android.gms.wearable.BIND_LISTENER"/>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/heart/rate/" />
             </intent-filter>
         </service>
     </application>
